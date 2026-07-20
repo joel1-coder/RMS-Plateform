@@ -14,8 +14,6 @@ import SystemSettings from './pages/admin/SystemSettings'
 import Notifications from './pages/admin/Notifications'
 import Reports from './pages/admin/Reports'
 import VivaVoce from './pages/admin/VivaVoce'
-import ThesisManagement from './pages/admin/ThesisManagement'
-import SynopsisManagement from './pages/admin/SynopsisManagement'
 import ResearchManagement from './pages/admin/ResearchManagement'
 import DRCManagement from './pages/admin/DRCManagement'
 import AssignScholar from './pages/admin/AssignScholar'
@@ -95,8 +93,6 @@ function AppRoutes() {
         <Route path="notifications" element={<Notifications />} />
         <Route path="reports" element={<Reports />} />
         <Route path="viva" element={<VivaVoce />} />
-        <Route path="thesis" element={<ThesisManagement />} />
-        <Route path="synopsis" element={<SynopsisManagement />} />
         <Route path="research" element={<ResearchManagement />} />
         <Route path="drc" element={<DRCManagement />} />
         <Route path="assign" element={<AssignScholar />} />

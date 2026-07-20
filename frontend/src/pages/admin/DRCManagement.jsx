@@ -180,12 +180,13 @@ export default function MeetingManagement() {
       </div>
 
       <div className="page-body">
-        <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+        <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
           {[
             { label: 'Total Meetings', value: meetings.length, icon: '📅', color: 'purple' },
             { label: 'Upcoming', value: meetings.filter(m => m.status === 'Scheduled').length, icon: '⏰', color: 'orange' },
             { label: 'Completed', value: meetings.filter(m => m.status === 'Completed').length, icon: '✅', color: 'green' },
             { label: 'Viva Voce', value: meetings.filter(m => m.type === 'Viva Voce').length, icon: '🎓', color: 'blue' },
+            { label: 'Synopsis Review', value: meetings.filter(m => m.type === 'Synopsis Review').length, icon: '📋', color: 'indigo' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>

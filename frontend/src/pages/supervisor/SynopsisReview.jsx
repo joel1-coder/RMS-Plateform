@@ -25,7 +25,8 @@ export default function SynopsisReview() {
     switch (status) {
       case 'Approved': return 'badge-success'
       case 'Pending': return 'badge-warning'
-      case 'Changes Requested': return 'badge-danger'
+      case 'Changes Requested': return 'badge-warning'
+      case 'Rejected': return 'badge-danger'
       default: return 'badge-gray'
     }
   }
@@ -79,7 +80,10 @@ export default function SynopsisReview() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-danger btn-sm" onClick={() => handleAction(selectedSub.id, 'Changes Requested')}>
+              <button className="btn btn-danger btn-sm" onClick={() => handleAction(selectedSub.id, 'Rejected')}>
+                Reject Synopsis
+              </button>
+              <button className="btn btn-warning btn-sm" onClick={() => handleAction(selectedSub.id, 'Changes Requested')}>
                 Request Changes
               </button>
               <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={() => handleAction(selectedSub.id, 'Approved')}>

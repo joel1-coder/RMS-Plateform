@@ -25,7 +25,8 @@ export default function ThesisReview() {
     switch (status) {
       case 'Approved': return 'badge-success'
       case 'Under Review': return 'badge-warning'
-      case 'Revision Required': return 'badge-danger'
+      case 'Revision Required': return 'badge-warning'
+      case 'Rejected': return 'badge-danger'
       default: return 'badge-gray'
     }
   }
@@ -69,7 +70,10 @@ export default function ThesisReview() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-danger btn-sm" onClick={() => handleAction(selectedSub.id, 'Revision Required')}>
+              <button className="btn btn-danger btn-sm" onClick={() => handleAction(selectedSub.id, 'Rejected')}>
+                Reject Draft
+              </button>
+              <button className="btn btn-warning btn-sm" onClick={() => handleAction(selectedSub.id, 'Revision Required')}>
                 Request Revisions
               </button>
               <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={() => handleAction(selectedSub.id, 'Approved')}>

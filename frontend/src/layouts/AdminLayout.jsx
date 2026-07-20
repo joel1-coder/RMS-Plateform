@@ -6,8 +6,6 @@ const NAV_ITEMS = [
   { to: '/admin', label: 'Dashboard', icon: '🏠', exact: true, section: 'OVERVIEW' },
   { to: '/admin/users', label: 'User Management', icon: '👥', section: 'MANAGEMENT' },
   { to: '/admin/research', label: 'Research', icon: '🔬', section: 'MANAGEMENT' },
-  { to: '/admin/synopsis', label: 'Synopsis', icon: '📋', section: 'MANAGEMENT' },
-  { to: '/admin/thesis', label: 'Thesis', icon: '📚', section: 'MANAGEMENT' },
   { to: '/admin/viva', label: 'Viva Voce', icon: '🎓', section: 'MANAGEMENT' },
   { to: '/admin/assign', label: 'Assign Scholar', icon: '🧑‍🎓', section: 'MANAGEMENT' },
   { to: '/admin/drc', label: 'Meetings', icon: '📅', section: 'MANAGEMENT' },
