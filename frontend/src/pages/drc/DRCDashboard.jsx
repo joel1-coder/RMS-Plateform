@@ -28,18 +28,12 @@ export default function DRCDashboard() {
   return (
     <div className="animate-fade">
       {/* Topbar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 28px', background: '#fff', borderBottom: '1px solid var(--border)',
-        position: 'sticky', top: 0, zIndex: 10,
-      }}>
+      <div className="topbar">
         <div>
-          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Research RMS · DRC Administration</div>
-          <div style={{ fontWeight: 800, fontSize: '17px' }}>DRC Dashboard</div>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <button className="topbar-btn">🔔</button>
-          <button className="btn btn-outline btn-sm" style={{ color: '#0D9488', borderColor: '#0D9488' }}>Schedule Meeting</button>
+          <div className="topbar-title">DRC Dashboard</div>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+            Research RMS · DRC Administration
+          </span>
         </div>
       </div>
 

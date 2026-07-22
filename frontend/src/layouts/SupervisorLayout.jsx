@@ -13,21 +13,42 @@ const NAV_SECTIONS = [
   {
     label: 'REVIEWS',
     items: [
-      { to: '/supervisor/synopsis', label: 'Synopsis', icon: '📋', badge: 3 },
-      { to: '/supervisor/thesis', label: 'Thesis', icon: '📚', badge: 1 },
+      { to: '/supervisor/synopsis', label: 'Synopsis Review', icon: '📋', badge: 3 },
+      { to: '/supervisor/thesis', label: 'Thesis Review', icon: '📚', badge: 1 },
       { to: '/supervisor/publications', label: 'Publications', icon: '📰', badge: 14 },
     ]
   },
   {
-    label: 'MANAGEMENT',
+    label: 'DC MANAGEMENT',
     items: [
-      { to: '/supervisor/meetings', label: 'Meetings', icon: '📅' },
-      { to: '/supervisor/progress', label: 'Progress Reports', icon: '📈' },
+      { to: '/supervisor/dc-members', label: 'DC Members', icon: '👨‍👩‍👧‍👦' },
+      { to: '/supervisor/schedule-dc-meeting', label: 'Schedule DC Meeting', icon: '📅' },
+      { to: '/supervisor/dc-meetings', label: 'DC Meetings & Minutes', icon: '📝' },
     ]
   },
   {
-    label: 'SYSTEM',
+    label: 'ACADEMIC',
     items: [
+      { to: '/supervisor/synopsis-submission', label: 'Synopsis Submission', icon: '📋' },
+      { to: '/supervisor/co-supervisor', label: 'Add Co-Supervisor', icon: '🤝' },
+      { to: '/supervisor/coursework-list', label: 'Coursework List', icon: '📒' },
+      { to: '/supervisor/coursework-details', label: 'Coursework Details', icon: '📝' },
+      { to: '/supervisor/thesis-submission', label: 'Thesis Submission', icon: '📚' },
+      { to: '/supervisor/thesis-viva', label: 'Thesis Viva-voce', icon: '🎓' },
+    ]
+  },
+  {
+    label: 'EXAMINATION',
+    items: [
+      { to: '/supervisor/examiner-panel', label: 'Examiner Panel', icon: '🔬' },
+      { to: '/supervisor/cancellation', label: 'Cancellation', icon: '❌' },
+    ]
+  },
+  {
+    label: 'TOOLS',
+    items: [
+      { to: '/supervisor/meetings', label: 'Meetings', icon: '🗓️' },
+      { to: '/supervisor/progress', label: 'Progress Reports', icon: '📈' },
       { to: '/supervisor/notifications', label: 'Notifications', icon: '🔔', badge: 5 },
       { to: '/supervisor/profile', label: 'Profile', icon: '👤' },
     ]

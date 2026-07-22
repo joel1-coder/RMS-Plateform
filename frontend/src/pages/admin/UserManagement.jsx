@@ -2,22 +2,22 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 const DEFAULT_USERS = [
-  { id: 1, name: 'Dr. Priya Kumar', email: 'supervisor@rms.edu', password: 'super123', role: 'Supervisor', dept: 'Computer Science', status: 'Active', joined: '2023-06-01', scholars: 8 },
-  { id: 2, name: 'Rahul Sharma', email: 'scholar@rms.edu', password: 'scholar123', role: 'Scholar', dept: 'Computer Science', status: 'Active', joined: '2023-08-15', scholars: '-' },
-  { id: 3, name: 'Prof. Anita Verma', email: 'hod@rms.edu', password: 'hod123', role: 'HOD', dept: 'Computer Science', status: 'Active', joined: '2022-01-10', scholars: '-' },
-  { id: 4, name: 'Dr. Mohan Reddy', email: 'drc@rms.edu', password: 'drc123', role: 'DRC', dept: 'Research Committee', status: 'Active', joined: '2022-03-20', scholars: '-' },
-  { id: 5, name: 'Neha Patel', email: 'neha@rms.edu', password: 'scholar123', role: 'Scholar', dept: 'Electronics', status: 'Inactive', joined: '2024-01-05', scholars: '-' },
-  { id: 6, name: 'Dr. Rajan Mehta', email: 'rajan@rms.edu', password: 'super123', role: 'Supervisor', dept: 'Mechanical', status: 'Active', joined: '2021-09-01', scholars: 5 },
-  { id: 7, name: 'Amit Kumar', email: 'amit@rms.edu', password: 'scholar123', role: 'Scholar', dept: 'Civil', status: 'Active', joined: '2024-07-01', scholars: '-' },
-  { id: 8, name: 'Ms. Deepa Nair', email: 'librarian@rms.edu', password: 'library123', role: 'Librarian', dept: 'Central Library', status: 'Active', joined: '2020-05-15', scholars: '-' },
-  { id: 9, name: 'Dr. Admin Singh', email: 'admin@rms.edu', password: 'admin123', role: 'Admin', dept: 'Administration', status: 'Active', joined: '2020-01-01', scholars: '-' },
+  { id: 1, name: 'Dr. Priya Kumar', email: 'supervisor@rms.edu', password: 'super123', role: 'supervisor', dept: 'Computer Science', status: 'Active', joined: '2023-06-01', scholars: 8 },
+  { id: 2, name: 'Rahul Sharma', email: 'scholar@rms.edu', password: 'scholar123', role: 'scholar', dept: 'Computer Science', status: 'Active', joined: '2023-08-15', scholars: '-' },
+  { id: 3, name: 'Prof. Anita Verma', email: 'hod@rms.edu', password: 'hod123', role: 'hod', dept: 'Computer Science', status: 'Active', joined: '2022-01-10', scholars: '-' },
+  { id: 4, name: 'Dr. Mohan Reddy', email: 'drc@rms.edu', password: 'drc123', role: 'drc', dept: 'Research Committee', status: 'Active', joined: '2022-03-20', scholars: '-' },
+  { id: 5, name: 'Neha Patel', email: 'neha@rms.edu', password: 'scholar123', role: 'scholar', dept: 'Electronics', status: 'Inactive', joined: '2024-01-05', scholars: '-' },
+  { id: 6, name: 'Dr. Rajan Mehta', email: 'rajan@rms.edu', password: 'super123', role: 'supervisor', dept: 'Mechanical', status: 'Active', joined: '2021-09-01', scholars: 5 },
+  { id: 7, name: 'Amit Kumar', email: 'amit@rms.edu', password: 'scholar123', role: 'scholar', dept: 'Civil', status: 'Active', joined: '2024-07-01', scholars: '-' },
+  { id: 8, name: 'Ms. Deepa Nair', email: 'librarian@rms.edu', password: 'library123', role: 'librarian', dept: 'Central Library', status: 'Active', joined: '2020-05-15', scholars: '-' },
+  { id: 9, name: 'Dr. Admin Singh', email: 'admin@rms.edu', password: 'admin123', role: 'admin', dept: 'Administration', status: 'Active', joined: '2020-01-01', scholars: '-' },
 ]
 
 const ROLES = ['All', 'Admin', 'Supervisor', 'Scholar', 'HOD', 'DRC', 'Librarian']
 const STATUSES = ['All', 'Active', 'Inactive']
 const ROLE_COLORS = {
-  Admin: 'badge-danger', Supervisor: 'badge-info', Scholar: 'badge-primary',
-  HOD: 'badge-warning', DRC: 'badge-success', Librarian: 'badge-gray',
+  admin: 'badge-danger', supervisor: 'badge-info', scholar: 'badge-primary',
+  hod: 'badge-warning', drc: 'badge-success', librarian: 'badge-gray',
 }
 
 function UserModal({ onClose, onSave, userToEdit = null }) {
@@ -127,7 +127,11 @@ export default function UserManagement() {
     const stored = localStorage.getItem('rms_all_users')
     if (stored) {
       try {
-        setUsers(JSON.parse(stored))
+        // Normalize roles to lowercase to prevent route mismatch loops
+        const parsed = JSON.parse(stored).map(u => ({ ...u, role: u.role ? u.role.toLowerCase() : u.role }))
+        setUsers(parsed)
+        // Re-save normalized data back
+        localStorage.setItem('rms_all_users', JSON.stringify(parsed))
       } catch (e) {
         setUsers(DEFAULT_USERS)
       }
@@ -155,7 +159,7 @@ export default function UserManagement() {
         ...formData,
         id: Date.now(),
         joined: new Date().toISOString().slice(0, 10),
-        scholars: formData.role === 'Supervisor' ? 0 : '-'
+        scholars: formData.role?.toLowerCase() === 'supervisor' ? 0 : '-'
       }
       const updated = [newUser, ...users]
       saveToStorage(updated)
@@ -179,7 +183,7 @@ export default function UserManagement() {
 
   const filtered = users.filter(u => {
     const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
-    const matchRole = filterRole === 'All' || u.role === filterRole
+    const matchRole = filterRole === 'All' || u.role?.toLowerCase() === filterRole.toLowerCase()
     const matchStatus = filterStatus === 'All' || u.status === filterStatus
     return matchSearch && matchRole && matchStatus
   })
@@ -294,7 +298,7 @@ export default function UserManagement() {
                     </td>
                     <td style={{ color: 'var(--text-secondary)' }}>{user.email}</td>
                     <td style={{ color: 'var(--text-muted)', fontFamily: 'monospace', fontSize: '12px' }}>{user.password || '—'}</td>
-                    <td><span className={`badge ${ROLE_COLORS[user.role] || 'badge-gray'}`}>{user.role}</span></td>
+                    <td><span className={`badge ${ROLE_COLORS[user.role] || 'badge-gray'}`}>{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '—'}</span></td>
                     <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{user.dept}</td>
                     <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{user.joined}</td>
                     <td>

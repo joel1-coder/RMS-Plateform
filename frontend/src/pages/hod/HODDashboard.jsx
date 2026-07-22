@@ -24,18 +24,12 @@ export default function HODDashboard() {
   return (
     <div className="animate-fade">
       {/* Topbar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 28px', background: '#fff', borderBottom: '1px solid var(--border)',
-        position: 'sticky', top: 0, zIndex: 10,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <input style={{ padding: '8px 14px 8px 36px', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border)', fontSize: '12.5px', width: '260px', background: '#F8FAFC' }} placeholder="Search scholars, papers, or files..." />
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Research RMS · HOD Dashboard</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <button className="topbar-btn">🔔</button>
-          <button className="btn btn-ghost btn-sm">Admin Portal →</button>
+      <div className="topbar">
+        <div>
+          <div className="topbar-title">HOD Dashboard</div>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+            Research RMS · HOD Administration
+          </span>
         </div>
       </div>
 

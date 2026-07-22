@@ -23,7 +23,7 @@ export default function MyScholars() {
     // 2. Filter scholars assigned to this logged-in supervisor
     const supervisorName = user.name || ''
     const assignedScholars = dbUsers.filter(
-      u => u.role === 'Scholar' &&
+      u => u.role?.toLowerCase() === 'scholar' &&
            u.assignedSupervisor &&
            u.assignedSupervisor.toLowerCase() === supervisorName.toLowerCase()
     )

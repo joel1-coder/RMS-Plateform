@@ -33,27 +33,16 @@ export default function DepartmentScholars() {
   return (
     <div className="animate-fade">
       {/* Topbar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 28px', background: '#fff', borderBottom: '1px solid var(--border)',
-        position: 'sticky', top: 0, zIndex: 10,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '11px', color: '#3B82F6', fontWeight: 700 }}>HOD Dashboard</span>
-          <span style={{ color: 'var(--text-muted)' }}>›</span>
-          <span style={{ fontWeight: 700, fontSize: '15px' }}>Department Scholars</span>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <input style={{ padding: '7px 14px 7px 32px', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border)', fontSize: '12.5px', width: '220px', background: '#F8FAFC' }} placeholder="Search scholars or ID..." value={search} onChange={e => setSearch(e.target.value)} />
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#3B82F6,#1D4ED8)' }}>＋ Register New Scholar</button>
+      <div className="topbar">
+        <div>
+          <div className="topbar-title">Department Scholars</div>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+            Oversee research progress and manage supervisor allocations for PhD candidates
+          </span>
         </div>
       </div>
 
       <div className="page-body">
-        <div style={{ marginBottom: '6px' }}>
-          <div style={{ fontSize: '20px', fontWeight: 800 }}>Department Scholars</div>
-          <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>Oversee research progress and manage supervisor allocations for PhD candidates.</div>
-        </div>
 
         {/* Status Filter Tabs + Area Filter */}
         <div className="filter-bar" style={{ marginBottom: '16px' }}>

@@ -29,26 +29,12 @@ export default function SupervisorDashboard() {
   return (
     <div className="animate-fade">
       {/* Topbar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '16px 28px', background: '#fff', borderBottom: '1px solid var(--border)',
-        position: 'sticky', top: 0, zIndex: 10,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>
-            Dashboard
-          </div>
-          <div style={{ fontWeight: 800, fontSize: '18px', color: 'var(--text-primary)' }}>
+      <div className="topbar">
+        <div>
+          <div className="topbar-title">Supervisor Dashboard</div>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
             Welcome back, Dr. Sarah Jenkins
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <input style={{ padding: '8px 16px 8px 36px', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border)', fontSize: '13px', width: '220px', color: 'var(--text-primary)', background: '#F8FAFC' }} placeholder="Search scholars or documents..." />
-          <button className="topbar-btn" style={{ position: 'relative' }}>
-            🔔
-            <span style={{ position: 'absolute', top: '2px', right: '2px', width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444', border: '2px solid #fff' }} />
-          </button>
-          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#6C63FF,#EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '14px' }}>D</div>
+          </span>
         </div>
       </div>
 

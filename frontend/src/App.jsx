@@ -44,6 +44,17 @@ import ProgressReports from './pages/supervisor/ProgressReports'
 import ReportsAnalytics from './pages/supervisor/ReportsAnalytics'
 import SupervisorNotifications from './pages/supervisor/Notifications'
 import SupervisorProfile from './pages/supervisor/Profile'
+import DCMembersManagement from './pages/supervisor/DCMembersManagement'
+import ScheduleDCMeeting from './pages/supervisor/ScheduleDCMeeting'
+import DCMeetingsManagement from './pages/supervisor/DCMeetingsManagement'
+import ThesisVivaVoce from './pages/supervisor/ThesisVivaVoce'
+import ThesisSubmissionManagement from './pages/supervisor/ThesisSubmissionManagement'
+import CourseworkListManagement from './pages/supervisor/CourseworkListManagement'
+import AddCoSupervisor from './pages/supervisor/AddCoSupervisor'
+import CourseworkDetailsManagement from './pages/supervisor/CourseworkDetailsManagement'
+import SynopsisSubmissionManagement from './pages/supervisor/SynopsisSubmissionManagement'
+import ExaminerPanelManagement from './pages/supervisor/ExaminerPanelManagement'
+import CancellationManagement from './pages/supervisor/CancellationManagement'
 
 // Pages - HOD
 import HODLayout from './layouts/HODLayout'
@@ -67,7 +78,10 @@ import DRCNotifications from './pages/drc/DRCNotifications'
 function ProtectedRoute({ children, allowedRoles }) {
   const { user, isAuthenticated } = useAuth()
   if (!isAuthenticated) return <Navigate to="/login" replace />
-  if (allowedRoles && !allowedRoles.includes(user?.role)) return <Navigate to="/login" replace />
+  if (allowedRoles && !allowedRoles.map(r => r.toLowerCase()).includes(user?.role?.toLowerCase())) {
+    const isRoleRegistered = user?.role && ['admin', 'scholar', 'supervisor', 'hod', 'drc'].includes(user.role.toLowerCase())
+    return <Navigate to={isRoleRegistered ? `/${user.role.toLowerCase()}` : "/login"} replace />
+  }
   return children
 }
 
@@ -76,9 +90,15 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={
-        isAuthenticated ? <Navigate to={`/${user.role}`} replace /> : <LoginPage />
+        isAuthenticated && user?.role && ['admin', 'scholar', 'supervisor', 'hod', 'drc'].includes(user.role.toLowerCase()) 
+          ? <Navigate to={`/${user.role.toLowerCase()}`} replace /> 
+          : <LoginPage />
       } />
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={
+        isAuthenticated && user?.role && ['admin', 'scholar', 'supervisor', 'hod', 'drc'].includes(user.role.toLowerCase()) 
+          ? <Navigate to={`/${user.role.toLowerCase()}`} replace /> 
+          : <Navigate to="/login" replace />
+      } />
 
       {/* Admin Routes */}
       <Route path="/admin" element={
@@ -132,6 +152,18 @@ function AppRoutes() {
         <Route path="progress" element={<ProgressReports />} />
         <Route path="notifications" element={<SupervisorNotifications />} />
         <Route path="profile" element={<SupervisorProfile />} />
+        <Route path="dc-members" element={<DCMembersManagement />} />
+        <Route path="schedule-dc-meeting" element={<ScheduleDCMeeting />} />
+        <Route path="dc-meetings" element={<DCMeetingsManagement />} />
+        <Route path="thesis-viva" element={<ThesisVivaVoce />} />
+        <Route path="thesis-submission" element={<ThesisSubmissionManagement />} />
+        <Route path="coursework-list" element={<CourseworkListManagement />} />
+        <Route path="co-supervisor" element={<AddCoSupervisor />} />
+        <Route path="coursework-details" element={<CourseworkDetailsManagement />} />
+        <Route path="synopsis-submission" element={<SynopsisSubmissionManagement />} />
+        <Route path="examiner-panel" element={<ExaminerPanelManagement />} />
+        <Route path="cancellation" element={<CancellationManagement />} />
+        <Route path="reports" element={<ReportsAnalytics />} />
       </Route>
 
       {/* HOD Routes */}
@@ -162,7 +194,11 @@ function AppRoutes() {
         <Route path="notifications" element={<DRCNotifications />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={
+        isAuthenticated && user?.role && ['admin', 'scholar', 'supervisor', 'hod', 'drc'].includes(user.role.toLowerCase())
+          ? <Navigate to={`/${user.role.toLowerCase()}`} replace />
+          : <Navigate to="/login" replace />
+      } />
     </Routes>
   )
 }

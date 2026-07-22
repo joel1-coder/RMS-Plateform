@@ -123,7 +123,7 @@ export default function MeetingsManagement() {
     } catch {}
 
     const assigned = dbUsers.filter(
-      u => u.role === 'Scholar' &&
+      u => u.role?.toLowerCase() === 'scholar' &&
            u.assignedSupervisor &&
            u.assignedSupervisor.toLowerCase() === user.name.toLowerCase()
     )

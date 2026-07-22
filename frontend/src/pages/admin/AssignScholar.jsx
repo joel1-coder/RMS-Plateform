@@ -3,14 +3,14 @@ import toast from 'react-hot-toast'
 
 // Fallback data if localStorage is empty
 const DEFAULT_USERS = [
-  { id: 1, name: 'Dr. Priya Kumar',   email: 'supervisor@rms.edu', password: 'super123',   role: 'Supervisor', dept: 'Computer Science',  status: 'Active' },
-  { id: 2, name: 'Rahul Sharma',      email: 'scholar@rms.edu',    password: 'scholar123', role: 'Scholar',    dept: 'Computer Science',  status: 'Active' },
-  { id: 3, name: 'Neha Patel',        email: 'neha@rms.edu',       password: 'scholar123', role: 'Scholar',    dept: 'Electronics',       status: 'Active' },
-  { id: 4, name: 'Dr. Rajan Mehta',   email: 'rajan@rms.edu',      password: 'super123',   role: 'Supervisor', dept: 'Mechanical',        status: 'Active' },
-  { id: 5, name: 'Amit Kumar',        email: 'amit@rms.edu',       password: 'scholar123', role: 'Scholar',    dept: 'Civil',             status: 'Active' },
-  { id: 6, name: 'Sonal Joshi',       email: 'sonal@rms.edu',      password: 'scholar123', role: 'Scholar',    dept: 'Computer Science',  status: 'Active' },
-  { id: 7, name: 'Dr. Sunita Rao',    email: 'sunita@rms.edu',     password: 'super123',   role: 'Supervisor', dept: 'Computer Science',  status: 'Active' },
-  { id: 8, name: 'Pooja Mehta',       email: 'pooja@rms.edu',      password: 'scholar123', role: 'Scholar',    dept: 'Computer Science',  status: 'Active' },
+  { id: 1, name: 'Dr. Priya Kumar',   email: 'supervisor@rms.edu', password: 'super123',   role: 'supervisor', dept: 'Computer Science',  status: 'Active' },
+  { id: 2, name: 'Rahul Sharma',      email: 'scholar@rms.edu',    password: 'scholar123', role: 'scholar',    dept: 'Computer Science',  status: 'Active' },
+  { id: 3, name: 'Neha Patel',        email: 'neha@rms.edu',       password: 'scholar123', role: 'scholar',    dept: 'Electronics',       status: 'Active' },
+  { id: 4, name: 'Dr. Rajan Mehta',   email: 'rajan@rms.edu',      password: 'super123',   role: 'supervisor', dept: 'Mechanical',        status: 'Active' },
+  { id: 5, name: 'Amit Kumar',        email: 'amit@rms.edu',       password: 'scholar123', role: 'scholar',    dept: 'Civil',             status: 'Active' },
+  { id: 6, name: 'Sonal Joshi',       email: 'sonal@rms.edu',      password: 'scholar123', role: 'scholar',    dept: 'Computer Science',  status: 'Active' },
+  { id: 7, name: 'Dr. Sunita Rao',    email: 'sunita@rms.edu',     password: 'super123',   role: 'supervisor', dept: 'Computer Science',  status: 'Active' },
+  { id: 8, name: 'Pooja Mehta',       email: 'pooja@rms.edu',      password: 'scholar123', role: 'scholar',    dept: 'Computer Science',  status: 'Active' },
 ]
 
 export default function AssignScholar() {
@@ -35,10 +35,13 @@ export default function AssignScholar() {
   }
 
   const hydrate = (list) => {
-    const safeList = Array.isArray(list) ? list : []
+    // Normalize roles to lowercase before storing/filtering
+    const safeList = Array.isArray(list)
+      ? list.map(u => ({ ...u, role: u.role ? u.role.toLowerCase() : u.role }))
+      : []
     setUsers(safeList)
-    setScholars(safeList.filter(u => u && u.role === 'Scholar' && u.status !== 'Inactive'))
-    setSupervisors(safeList.filter(u => u && u.role === 'Supervisor' && u.status !== 'Inactive'))
+    setScholars(safeList.filter(u => u && u.role === 'scholar' && u.status !== 'Inactive'))
+    setSupervisors(safeList.filter(u => u && u.role === 'supervisor' && u.status !== 'Inactive'))
   }
 
   /* ─── assign ─── */

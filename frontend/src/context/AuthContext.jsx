@@ -12,6 +12,8 @@ export function AuthProvider({ children }) {
     if (stored) {
       try {
         const parsed = JSON.parse(stored)
+        // Normalize role to lowercase to prevent route mismatch loops
+        if (parsed.role) parsed.role = parsed.role.toLowerCase()
         setUser(parsed)
         setIsAuthenticated(true)
       } catch {}

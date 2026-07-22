@@ -69,9 +69,9 @@ export default function LoginPage() {
     } catch {}
 
     if (matchedUser) {
-      login({ email: matchedUser.email, name: matchedUser.name, role: selectedRole, department: matchedUser.dept })
+      login({ email: matchedUser.email, name: matchedUser.name, role: selectedRole.toLowerCase(), department: matchedUser.dept })
       toast.success(`Welcome back, ${matchedUser.name.split(' ').pop()}!`)
-      navigate(`/${selectedRole}`)
+      navigate(`/${selectedRole.toLowerCase()}`)
     } else {
       // Fallback to default credentials
       const demo = DEFAULT_CREDENTIALS[selectedRole]
