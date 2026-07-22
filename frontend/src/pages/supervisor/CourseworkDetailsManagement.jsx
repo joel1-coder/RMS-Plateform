@@ -3,37 +3,14 @@ import toast from 'react-hot-toast'
 
 const scholarDetails = {
   regNo: 'VANI K [BDU2020410331] | COMPUTER SCIENCE - FACULTY OF SCIENCE',
-  dcMembers: [
-    {
-      role: 'Research Adviser',
-      name: 'Dr. BRITTO RAMESH KUMAR S.',
-      designation: 'Assistant Professor',
-      dept: 'COMPUTER SCIENCE, ST. JOSEPH\'S COLLEGE (AUTONOMOUS)',
-      city: '(AUTONOMOUS) Tiruchirappalli - 620002',
-      accountInfo: 'Britto Ramesh Kumar S 00810500004054204 SBI:000002 State Indian Bank Main Branch',
-    },
-    {
-      role: 'DC Member 1',
-      name: 'Dr. J.P. Charles',
-      designation: 'Assistant Professor',
-      dept: 'Dept of Information Technology, ST. JOSEPH\'S COLLEGE (AUTONOMOUS)',
-      city: 'New Chathram Road Silarai, Trichy - 620002',
-      accountInfo: 'Joseph Charles P 0081050000444024 SBI:000002 South Indian Bank Main Branch',
-    },
-    {
-      role: 'DC Member 2',
-      name: 'Dr. M.Kasthuri',
-      designation: 'Assistant Professor',
-      dept: 'Dept of Computer Applications, Bishop Heber College, Attirami Road, Vayalur Road, Puthur',
-      city: 'Trichy - 620017',
-      accountInfo: 'M.Kasthuri 4094000070184SS PLN80416410 Punjab National Bank Puthur Branch, Bishop Heber College Campus',
-    },
-  ],
 }
 
 export default function CourseworkDetailsManagement() {
   const [marks, setMarks] = useState([
-    { subject: 'CLOUD COMPUTING [JOHPHCS0011', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
+    { subject: 'RESEARCH METHODOLOGY [JOHPHCS001]', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
+    { subject: 'ADVANCED COMPUTER SCIENCE [JOHPHCS002]', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
+    { subject: 'CLOUD COMPUTING [JOHPHCS0011]', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
+    { subject: 'ELECTIVE / SPECIAL PAPER [JOHPHCS0012]', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
   ])
   const [saving, setSaving] = useState(false)
 
@@ -41,10 +18,25 @@ export default function CourseworkDetailsManagement() {
     setMarks(prev => prev.map((m, i) => i === idx ? { ...m, [key]: val } : m))
   }
 
+  const handleAddRow = () => {
+    setMarks(prev => [
+      ...prev,
+      { subject: '', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' }
+    ])
+  }
+
+  const handleRemoveRow = (idx) => {
+    if (marks.length === 1) {
+      toast.error('At least one coursework row is required')
+      return
+    }
+    setMarks(prev => prev.filter((_, i) => i !== idx))
+  }
+
   const handleSave = async () => {
     setSaving(true)
     await new Promise(r => setTimeout(r, 1000))
-    toast.success('Coursework details saved!')
+    toast.success('Coursework details saved successfully!')
     setSaving(false)
   }
 
@@ -76,56 +68,40 @@ export default function CourseworkDetailsManagement() {
           </div>
         </div>
 
-        {/* DC Members Cards */}
-        <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-primary)', marginBottom: '14px' }}>
-          Coursework Details <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>add details here.</span>
-        </div>
-
+        {/* Mark Entry Card */}
         <div className="card" style={{ marginBottom: '20px' }}>
           <div className="card-body">
-            {/* DC Members Table */}
-            <div style={{ marginBottom: '20px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr auto auto auto', gap: '0', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border)' }}>
-                {/* Header */}
-                <div style={{ padding: '10px 14px', background: '#F1F5F9', fontWeight: 700, fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', borderBottom: '1px solid var(--border)' }}>DC MEMBER</div>
-                <div style={{ padding: '10px 14px', background: '#F1F5F9', fontWeight: 700, fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', borderBottom: '1px solid var(--border)', gridColumn: '2/4' }}>NAME & ADDRESS</div>
-                <div style={{ padding: '10px 14px', background: '#F1F5F9', fontWeight: 700, fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', borderBottom: '1px solid var(--border)' }}>ACCOUNT INFORMATION</div>
-                <div style={{ padding: '10px 14px', background: '#F1F5F9', fontWeight: 700, fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', borderBottom: '1px solid var(--border)' }}>SITTING FEE DS.1+</div>
-                <div style={{ padding: '10px 14px', background: '#F1F5F9', fontWeight: 700, fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', borderBottom: '1px solid var(--border)' }}>TA / DA CLASS DS.1+</div>
-
-                {/* Rows */}
-                {scholarDetails.dcMembers.map((m, i) => (
-                  <>
-                    <div key={`role-${i}`} style={{ padding: '12px 14px', fontSize: '12.5px', fontWeight: 600, borderBottom: i < 2 ? '1px solid var(--border)' : 'none' }}>
-                      {m.role}
-                    </div>
-                    <div style={{ padding: '12px 14px', fontSize: '12px', borderBottom: i < 2 ? '1px solid var(--border)' : 'none', gridColumn: '2/4' }}>
-                      <div style={{ fontWeight: 700, marginBottom: '2px' }}>{m.name}</div>
-                      <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{m.designation}<br />{m.dept}<br />{m.city}</div>
-                    </div>
-                    <div style={{ padding: '12px 14px', fontSize: '11.5px', color: 'var(--text-muted)', borderBottom: i < 2 ? '1px solid var(--border)' : 'none', lineHeight: 1.5 }}>
-                      {m.accountInfo}
-                    </div>
-                    <div style={{ padding: '12px 14px', borderBottom: i < 2 ? '1px solid var(--border)' : 'none' }}>
-                      <input type="number" placeholder="0"
-                        style={{ width: '60px', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12.5px', textAlign: 'center' }} />
-                    </div>
-                    <div style={{ padding: '12px 14px', borderBottom: i < 2 ? '1px solid var(--border)' : 'none' }}>
-                      <input type="number" placeholder="0"
-                        style={{ width: '60px', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12.5px', textAlign: 'center' }} />
-                    </div>
-                  </>
-                ))}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)' }}>Mark Entry</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Enter exam date, marks scored, and credits for coursework subjects.</div>
               </div>
+              <button
+                type="button"
+                onClick={handleAddRow}
+                style={{
+                  padding: '7px 14px',
+                  background: 'linear-gradient(90deg, #4F46E5, #6C63FF)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                ➕ Add Subject Row
+              </button>
             </div>
 
-            {/* Mark Entry */}
-            <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-primary)', marginBottom: '12px' }}>Mark Entry</div>
             <div style={{ overflowX: 'auto' }}>
               <table className="table">
                 <thead>
                   <tr>
-                    <th>#</th>
+                    <th style={{ width: '40px' }}>#</th>
                     <th>SUBJECT NAME</th>
                     <th>EXAM DATE</th>
                     <th>MAX MARK</th>
@@ -133,29 +109,73 @@ export default function CourseworkDetailsManagement() {
                     <th>SCORED MARK</th>
                     <th>CREDIT MARK</th>
                     <th>RESULT</th>
+                    <th style={{ width: '50px' }}>ACTION</th>
                   </tr>
                 </thead>
                 <tbody>
                   {marks.map((m, i) => (
                     <tr key={i}>
                       <td>{i + 1}</td>
-                      <td style={{ fontSize: '12.5px', maxWidth: '200px' }}>{m.subject}</td>
                       <td>
-                        <input type="date" value={m.examDate} onChange={e => handleMarkChange(i, 'examDate', e.target.value)}
-                          style={{ padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12px', width: '130px' }} />
+                        <input
+                          type="text"
+                          value={m.subject}
+                          onChange={e => handleMarkChange(i, 'subject', e.target.value)}
+                          placeholder="Enter Subject Name & Code"
+                          style={{ width: '100%', minWidth: '220px', padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12.5px' }}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="date"
+                          value={m.examDate}
+                          onChange={e => handleMarkChange(i, 'examDate', e.target.value)}
+                          style={{ padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12px', width: '130px' }}
+                        />
                       </td>
                       <td style={{ textAlign: 'center', fontWeight: 600 }}>{m.maxMark}</td>
                       <td style={{ textAlign: 'center', fontWeight: 600 }}>{m.minMark}</td>
                       <td>
-                        <input type="text" value={m.scoredMark} onChange={e => handleMarkChange(i, 'scoredMark', e.target.value)} placeholder="Enter Mark"
-                          style={{ width: '90px', padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12px' }} />
+                        <input
+                          type="text"
+                          value={m.scoredMark}
+                          onChange={e => handleMarkChange(i, 'scoredMark', e.target.value)}
+                          placeholder="Enter Mark"
+                          style={{ width: '90px', padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12px' }}
+                        />
                       </td>
                       <td>
-                        <input type="text" value={m.creditMark} onChange={e => handleMarkChange(i, 'creditMark', e.target.value)} placeholder="Enter Credit"
-                          style={{ width: '90px', padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12px' }} />
+                        <input
+                          type="text"
+                          value={m.creditMark}
+                          onChange={e => handleMarkChange(i, 'creditMark', e.target.value)}
+                          placeholder="Enter Credit"
+                          style={{ width: '90px', padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12px' }}
+                        />
                       </td>
                       <td>
-                        <span style={{ fontSize: '11.5px', color: '#6C63FF', fontStyle: 'italic' }}>{m.result}</span>
+                        <span style={{ fontSize: '11.5px', color: '#6C63FF', fontStyle: 'italic' }}>
+                          {m.scoredMark ? (Number(m.scoredMark) >= m.minMark ? '✅ PASS' : '❌ FAIL') : m.result}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRow(i)}
+                          title="Remove Subject Row"
+                          style={{
+                            padding: '4px 8px',
+                            background: '#FEE2E2',
+                            color: '#EF4444',
+                            border: '1px solid #FCA5A5',
+                            borderRadius: 'var(--radius-sm)',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                          }}
+                        >
+                          🗑️
+                        </button>
                       </td>
                     </tr>
                   ))}
