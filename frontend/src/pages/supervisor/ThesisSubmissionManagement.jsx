@@ -1,26 +1,25 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
-const thesisRecords = []
-
-const NAV_ITEMS = [
-  { icon: '🏠', label: 'Dashboard' },
-  { icon: '👤', label: 'Account Details' },
-  { icon: '👥', label: 'Scholars List' },
-  { icon: '📄', label: 'DC-Constitution' },
-  { icon: '📊', label: 'DC-I Status' },
-  { icon: '📝', label: 'Coursework Mark Entry' },
-  { icon: '🤝', label: 'Co-Supervisor Nomination' },
-  { icon: '📋', label: 'Synopsis Submission' },
-  { icon: '📚', label: 'Thesis Submission', active: true },
-  { icon: '🔬', label: 'Examiner Panel' },
-  { icon: '🎓', label: 'Thesis Viva-voce' },
-  { icon: '❌', label: 'Cancellation' },
+const thesisRecords = [
+  { regNo: 'BDU2020410331', name: 'Miss / Mrs. VIMAL VANI K', discipline: 'COMPUTER SCIENCE', thesis: 'Deep Learning Approaches in Healthcare Diagnostics.pdf', revision: 'Revision 1 (Submitted)' },
+  { regNo: 'BDU2021050612', name: 'Mr. ANTONY JOHN PRABU J', discipline: 'COMPUTER SCIENCE', thesis: 'Secure IoT Protocols for Smart Cities.pdf', revision: 'Initial Submission' },
+  { regNo: 'BDU2019882734', name: 'Miss / Mrs. DHANEDDHAMMA K', discipline: 'ELECTRONICS & COMM.', thesis: 'VLSI Architecture for High-Speed Signal Processing.pdf', revision: 'Final Copy' },
+  { regNo: 'BDU2022394821', name: 'Mr. REX CYRIL B', discipline: 'INFORMATION TECH.', thesis: 'Blockchain Framework for Distributed Supply Chains.pdf', revision: 'Initial Submission' },
+  { regNo: 'BDU2020583920', name: 'Miss / Mrs. SARANYA PRIYA A', discipline: 'COMPUTER APPLICATIONS', thesis: 'Natural Language Processing for Clinical Decision Systems.pdf', revision: 'Revision 2 (Under Review)' }
 ]
 
 export default function ThesisSubmissionManagement() {
   const [search, setSearch] = useState('')
   const [perPage, setPerPage] = useState(10)
+
+  const filtered = thesisRecords.filter(r =>
+    !search ||
+    r.regNo?.toLowerCase().includes(search.toLowerCase()) ||
+    r.name?.toLowerCase().includes(search.toLowerCase()) ||
+    r.discipline?.toLowerCase().includes(search.toLowerCase()) ||
+    r.thesis?.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div className="animate-fade">
@@ -61,7 +60,7 @@ export default function ThesisSubmissionManagement() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Search:</span>
-            <input value={search} onChange={e => setSearch(e.target.value)}
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, reg no..."
               style={{ padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '13px', width: '200px', background: '#fff' }} />
           </div>
         </div>
@@ -78,23 +77,29 @@ export default function ThesisSubmissionManagement() {
                   <th>Discipline ⇅</th>
                   <th>Thesis ⇅</th>
                   <th>Revision ⇅</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {thesisRecords.length === 0 ? (
+                {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)', fontSize: '14px' }}>
+                    <td colSpan={7} style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)', fontSize: '14px' }}>
                       No data available in table
                     </td>
                   </tr>
-                ) : thesisRecords.map((r, i) => (
+                ) : filtered.slice(0, perPage).map((r, i) => (
                   <tr key={i}>
                     <td>{i + 1}</td>
-                    <td>{r.regNo}</td>
+                    <td style={{ fontWeight: 600 }}>{r.regNo}</td>
                     <td>{r.name}</td>
-                    <td>{r.discipline}</td>
-                    <td>{r.thesis}</td>
-                    <td>{r.revision}</td>
+                    <td><span style={{ fontSize: '12px', color: '#4338CA', fontWeight: 600 }}>{r.discipline}</span></td>
+                    <td style={{ fontSize: '12px', color: '#2563EB', textDecoration: 'underline', cursor: 'pointer' }}>📄 {r.thesis}</td>
+                    <td><span className="badge badge-warning" style={{ fontSize: '11px' }}>{r.revision}</span></td>
+                    <td>
+                      <button className="btn btn-primary btn-sm" onClick={() => toast.success(`Opening Thesis for ${r.name}`)}>
+                        View Thesis
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -102,7 +107,7 @@ export default function ThesisSubmissionManagement() {
           </div>
           <div style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border)' }}>
             <button className="btn btn-ghost btn-sm">Previous</button>
-            <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Showing 0 to 0 of 0 entries</span>
+            <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Showing 1 to {Math.min(filtered.length, perPage)} of {filtered.length} entries</span>
             <button className="btn btn-ghost btn-sm">Next</button>
           </div>
         </div>

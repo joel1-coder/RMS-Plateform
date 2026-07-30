@@ -1,7 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const drcStats = [
-  { label: 'Pending Synopses', value: '05', icon: '📋', color: 'orange', sub: 'Requires Review' },
   { label: 'Active Committees', value: '12', icon: '👥', color: 'blue', sub: 'Across CS & Biotech' },
   { label: 'Meetings Scheduled', value: '03', icon: '📅', color: 'green', sub: 'Next: Oct 25, 10 AM' },
   { label: 'Approved YTD', value: '48', icon: '✅', color: 'teal', sub: 'On track' },
@@ -14,10 +13,6 @@ const activityData = [
   { name: 'Oct-Dec', Approved: 18, Rejected: 3 },
 ]
 
-const pendingSynopses = [
-  { id: 'SYN-2023-401', scholar: 'Aravind Sharma', topic: 'Optimization of Superconducting Qubits using AI', supervisor: 'Dr. Robert Chen', submitted: '2 days ago' },
-  { id: 'SYN-2023-402', scholar: 'Elena Rodriguez', topic: 'Topology in Higher-Dimensional Manifolds', supervisor: 'Prof. Sarah Jenkins', submitted: '3 days ago' },
-]
 
 const upcomingMeetings = [
   { id: 1, title: 'DRC Evaluation Panel (CS)', date: 'Oct 25, 2023', time: '10:00 AM', room: 'Conference Hall A', members: ['Dr. Mohan Reddy', 'Dr. Sarah Chen', 'Prof. Alan Turing'] },
@@ -103,43 +98,8 @@ export default function DRCDashboard() {
           </div>
         </div>
 
-        {/* Pending Synopses and Meetings lists */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px' }}>
-          {/* Pending Reviews */}
-          <div className="card">
-            <div className="card-header">
-              <div className="card-title">Pending Synopsis Board Approval</div>
-              <button className="btn btn-ghost btn-sm">View All Queue</button>
-            </div>
-            <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Scholar</th>
-                    <th>Research Focus Area</th>
-                    <th>Supervisor</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pendingSynopses.map((p, idx) => (
-                    <tr key={idx}>
-                      <td>
-                        <div style={{ fontWeight: 700, fontSize: '13px' }}>{p.scholar}</div>
-                        <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>{p.id}</div>
-                      </td>
-                      <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '180px' }}>{p.topic}</td>
-                      <td style={{ fontSize: '12.5px' }}>{p.supervisor}</td>
-                      <td>
-                        <button className="btn btn-primary btn-sm" style={{ background: '#0D9488', border: 'none', fontSize: '11px', padding: '4px 8px' }}>Review</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
+        {/* Upcoming Meetings */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
           {/* Upcoming Meetings */}
           <div className="card">
             <div className="card-header">

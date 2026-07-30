@@ -1,5 +1,23 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
+
+// Load scholars from localStorage (rms_all_users, role === 'scholar')
+function loadScholars() {
+  try {
+    const raw = localStorage.getItem('rms_all_users')
+    if (raw) {
+      return JSON.parse(raw)
+        .filter(u => (u.role || '').toLowerCase() === 'scholar')
+        .map(u => ({ id: u.id, name: u.name, dept: u.dept || '' }))
+    }
+  } catch { /* ignore */ }
+  // Fallback defaults
+  return [
+    { id: 1, name: 'Rahul Sharma', dept: 'Computer Science' },
+    { id: 5, name: 'Neha Patel', dept: 'Electronics' },
+    { id: 7, name: 'Amit Kumar', dept: 'Civil' },
+  ]
+}
 
 const DEFAULT_MEETINGS = [
   { id: 1, type: 'Viva Voce', scholar: 'Rahul Sharma', panel: 'Dr. Mohan Reddy, Prof. R. Iyer', date: '2024-07-25', time: '10:00 AM', venue: 'Board Room 1', status: 'Scheduled' },
@@ -21,6 +39,15 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
     status: 'Scheduled'
   })
 
+  const [scholars, setScholars] = useState([])
+  const [scholarSearch, setScholarSearch] = useState('')
+  const [showScholarDrop, setShowScholarDrop] = useState(false)
+  const scholarRef = useRef(null)
+
+  useEffect(() => {
+    setScholars(loadScholars())
+  }, [])
+
   useEffect(() => {
     if (editData) {
       setForm({
@@ -32,8 +59,25 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
         panel: editData.panel || 'CS & AI Evaluation Panel',
         status: editData.status || 'Scheduled'
       })
+      setScholarSearch(editData.scholar || '')
     }
   }, [editData])
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (scholarRef.current && !scholarRef.current.contains(e.target)) {
+        setShowScholarDrop(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filteredScholars = scholars.filter(s =>
+    s.name.toLowerCase().includes(scholarSearch.toLowerCase()) ||
+    (s.dept || '').toLowerCase().includes(scholarSearch.toLowerCase())
+  )
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
 
@@ -57,9 +101,69 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             <div className="grid-2">
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <div className="form-group" style={{ gridColumn: '1 / -1', position: 'relative' }} ref={scholarRef}>
                 <label className="form-label">Scholar Candidate *</label>
-                <input name="scholar" required className="form-control" placeholder="e.g. Arjun Mehta" value={form.scholar} onChange={handleChange} />
+                <input
+                  name="scholar"
+                  required
+                  autoComplete="off"
+                  className="form-control"
+                  placeholder="Type to search scholar..."
+                  value={scholarSearch}
+                  onChange={e => {
+                    setScholarSearch(e.target.value)
+                    setForm({ ...form, scholar: e.target.value })
+                    setShowScholarDrop(true)
+                  }}
+                  onFocus={() => setShowScholarDrop(true)}
+                />
+                {showScholarDrop && filteredScholars.length > 0 && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 999,
+                    background: '#fff', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-md)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)', maxHeight: '180px', overflowY: 'auto', marginTop: '2px'
+                  }}>
+                    {filteredScholars.map(s => (
+                      <div
+                        key={s.id}
+                        onMouseDown={() => {
+                          setScholarSearch(s.name)
+                          setForm({ ...form, scholar: s.name })
+                          setShowScholarDrop(false)
+                        }}
+                        style={{
+                          padding: '9px 14px', cursor: 'pointer', display: 'flex',
+                          alignItems: 'center', gap: '10px',
+                          borderBottom: '1px solid var(--border)',
+                          transition: 'background 0.15s'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#F0FDF4'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <span style={{
+                          width: '28px', height: '28px', borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #0D9488, #10B981)',
+                          color: '#fff', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', fontWeight: 700, fontSize: '12px', flexShrink: 0
+                        }}>{s.name.charAt(0)}</span>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '13px' }}>{s.name}</div>
+                          {s.dept && <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.dept}</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {showScholarDrop && filteredScholars.length === 0 && scholarSearch && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 999,
+                    background: '#fff', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-md)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)', padding: '12px 14px',
+                    fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '2px'
+                  }}>
+                    No scholars found. You can still type a name manually.
+                  </div>
+                )}
               </div>
               <div className="form-group">
                 <label className="form-label">Evaluation Type</label>

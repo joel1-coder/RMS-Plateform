@@ -1,17 +1,22 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
-const examinerRecords = []
+const examinerRecords = [
+  { regNo: 'BDU2020410331', discipline: 'COMPUTER SCIENCE', name: 'Miss / Mrs. VIMAL VANI K', status: 'Active' },
+  { regNo: 'BDU2021050612', discipline: 'COMPUTER SCIENCE', name: 'Mr. ANTONY JOHN PRABU J', status: 'Pending Nomination' },
+  { regNo: 'BDU2019882734', discipline: 'ELECTRONICS & COMM.', name: 'Miss / Mrs. DHANEDDHAMMA K', status: 'Evaluation Active' },
+  { regNo: 'BDU2022394821', discipline: 'INFORMATION TECH.', name: 'Mr. REX CYRIL B', status: 'Report Received' },
+  { regNo: 'BDU2020583920', discipline: 'COMPUTER APPLICATIONS', name: 'Miss / Mrs. SARANYA PRIYA A', status: 'Pending Nomination' }
+]
 
 export default function ExaminerPanelManagement() {
   const [search, setSearch] = useState('')
   const [perPage, setPerPage] = useState(10)
-  const [statusFilter, setStatusFilter] = useState('')
-  const [pendingNominations] = useState(0)
-  const [evaluationActive] = useState(0)
+  const [pendingNominations] = useState(2)
+  const [evaluationActive] = useState(3)
 
   const filtered = examinerRecords.filter(r =>
-    !search || r.regNo?.toLowerCase().includes(search.toLowerCase()) || r.name?.toLowerCase().includes(search.toLowerCase())
+    !search || r.regNo?.toLowerCase().includes(search.toLowerCase()) || r.name?.toLowerCase().includes(search.toLowerCase()) || r.discipline?.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -89,13 +94,17 @@ export default function ExaminerPanelManagement() {
                       <br /><span style={{ fontSize: '12px', color: '#94A3B8' }}>Try adjusting your filters or search criteria.</span>
                     </td>
                   </tr>
-                ) : filtered.map((r, i) => (
+                ) : filtered.slice(0, perPage).map((r, i) => (
                   <tr key={i}>
                     <td>{i + 1}</td>
-                    <td>{r.regNo}</td>
-                    <td>{r.discipline}</td>
+                    <td style={{ fontWeight: 600 }}>{r.regNo}</td>
+                    <td><span style={{ fontSize: '12px', color: '#4338CA', fontWeight: 600 }}>{r.discipline}</span></td>
                     <td>{r.name}</td>
-                    <td><button className="btn btn-primary btn-sm">View</button></td>
+                    <td>
+                      <button className="btn btn-primary btn-sm" onClick={() => toast.success(`Viewing panel for ${r.name}`)}>
+                        View Panel
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -103,7 +112,7 @@ export default function ExaminerPanelManagement() {
           </div>
           <div style={{ padding: '12px 20px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button className="btn btn-ghost btn-sm">‹ Previous</button>
-            <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Showing 0 to 0 of 0 entries</span>
+            <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Showing 1 to {Math.min(filtered.length, perPage)} of {filtered.length} entries</span>
             <button className="btn btn-ghost btn-sm">Next ›</button>
           </div>
         </div>
