@@ -20,22 +20,19 @@ function loadScholars() {
 }
 
 const DEFAULT_MEETINGS = [
-  { id: 1, type: 'Viva Voce', scholar: 'Rahul Sharma', panel: 'Dr. Mohan Reddy, Prof. R. Iyer', date: '2024-07-25', time: '10:00 AM', venue: 'Board Room 1', status: 'Scheduled' },
-  { id: 2, type: 'Synopsis Review', scholar: 'Neha Patel', panel: 'Dr. A. Sharma, Prof. K. Das', date: '2024-06-15', time: '02:00 PM', venue: 'Conference Room 2', status: 'Completed' },
-  { id: 3, type: 'Doctoral Committee', scholar: 'Amit Kumar', panel: 'Dr. Mohan Reddy', date: '2024-08-10', time: '11:00 AM', venue: 'Seminar Hall', status: 'Scheduled' },
-  { id: 4, type: 'Progress Review', scholar: 'Sonal Joshi', panel: 'Prof. P. Singh (External)', date: '2024-08-12', time: '09:30 AM', venue: 'Virtual - Meet Link', status: 'Scheduled' },
+  { id: 1, scholar: 'Rahul Sharma', date: '2024-07-25', time: '10:00 AM', venue: 'Board Room 1', panel: 'Viva Voce Examination Board', status: 'Scheduled' },
+  { id: 2, scholar: 'Neha Patel', date: '2024-06-15', time: '02:00 PM', venue: 'Conference Room 2', panel: 'Synopsis Presentation Board', status: 'Completed' },
+  { id: 3, scholar: 'Amit Kumar', date: '2024-08-10', time: '11:00 AM', venue: 'Seminar Hall', panel: 'Doctoral Committee Review', status: 'Scheduled' },
+  { id: 4, scholar: 'Sonal Joshi', date: '2024-08-12', time: '09:30 AM', venue: 'Virtual - Meet Link', panel: 'First Year Progress Assessment', status: 'Scheduled' },
 ]
-
-const MEETING_TYPES = ['Synopsis Review', 'Defense Evaluation', 'Bi-Annual Progress', 'Viva Voce', 'Other']
 
 function DRCMeetingModal({ onClose, onSave, editData = null }) {
   const [form, setForm] = useState({
     scholar: '',
-    type: 'Synopsis Review',
     date: '',
     time: '',
     venue: '',
-    panel: 'CS & AI Evaluation Panel',
+    panel: '',
     status: 'Scheduled'
   })
 
@@ -52,11 +49,10 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
     if (editData) {
       setForm({
         scholar: editData.scholar || '',
-        type: editData.type || 'Synopsis Review',
         date: editData.date || '',
         time: editData.time || '',
         venue: editData.venue || '',
-        panel: editData.panel || 'CS & AI Evaluation Panel',
+        panel: editData.panel || '',
         status: editData.status || 'Scheduled'
       })
       setScholarSearch(editData.scholar || '')
@@ -83,8 +79,8 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
 
   const handleSubmit = e => {
     e.preventDefault()
-    if (!form.scholar || !form.date || !form.time) {
-      toast.error('Scholar name, date and time are required')
+    if (!form.scholar || !form.date || !form.time || !form.venue || !form.panel) {
+      toast.error('All fields are required')
       return
     }
     onSave(form)
@@ -95,20 +91,22 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
     <div className="modal-backdrop">
       <div className="modal">
         <div className="modal-header">
-          <span className="modal-title">{editData ? 'Edit DRC Review Session' : 'Schedule DRC Review Session'}</span>
+          <span className="modal-title">Meeting Schedule</span>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
-            <div className="grid-2">
-              <div className="form-group" style={{ gridColumn: '1 / -1', position: 'relative' }} ref={scholarRef}>
-                <label className="form-label">Scholar Candidate *</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              
+              {/* 1. Candidate Name */}
+              <div className="form-group" style={{ position: 'relative' }} ref={scholarRef}>
+                <label className="form-label">Candidate Name *</label>
                 <input
                   name="scholar"
                   required
                   autoComplete="off"
                   className="form-control"
-                  placeholder="Type to search scholar..."
+                  placeholder="Type to search candidate..."
                   value={scholarSearch}
                   onChange={e => {
                     setScholarSearch(e.target.value)
@@ -154,51 +152,45 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
                     ))}
                   </div>
                 )}
-                {showScholarDrop && filteredScholars.length === 0 && scholarSearch && (
-                  <div style={{
-                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 999,
-                    background: '#fff', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-md)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)', padding: '12px 14px',
-                    fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '2px'
-                  }}>
-                    No scholars found. You can still type a name manually.
-                  </div>
-                )}
               </div>
+
+              {/* 2. Meeting Date, Time and Venue */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label className="form-label">Meeting Date *</label>
+                  <input name="date" type="date" required className="form-control" value={form.date} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Meeting Time *</label>
+                  <input name="time" type="time" required className="form-control" value={form.time} onChange={handleChange} />
+                </div>
+              </div>
+
               <div className="form-group">
-                <label className="form-label">Evaluation Type</label>
-                <select name="type" className="form-control form-select" value={form.type} onChange={handleChange}>
-                  {MEETING_TYPES.map(t => <option key={t}>{t}</option>)}
-                </select>
+                <label className="form-label">Venue *</label>
+                <input name="venue" required className="form-control" placeholder="e.g. Conference Hall A or Zoom Link" value={form.venue} onChange={handleChange} />
               </div>
+
+              {/* 3. Regards Title */}
               <div className="form-group">
-                <label className="form-label">Room / Venue</label>
-                <input name="venue" className="form-control" placeholder="e.g. Conference Hall A or Zoom Link" value={form.venue} onChange={handleChange} />
+                <label className="form-label">Regards Title *</label>
+                <input name="panel" required className="form-control" placeholder="e.g. Synopsis Review / Thesis Assessment" value={form.panel} onChange={handleChange} />
               </div>
+
+              {/* 4. Status */}
               <div className="form-group">
-                <label className="form-label">Date *</label>
-                <input name="date" type="date" required className="form-control" value={form.date} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Time *</label>
-                <input name="time" type="time" required className="form-control" value={form.time} onChange={handleChange} />
-              </div>
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label className="form-label">DRC Committee Board / Panel</label>
-                <input name="panel" className="form-control" placeholder="e.g. CS & AI Evaluation Panel" value={form.panel} onChange={handleChange} />
-              </div>
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                 <label className="form-label">Status</label>
                 <select name="status" className="form-control form-select" value={form.status} onChange={handleChange}>
                   {['Scheduled', 'Completed', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
+
             </div>
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
             <button type="submit" className="btn btn-primary" style={{ background: '#0D9488', borderColor: '#0D9488' }}>
-              {editData ? 'Save Changes' : 'Schedule Session'}
+              {editData ? 'Save Changes' : 'Schedule Meeting'}
             </button>
           </div>
         </form>
@@ -212,7 +204,6 @@ export default function DRCMeetingManagement() {
   const [showModal, setShowModal] = useState(false)
   const [editingMeeting, setEditingMeeting] = useState(null)
   const [search, setSearch] = useState('')
-  const [filterType, setFilterType] = useState('All')
 
   useEffect(() => {
     try {
@@ -237,29 +228,27 @@ export default function DRCMeetingManagement() {
     if (editingMeeting) {
       const updated = meetings.map(m => m.id === editingMeeting.id ? { ...m, ...formData } : m)
       saveToStorage(updated)
-      toast.success('DRC Review Session updated!')
+      toast.success('Meeting updated!')
       setEditingMeeting(null)
     } else {
       const newMeeting = { ...formData, id: Date.now() }
       saveToStorage([newMeeting, ...meetings])
-      toast.success('DRC Review Session scheduled successfully!')
+      toast.success('Meeting scheduled successfully!')
     }
   }
 
   const handleDelete = (id) => {
-    if (window.confirm('Cancel and delete this DRC review session?')) {
+    if (window.confirm('Cancel and delete this scheduled meeting?')) {
       saveToStorage(meetings.filter(m => m.id !== id))
-      toast.success('Session removed')
+      toast.success('Meeting removed')
     }
   }
 
   const filtered = meetings.filter(m => {
     const sTerm = search.toLowerCase()
     const scholarName = m.scholar || ''
-    const mType = m.type || ''
-    const matchSearch = scholarName.toLowerCase().includes(sTerm) || mType.toLowerCase().includes(sTerm)
-    const matchType = filterType === 'All' || m.type === filterType
-    return matchSearch && matchType
+    const panelName = m.panel || ''
+    return scholarName.toLowerCase().includes(sTerm) || panelName.toLowerCase().includes(sTerm)
   })
 
   return (
@@ -275,12 +264,12 @@ export default function DRCMeetingManagement() {
       {/* Topbar */}
       <div className="topbar">
         <div>
-          <div className="topbar-title">DRC Meeting Management</div>
-          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Schedule and coordinate research defense and synopsis assessment panels</span>
+          <div className="topbar-title">Meeting Schedule</div>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Coordinate and list scheduled Doctoral Research Committee reviews</span>
         </div>
         <div className="topbar-actions">
           <button className="btn btn-primary btn-sm" style={{ background: '#0D9488', borderColor: '#0D9488' }} onClick={() => setShowModal(true)}>
-            ＋ Schedule Session
+            ＋ Meeting Schedule
           </button>
         </div>
       </div>
@@ -290,22 +279,17 @@ export default function DRCMeetingManagement() {
           <div className="filter-bar">
             <div className="search-bar">
               <span className="search-icon">🔍</span>
-              <input className="form-control" placeholder="Search scholar or type..." value={search} onChange={e => setSearch(e.target.value)} />
+              <input className="form-control" placeholder="Search candidate or title..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
-            <select className="form-control form-select" style={{ width: '180px' }} value={filterType} onChange={e => setFilterType(e.target.value)}>
-              <option>All</option>
-              {MEETING_TYPES.map(t => <option key={t}>{t}</option>)}
-            </select>
           </div>
 
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
             <table className="table">
               <thead>
                 <tr>
-                  <th>Committee / Session</th>
-                  <th>Scholar / Candidate</th>
-                  <th>Schedule</th>
-                  <th>Room / Venue</th>
+                  <th>Candidate Name</th>
+                  <th>Meeting Date, Time & Venue</th>
+                  <th>Regards Title</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -313,30 +297,39 @@ export default function DRCMeetingManagement() {
               <tbody>
                 {filtered.map(m => (
                   <tr key={m.id}>
+                    {/* 1. Candidate Name */}
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '20px' }}>📅</span>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{m.panel || 'Evaluation Committee'}</div>
-                          <span className="badge badge-info" style={{ fontSize: '9px', padding: '1px 5px', background: '#E0F2FE', color: '#0369A1' }}>{m.type}</span>
-                        </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{
+                          width: '32px', height: '32px', borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #0D9488, #0F766E)',
+                          color: '#fff', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', fontWeight: 700, fontSize: '13px'
+                        }}>{(m.scholar || 'S').charAt(0)}</span>
+                        <div style={{ fontWeight: 600, fontSize: '13.5px' }}>{m.scholar}</div>
                       </div>
                     </td>
+
+                    {/* 2. Meeting Date, Time & Venue */}
                     <td>
-                      <div style={{ fontWeight: 600, fontSize: '13px' }}>{m.scholar}</div>
-                    </td>
-                    <td>
-                      <div style={{ fontSize: '12.5px', fontWeight: 600 }}>{m.date}</div>
+                      <div style={{ fontSize: '13px', fontWeight: 600 }}>{m.date}</div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{m.time}</div>
+                      <div style={{ fontSize: '11px', color: '#0D9488', marginTop: '2px', fontWeight: 600 }}>📍 {m.venue || 'TBD'}</div>
                     </td>
+
+                    {/* 3. Regards Title */}
                     <td>
-                      <span className="badge badge-warning" style={{ fontSize: '11px', background: '#FEF3C7', color: '#D97706' }}>{m.venue || 'TBD'}</span>
+                      <div style={{ fontSize: '13px', fontWeight: 500, color: '#334155' }}>{m.panel || 'Review Session'}</div>
                     </td>
+
+                    {/* 4. Status */}
                     <td>
                       <span className={`badge ${m.status === 'Completed' ? 'badge-success' : m.status === 'Cancelled' ? 'badge-danger' : 'badge-warning'}`}>
                         {m.status}
                       </span>
                     </td>
+
+                    {/* Actions */}
                     <td>
                       <div style={{ display: 'flex', gap: '4px' }}>
                         <button className="btn btn-ghost btn-sm" onClick={() => setEditingMeeting(m)}>Edit</button>
@@ -347,7 +340,7 @@ export default function DRCMeetingManagement() {
                 ))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                       No meetings found.
                     </td>
                   </tr>

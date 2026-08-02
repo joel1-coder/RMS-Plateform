@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import toast from 'react-hot-toast'
+import ScholarProfileView from './ScholarProfileView'
 
 export default function MyScholars() {
   const { user } = useAuth()
@@ -7,6 +9,7 @@ export default function MyScholars() {
   const [search, setSearch] = useState('')
   const [filterDept, setFilterDept] = useState('All')
   const [filterStatus, setFilterStatus] = useState('All')
+  const [viewingScholar, setViewingScholar] = useState(null)
 
   useEffect(() => {
     if (!user) return
@@ -83,6 +86,10 @@ export default function MyScholars() {
 
   // Get distinct departments for filter list
   const departments = [...new Set(scholars.map(s => s.dept))]
+
+  if (viewingScholar) {
+    return <ScholarProfileView scholar={viewingScholar} onBack={() => setViewingScholar(null)} />
+  }
 
   return (
     <div className="animate-fade">
@@ -204,7 +211,7 @@ export default function MyScholars() {
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '5px' }}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => toast.success(`Viewing profile of ${s.name} (Email: ${s.email})`)}>
+                        <button className="btn btn-secondary btn-sm" onClick={() => setViewingScholar(s)}>
                           View Profile
                         </button>
                       </div>

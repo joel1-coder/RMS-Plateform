@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 
 const NAV = [
   { to: '/drc', label: 'Dashboard', icon: '🏠', exact: true },
+  { to: '/drc/scholars', label: 'View Scholars', icon: '🎓' },
   { to: '/drc/meetings', label: 'Meeting Management', icon: '📅' },
   { to: '/drc/minutes', label: 'Meeting Minutes', icon: '📝' },
   { to: '/drc/notifications', label: 'Notifications', icon: '🔔', badge: 3 },

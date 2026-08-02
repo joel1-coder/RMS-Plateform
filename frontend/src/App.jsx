@@ -71,6 +71,7 @@ import DRCDashboard from './pages/drc/DRCDashboard'
 import DRCSynopsisApproval from './pages/drc/DRCSynopsisApproval'
 import CommitteeManagement from './pages/drc/CommitteeManagement'
 import DRCMeetingManagement from './pages/drc/DRCMeetingManagement'
+import DRCViewScholars from './pages/drc/DRCViewScholars'
 import MeetingMinutes from './pages/drc/MeetingMinutes'
 import DRCReports from './pages/drc/DRCReports'
 import DRCNotifications from './pages/drc/DRCNotifications'
@@ -187,6 +188,7 @@ function AppRoutes() {
         </ProtectedRoute>
       }>
         <Route index element={<DRCDashboard />} />
+        <Route path="scholars" element={<DRCViewScholars />} />
         <Route path="synopsis" element={<DRCSynopsisApproval />} />
         <Route path="meetings" element={<DRCMeetingManagement />} />
         <Route path="minutes" element={<MeetingMinutes />} />
