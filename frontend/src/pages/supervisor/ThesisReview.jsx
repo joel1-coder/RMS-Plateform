@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 const initialThesisSubmissions = [
@@ -8,17 +8,173 @@ const initialThesisSubmissions = [
   { id: 4, scholarName: 'Sarah Wong', scholarId: 'PH2022019', dept: 'Molecular Biology', title: 'CRISPR-Cas9 Mediated Gene Editing for Drought-Resistant Crops', date: 'Oct 05, 2023', status: 'Under Review' },
 ]
 
+function loadScholars() {
+  try {
+    const raw = localStorage.getItem('rms_all_users')
+    if (raw) {
+      return JSON.parse(raw)
+        .filter(u => (u.role || '').toLowerCase() === 'scholar')
+        .map(u => ({ id: u.id || 'PH' + Math.floor(100000 + Math.random() * 900000), name: u.name, dept: u.dept || 'Computer Science' }))
+    }
+  } catch { /* ignore */ }
+  // Fallback defaults
+  return [
+    { id: 'PH2021008', name: 'Ahmed Mansoor', dept: 'Computer Science' },
+    { id: 'PH2022045', name: 'Elena Lopez', dept: 'Data Science' },
+    { id: 'PH2021088', name: 'Rajesh Kumar', dept: 'Quantum Physics' },
+    { id: 'PH2022019', name: 'Sarah Wong', dept: 'Molecular Biology' },
+  ]
+}
+
+function UploadThesisModal({ onClose, onUpload }) {
+  const [scholars, setScholars] = useState([])
+  const [selectedScholar, setSelectedScholar] = useState('')
+  const [title, setTitle] = useState('')
+  const [file, setFile] = useState(null)
+
+  useEffect(() => {
+    setScholars(loadScholars())
+  }, [])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!selectedScholar || !title || !file) {
+      toast.error('Please select a scholar, enter thesis title, and choose a file.')
+      return
+    }
+    const scholarObj = scholars.find(s => s.name === selectedScholar) || { id: 'PH' + Date.now().toString().slice(-6), dept: 'Research' }
+    
+    onUpload({
+      id: Date.now(),
+      scholarName: scholarObj.name,
+      scholarId: scholarObj.id,
+      dept: scholarObj.dept,
+      title: title,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+      status: 'Under Review'
+    })
+    toast.success('Thesis draft uploaded successfully!')
+    onClose()
+  }
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal">
+        <div className="modal-header">
+          <span className="modal-title">Upload Scholar Thesis</span>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="form-group">
+              <label className="form-label" style={{ fontWeight: 600 }}>Select Scholar *</label>
+              <select 
+                className="form-control form-select" 
+                value={selectedScholar} 
+                onChange={e => setSelectedScholar(e.target.value)}
+                required
+              >
+                <option value="">-- Choose Scholar --</option>
+                {scholars.map(s => (
+                  <option key={s.id} value={s.name}>{s.name} ({s.id})</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label" style={{ fontWeight: 600 }}>Thesis Title *</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                placeholder="Enter thesis draft title" 
+                value={title} 
+                onChange={e => setTitle(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label" style={{ fontWeight: 600 }}>Select Thesis File *</label>
+              <div 
+                onClick={() => document.getElementById('thesisFileInput').click()}
+                style={{
+                  border: '2px dashed #CBD5E1', borderRadius: 'var(--radius-md)',
+                  padding: '24px', textAlign: 'center', cursor: 'pointer',
+                  background: '#FAFAFA', transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = '#4F46E5'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = '#CBD5E1'}
+              >
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📄</div>
+                {file ? (
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '13px', color: '#10B981' }}>Selected: {file.name}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Click to change file</div>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '13px' }}>Click to select thesis draft</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>PDF or DOCX format</div>
+                  </div>
+                )}
+                <input 
+                  id="thesisFileInput" 
+                  type="file" 
+                  style={{ display: 'none' }} 
+                  onChange={e => {
+                    if (e.target.files?.[0]) setFile(e.target.files[0])
+                  }} 
+                />
+              </div>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>Upload Thesis</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 export default function ThesisReview() {
-  const [submissions, setSubmissions] = useState(initialThesisSubmissions)
+  const [submissions, setSubmissions] = useState([])
   const [search, setSearch] = useState('')
   const [selectedSub, setSelectedSub] = useState(null)
   const [remarks, setRemarks] = useState('')
+  const [showUploadModal, setShowUploadModal] = useState(false)
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('rms_thesis_submissions')
+      if (stored) {
+        setSubmissions(JSON.parse(stored))
+      } else {
+        setSubmissions(initialThesisSubmissions)
+        localStorage.setItem('rms_thesis_submissions', JSON.stringify(initialThesisSubmissions))
+      }
+    } catch {
+      setSubmissions(initialThesisSubmissions)
+    }
+  }, [])
+
+  const saveToStorage = (updated) => {
+    setSubmissions(updated)
+    localStorage.setItem('rms_thesis_submissions', JSON.stringify(updated))
+  }
 
   const handleAction = (id, newStatus) => {
-    setSubmissions(prev => prev.map(sub => sub.id === id ? { ...sub, status: newStatus } : sub))
+    const updated = submissions.map(sub => sub.id === id ? { ...sub, status: newStatus } : sub)
+    saveToStorage(updated)
     toast.success(`Thesis status updated to ${newStatus}`)
     setSelectedSub(null)
     setRemarks('')
+  }
+
+  const handleUpload = (newSubmission) => {
+    const updated = [newSubmission, ...submissions]
+    saveToStorage(updated)
   }
 
   const getStatusBadge = (status) => {
@@ -32,13 +188,21 @@ export default function ThesisReview() {
   }
 
   const filtered = submissions.filter(sub => 
-    sub.scholarName.toLowerCase().includes(search.toLowerCase()) || 
-    sub.title.toLowerCase().includes(search.toLowerCase())
+    (sub.scholarName || '').toLowerCase().includes(search.toLowerCase()) || 
+    (sub.title || '').toLowerCase().includes(search.toLowerCase())
   )
 
   return (
     <div className="animate-fade">
-      {/* Modal */}
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <UploadThesisModal 
+          onClose={() => setShowUploadModal(false)}
+          onUpload={handleUpload}
+        />
+      )}
+
+      {/* Review Modal */}
       {selectedSub && (
         <div className="modal-backdrop">
           <div className="modal">
@@ -93,6 +257,7 @@ export default function ThesisReview() {
         </div>
         <div className="topbar-actions">
           <button className="btn btn-ghost btn-sm">📥 Export Report</button>
+          <button className="btn btn-primary btn-sm" style={{ background: '#0D9488', borderColor: '#0D9488' }} onClick={() => setShowUploadModal(true)}>＋ Upload Thesis</button>
           <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>＋ New Call for Submissions</button>
         </div>
       </div>
@@ -147,7 +312,7 @@ export default function ThesisReview() {
                     <tr key={sub.id}>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div className="avatar avatar-sm" style={{ background: '#3B82F6' }}>{sub.scholarName.charAt(0)}</div>
+                          <div className="avatar avatar-sm" style={{ background: '#3B82F6' }}>{(sub.scholarName || 'S').charAt(0)}</div>
                           <div>
                             <div style={{ fontWeight: 600, fontSize: '13px' }}>{sub.scholarName}</div>
                             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{sub.dept}</div>
@@ -168,6 +333,13 @@ export default function ThesisReview() {
                       </td>
                     </tr>
                   ))}
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                        No thesis submissions found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

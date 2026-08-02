@@ -250,17 +250,17 @@ export default function ScheduleDCMeeting() {
             </div>
           </form>
 
-          {/* Right Panel - Pre-read Documents */}
+          {/* Right Panel - Minutes Upload */}
           <div style={{ width: '320px', flexShrink: 0 }}>
             <div className="card">
               <div className="card-header">
                 <div style={{ fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>📄</span> Pre-read Documents
+                  <span>📄</span> Minutes Upload
                 </div>
               </div>
               <div className="card-body">
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '14px' }}>
-                  Ensure all required documents for the committee review are uploaded.
+                  Ensure all meeting minutes and review documents are uploaded.
                 </div>
                 {/* Upload Zone */}
                 <div

@@ -34,7 +34,7 @@ const NAV_SECTIONS = [
       { to: '/supervisor/coursework-list', label: 'Coursework List', icon: '📒' },
       { to: '/supervisor/coursework-details', label: 'Coursework Details', icon: '📝' },
       { to: '/supervisor/thesis-submission', label: 'Thesis Submission', icon: '📚' },
-      { to: '/supervisor/thesis-viva', label: 'Thesis Viva-voce', icon: '🎓' },
+      { to: '/supervisor/thesis-viva', label: 'Viva Voce', icon: '🎓' },
     ]
   },
   {

@@ -7,10 +7,10 @@ const scholarDetails = {
 
 export default function CourseworkDetailsManagement() {
   const [marks, setMarks] = useState([
-    { subject: 'RESEARCH METHODOLOGY [JOHPHCS001]', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
-    { subject: 'ADVANCED COMPUTER SCIENCE [JOHPHCS002]', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
-    { subject: 'CLOUD COMPUTING [JOHPHCS0011]', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
-    { subject: 'ELECTIVE / SPECIAL PAPER [JOHPHCS0012]', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' },
+    { subject: 'RESEARCH METHODOLOGY [JOHPHCS001]', coursework: 'Research Methodology', examDate: '', maxMark: 100, internal: '', external: '', eScript: '', creditMark: '', result: 'Auto calculated' },
+    { subject: 'ADVANCED COMPUTER SCIENCE [JOHPHCS002]', coursework: 'Core Course', examDate: '', maxMark: 100, internal: '', external: '', eScript: '', creditMark: '', result: 'Auto calculated' },
+    { subject: 'CLOUD COMPUTING [JOHPHCS0011]', coursework: 'Elective Course', examDate: '', maxMark: 100, internal: '', external: '', eScript: '', creditMark: '', result: 'Auto calculated' },
+    { subject: 'ELECTIVE / SPECIAL PAPER [JOHPHCS0012]', coursework: 'Special Paper', examDate: '', maxMark: 100, internal: '', external: '', eScript: '', creditMark: '', result: 'Auto calculated' },
   ])
   const [saving, setSaving] = useState(false)
 
@@ -21,7 +21,7 @@ export default function CourseworkDetailsManagement() {
   const handleAddRow = () => {
     setMarks(prev => [
       ...prev,
-      { subject: '', examDate: '', maxMark: 100, minMark: 50, scoredMark: '', creditMark: '', result: 'Auto calculated' }
+      { subject: '', coursework: 'Core Course', examDate: '', maxMark: 100, internal: '', external: '', eScript: '', creditMark: '', result: 'Auto calculated' }
     ])
   }
 
@@ -103,10 +103,12 @@ export default function CourseworkDetailsManagement() {
                   <tr>
                     <th style={{ width: '40px' }}>#</th>
                     <th>SUBJECT NAME</th>
+                    <th>COURSE-WORK</th>
                     <th>EXAM DATE</th>
                     <th>MAX MARK</th>
-                    <th>MIN MARK</th>
-                    <th>SCORED MARK</th>
+                    <th>INTERNAL</th>
+                    <th>EXTERNAL</th>
+                    <th>E-SCRIPT</th>
                     <th>CREDIT MARK</th>
                     <th>RESULT</th>
                     <th style={{ width: '50px' }}>ACTION</th>
@@ -122,8 +124,20 @@ export default function CourseworkDetailsManagement() {
                           value={m.subject}
                           onChange={e => handleMarkChange(i, 'subject', e.target.value)}
                           placeholder="Enter Subject Name & Code"
-                          style={{ width: '100%', minWidth: '220px', padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12.5px' }}
+                          style={{ width: '100%', minWidth: '200px', padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12.5px' }}
                         />
+                      </td>
+                      <td>
+                        <select
+                          value={m.coursework}
+                          onChange={e => handleMarkChange(i, 'coursework', e.target.value)}
+                          style={{ padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12.5px', background: '#fff', width: '160px' }}
+                        >
+                          <option value="Core Course">Core Course</option>
+                          <option value="Elective Course">Elective Course</option>
+                          <option value="Research Methodology">Research Methodology</option>
+                          <option value="Special Paper">Special Paper</option>
+                        </select>
                       </td>
                       <td>
                         <input
@@ -134,15 +148,65 @@ export default function CourseworkDetailsManagement() {
                         />
                       </td>
                       <td style={{ textAlign: 'center', fontWeight: 600 }}>{m.maxMark}</td>
-                      <td style={{ textAlign: 'center', fontWeight: 600 }}>{m.minMark}</td>
                       <td>
                         <input
                           type="text"
-                          value={m.scoredMark}
-                          onChange={e => handleMarkChange(i, 'scoredMark', e.target.value)}
-                          placeholder="Enter Mark"
+                          value={m.internal}
+                          onChange={e => handleMarkChange(i, 'internal', e.target.value)}
+                          placeholder="Enter Internal"
                           style={{ width: '90px', padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12px' }}
                         />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          value={m.external}
+                          onChange={e => handleMarkChange(i, 'external', e.target.value)}
+                          placeholder="Enter External"
+                          style={{ width: '90px', padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12px' }}
+                        />
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          {m.eScript ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#ECFDF5', border: '1px solid #A7F3D0', padding: '4px 8px', borderRadius: '4px', maxWidth: '140px' }}>
+                              <span style={{ fontSize: '11px', color: '#065F46', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={m.eScript}>
+                                📄 {m.eScript}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleMarkChange(i, 'eScript', '')}
+                                style={{ background: 'none', border: 'none', color: '#10B981', cursor: 'pointer', fontSize: '12px', padding: 0 }}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <label
+                                htmlFor={`escript-file-${i}`}
+                                style={{
+                                  padding: '5px 10px', background: '#F3F4F6', border: '1px solid #D1D5DB',
+                                  borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 600,
+                                  display: 'inline-flex', alignItems: 'center', gap: '4px'
+                                }}
+                              >
+                                📤 Upload
+                              </label>
+                              <input
+                                id={`escript-file-${i}`}
+                                type="file"
+                                style={{ display: 'none' }}
+                                onChange={e => {
+                                  if (e.target.files?.[0]) {
+                                    handleMarkChange(i, 'eScript', e.target.files[0].name)
+                                    toast.success(`E-Script uploaded for row ${i + 1}`)
+                                  }
+                                }}
+                              />
+                            </>
+                          )}
+                        </div>
                       </td>
                       <td>
                         <input
@@ -154,8 +218,13 @@ export default function CourseworkDetailsManagement() {
                         />
                       </td>
                       <td>
-                        <span style={{ fontSize: '11.5px', color: '#6C63FF', fontStyle: 'italic' }}>
-                          {m.scoredMark ? (Number(m.scoredMark) >= m.minMark ? '✅ PASS' : '❌ FAIL') : m.result}
+                        <span style={{ fontSize: '11.5px', color: '#6C63FF', fontStyle: 'italic', fontWeight: 700 }}>
+                          {(() => {
+                            const hasMarks = m.internal !== '' || m.external !== '';
+                            if (!hasMarks) return m.result;
+                            const total = (Number(m.internal) || 0) + (Number(m.external) || 0);
+                            return total >= 50 ? '✅ PASS' : '❌ FAIL';
+                          })()}
                         </span>
                       </td>
                       <td style={{ textAlign: 'center' }}>
