@@ -1,0 +1,306 @@
+[
+  {
+    "page": "/login",
+    "file": "frontend/src/pages/LoginPage.jsx",
+    "title": "Login Page",
+    "actions": [
+      {
+        "selector": "form",
+        "label": "Sign In",
+        "type": "api",
+        "target": "POST /api/auth/login",
+        "description": "Authenticates user and redirects to their dashboard based on role (/admin, /scholar, /supervisor, /hod, /drc)"
+      }
+    ]
+  },
+  {
+    "page": "/admin",
+    "file": "frontend/src/pages/admin/AdminDashboard.jsx",
+    "title": "Admin Dashboard",
+    "actions": [
+      {
+        "selector": "NavLink to='/admin/users'",
+        "label": "User Management",
+        "type": "navigate",
+        "target": "/admin/users"
+      },
+      {
+        "selector": "NavLink to='/admin/research'",
+        "label": "Research Management",
+        "type": "navigate",
+        "target": "/admin/research"
+      },
+      {
+        "selector": "NavLink to='/admin/assign'",
+        "label": "Assign Scholar",
+        "type": "navigate",
+        "target": "/admin/assign"
+      },
+      {
+        "selector": "NavLink to='/admin/drc'",
+        "label": "Meetings",
+        "type": "navigate",
+        "target": "/admin/drc"
+      }
+    ]
+  },
+  {
+    "page": "/admin/users",
+    "file": "frontend/src/pages/admin/UserManagement.jsx",
+    "title": "User Management",
+    "actions": [
+      {
+        "selector": "button.btn-primary",
+        "label": "Add User",
+        "type": "api",
+        "target": "POST /api/users",
+        "description": "Creates a new user record (Admin, Supervisor, Scholar, HOD, DRC, Librarian)"
+      },
+      {
+        "selector": "button.btn-secondary",
+        "label": "Edit User",
+        "type": "api",
+        "target": "PUT /api/users/:id",
+        "description": "Updates details (role, email, dept, status, password) of an existing user"
+      },
+      {
+        "selector": "button.btn-ghost (trash icon)",
+        "label": "Delete User",
+        "type": "api",
+        "target": "DELETE /api/users/:id",
+        "description": "Deletes user record"
+      }
+    ]
+  },
+  {
+    "page": "/admin/research",
+    "file": "frontend/src/pages/admin/ResearchManagement.jsx",
+    "title": "Research Management",
+    "actions": [
+      {
+        "selector": "button.btn-primary",
+        "label": "New Research",
+        "type": "api",
+        "target": "POST /api/research",
+        "description": "Creates a new research project"
+      },
+      {
+        "selector": "button.btn-secondary",
+        "label": "Edit Project",
+        "type": "api",
+        "target": "PUT /api/research/:id",
+        "description": "Modifies project topic, supervisor, progress percentage, stage, status"
+      },
+      {
+        "selector": "button.btn-ghost (trash icon)",
+        "label": "Delete Project",
+        "type": "api",
+        "target": "DELETE /api/research/:id",
+        "description": "Removes research project entry"
+      }
+    ]
+  },
+  {
+    "page": "/admin/assign",
+    "file": "frontend/src/pages/admin/AssignScholar.jsx",
+    "title": "Assign Scholar to Supervisor",
+    "actions": [
+      {
+        "selector": "button.btn-primary",
+        "label": "Assign Scholar",
+        "type": "api",
+        "target": "PUT /api/users/:scholarId/assign-supervisor",
+        "description": "Assigns scholar to a supervisor, updating local user objects"
+      },
+      {
+        "selector": "button.btn-ghost (unlink)",
+        "label": "Unassign Scholar",
+        "type": "api",
+        "target": "PUT /api/users/:scholarId/unassign-supervisor",
+        "description": "Removes supervisor reference from the scholar"
+      }
+    ]
+  },
+  {
+    "page": "/admin/drc",
+    "file": "frontend/src/pages/admin/DRCManagement.jsx",
+    "title": "Meeting & Viva Assigning",
+    "actions": [
+      {
+        "selector": "button.btn-primary",
+        "label": "Assign Meeting",
+        "type": "api",
+        "target": "POST /api/meetings",
+        "description": "Assigns and schedules a new meeting (Viva Voce, Synopsis Review, etc.)"
+      },
+      {
+        "selector": "button.btn-secondary",
+        "label": "Edit Meeting",
+        "type": "api",
+        "target": "PUT /api/meetings/:id",
+        "description": "Updates scheduled date, time, venue, status"
+      },
+      {
+        "selector": "button.btn-ghost (trash icon)",
+        "label": "Delete Meeting",
+        "type": "api",
+        "target": "DELETE /api/meetings/:id",
+        "description": "Deletes meeting schedule"
+      }
+    ]
+  },
+  {
+    "page": "/admin/reports",
+    "file": "frontend/src/pages/admin/Reports.jsx",
+    "title": "Reports & Analytics",
+    "actions": [
+      {
+        "selector": "button.btn-primary (search)",
+        "label": "Search Scholar",
+        "type": "api",
+        "target": "GET /api/reports/scholar?name=:name",
+        "description": "Looks up scholar details and projects by name"
+      },
+      {
+        "selector": "button.btn-primary (generate)",
+        "label": "Generate Report",
+        "type": "api",
+        "target": "GET /api/reports/generate",
+        "description": "Generates aggregate reports on status, thesis progress, and viva statistics"
+      }
+    ]
+  },
+  {
+    "page": "/scholar/synopsis",
+    "file": "frontend/src/pages/scholar/ScholarSynopsis.jsx",
+    "title": "Synopsis Submissions",
+    "actions": [
+      {
+        "selector": "form",
+        "label": "Upload Synopsis Document",
+        "type": "api",
+        "target": "POST /api/submissions/synopsis",
+        "description": "Submits research synopsis and uploads PDF attachment"
+      }
+    ]
+  },
+  {
+    "page": "/scholar/thesis",
+    "file": "frontend/src/pages/scholar/ScholarThesis.jsx",
+    "title": "Thesis Submission",
+    "actions": [
+      {
+        "selector": "form",
+        "label": "Submit Thesis",
+        "type": "api",
+        "target": "POST /api/submissions/thesis",
+        "description": "Uploads final thesis copy and references metadata"
+      }
+    ]
+  },
+  {
+    "page": "/supervisor/scholars",
+    "file": "frontend/src/pages/supervisor/MyScholars.jsx",
+    "title": "My Scholars",
+    "actions": [
+      {
+        "selector": "button.btn-secondary",
+        "label": "View Profile",
+        "type": "navigate",
+        "target": "/supervisor/profile/:id",
+        "description": "Navigates to specific profile details of the assigned scholar"
+      }
+    ]
+  },
+  {
+    "page": "/supervisor/meetings",
+    "file": "frontend/src/pages/supervisor/MeetingsManagement.jsx",
+    "title": "Supervisor Meetings Management",
+    "actions": [
+      {
+        "selector": "button.btn-primary",
+        "label": "Schedule New Meeting",
+        "type": "api",
+        "target": "POST /api/meetings",
+        "description": "Schedules a regular review meeting with a scholar"
+      },
+      {
+        "selector": "button.btn-outline",
+        "label": "Edit",
+        "type": "api",
+        "target": "PUT /api/meetings/:id",
+        "description": "Modifies meeting details"
+      },
+      {
+        "selector": "button.btn-ghost (cancel)",
+        "label": "Cancel Meeting",
+        "type": "api",
+        "target": "DELETE /api/meetings/:id",
+        "description": "Cancels and deletes a scheduled meeting"
+      }
+    ]
+  },
+  {
+    "page": "/drc/synopsis",
+    "file": "frontend/src/pages/drc/DRCSynopsisApproval.jsx",
+    "title": "Synopsis Approval Queue",
+    "actions": [
+      {
+        "selector": "button.btn-primary (approve)",
+        "label": "Approved by DRC",
+        "type": "api",
+        "target": "PUT /api/submissions/synopsis/:id/status",
+        "description": "Updates state to Approved by DRC"
+      },
+      {
+        "selector": "button.btn-danger (reject)",
+        "label": "Needs DRC Revision",
+        "type": "api",
+        "target": "PUT /api/submissions/synopsis/:id/status",
+        "description": "Sends feedback remarks and sets state to Revision Required"
+      }
+    ]
+  },
+  {
+    "page": "/drc/meetings",
+    "file": "frontend/src/pages/drc/DRCMeetingManagement.jsx",
+    "title": "DRC Meeting Management",
+    "actions": [
+      {
+        "selector": "button.btn-primary",
+        "label": "Schedule Session",
+        "type": "api",
+        "target": "POST /api/meetings",
+        "description": "Schedules a new evaluation panel review session"
+      },
+      {
+        "selector": "button.btn-ghost (edit)",
+        "label": "Edit Session",
+        "type": "api",
+        "target": "PUT /api/meetings/:id",
+        "description": "Edits details of scheduled evaluation sessions"
+      },
+      {
+        "selector": "button.btn-ghost (delete)",
+        "label": "Delete Session",
+        "type": "api",
+        "target": "DELETE /api/meetings/:id",
+        "description": "Deletes scheduled defense session"
+      }
+    ]
+  },
+  {
+    "page": "/drc/minutes",
+    "file": "frontend/src/pages/drc/MeetingMinutes.jsx",
+    "title": "DRC Meeting Minutes",
+    "actions": [
+      {
+        "selector": "button.btn-primary (add)",
+        "label": "Record Minutes",
+        "type": "api",
+        "target": "POST /api/minutes",
+        "description": "Saves resolutions and decisions of doctoral review panels"
+      }
+    ]
+  }
+]

@@ -1,0 +1,367 @@
+[
+  {
+    "endpoint": "POST /api/auth/login",
+    "description": "Authenticates user and returns JWT token plus user profile data.",
+    "auth": "None",
+    "request": {
+      "email": "string (required, valid email)",
+      "password": "string (required, min 6 chars)",
+      "role": "string (required, one of: admin, supervisor, scholar, hod, drc, librarian)"
+    },
+    "response": {
+      "token": "JWT token string",
+      "user": {
+        "id": "number/ObjectId",
+        "email": "string",
+        "name": "string",
+        "role": "string",
+        "dept": "string"
+      }
+    },
+    "status_codes": {
+      "200": "Successful authentication",
+      "400": "Validation error or missing fields",
+      "401": "Invalid email, password, or role mismatched"
+    }
+  },
+  {
+    "endpoint": "GET /api/users",
+    "description": "Returns list of all users, filterable by role and status.",
+    "auth": "Bearer JWT (admin, hod)",
+    "request_params": {
+      "role": "string (optional)",
+      "status": "string (optional)"
+    },
+    "response": [
+      {
+        "id": "number/ObjectId",
+        "name": "string",
+        "email": "string",
+        "role": "string",
+        "dept": "string",
+        "status": "string",
+        "joined": "string (YYYY-MM-DD)",
+        "assignedSupervisor": "string (optional)",
+        "assignedSupervisorId": "number/ObjectId (optional)"
+      }
+    ],
+    "status_codes": {
+      "200": "Success",
+      "403": "Access Denied"
+    }
+  },
+  {
+    "endpoint": "POST /api/users",
+    "description": "Creates a new system user.",
+    "auth": "Bearer JWT (admin)",
+    "request": {
+      "name": "string (required)",
+      "email": "string (required, valid email)",
+      "password": "string (required)",
+      "role": "string (required, admin/supervisor/scholar/hod/drc/librarian)",
+      "dept": "string (required)",
+      "status": "string (optional, default: Active)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "name": "string",
+      "email": "string",
+      "role": "string",
+      "dept": "string",
+      "status": "string"
+    },
+    "status_codes": {
+      "201": "Created",
+      "400": "Validation failed / Email already exists"
+    }
+  },
+  {
+    "endpoint": "PUT /api/users/:id",
+    "description": "Updates details of an existing user.",
+    "auth": "Bearer JWT (admin)",
+    "request": {
+      "name": "string (optional)",
+      "email": "string (optional)",
+      "password": "string (optional)",
+      "role": "string (optional)",
+      "dept": "string (optional)",
+      "status": "string (optional)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "name": "string",
+      "email": "string",
+      "role": "string",
+      "dept": "string",
+      "status": "string"
+    },
+    "status_codes": {
+      "200": "Updated successfully",
+      "404": "User not found"
+    }
+  },
+  {
+    "endpoint": "DELETE /api/users/:id",
+    "description": "Deletes a user from the system.",
+    "auth": "Bearer JWT (admin)",
+    "response": {
+      "success": "boolean"
+    },
+    "status_codes": {
+      "200": "Deleted successfully",
+      "404": "User not found"
+    }
+  },
+  {
+    "endpoint": "PUT /api/users/:scholarId/assign-supervisor",
+    "description": "Assigns a supervisor to a scholar candidate.",
+    "auth": "Bearer JWT (admin, hod)",
+    "request": {
+      "supervisorId": "number/ObjectId (required)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "name": "string",
+      "role": "Scholar",
+      "assignedSupervisor": "string",
+      "assignedSupervisorId": "number/ObjectId"
+    },
+    "status_codes": {
+      "200": "Assignment succeeded",
+      "404": "Scholar or Supervisor not found"
+    }
+  },
+  {
+    "endpoint": "PUT /api/users/:scholarId/unassign-supervisor",
+    "description": "Removes supervisor reference from a scholar.",
+    "auth": "Bearer JWT (admin, hod)",
+    "response": {
+      "id": "number/ObjectId",
+      "name": "string",
+      "role": "Scholar",
+      "assignedSupervisor": null,
+      "assignedSupervisorId": null
+    },
+    "status_codes": {
+      "200": "Unassignment succeeded",
+      "404": "Scholar not found"
+    }
+  },
+  {
+    "endpoint": "GET /api/research",
+    "description": "Returns list of all research projects, filterable by status and stage.",
+    "auth": "Bearer JWT (admin, supervisor, scholar, hod, drc)",
+    "request_params": {
+      "status": "string (optional)",
+      "stage": "string (optional)"
+    },
+    "response": [
+      {
+        "id": "number/ObjectId",
+        "scholar": "string",
+        "topic": "string",
+        "supervisor": "string",
+        "dept": "string",
+        "startDate": "string",
+        "status": "string",
+        "progress": "number",
+        "stage": "string"
+      }
+    ],
+    "status_codes": {
+      "200": "Success"
+    }
+  },
+  {
+    "endpoint": "POST /api/research",
+    "description": "Creates a new research project tracking entry.",
+    "auth": "Bearer JWT (admin)",
+    "request": {
+      "scholar": "string (required)",
+      "topic": "string (required)",
+      "supervisor": "string (required)",
+      "dept": "string (required)",
+      "startDate": "string (required)",
+      "stage": "string (optional, default: Course Work)",
+      "progress": "number (optional, default: 0)",
+      "status": "string (optional, default: Active)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "scholar": "string",
+      "topic": "string",
+      "supervisor": "string",
+      "dept": "string",
+      "startDate": "string",
+      "stage": "string",
+      "progress": "number",
+      "status": "string"
+    },
+    "status_codes": {
+      "201": "Created",
+      "400": "Validation failed"
+    }
+  },
+  {
+    "endpoint": "PUT /api/research/:id",
+    "description": "Updates details of a research project (progress, stage, status, topic).",
+    "auth": "Bearer JWT (admin, supervisor)",
+    "request": {
+      "topic": "string (optional)",
+      "supervisor": "string (optional)",
+      "stage": "string (optional)",
+      "progress": "number (optional)",
+      "status": "string (optional)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "scholar": "string",
+      "topic": "string",
+      "progress": "number",
+      "stage": "string",
+      "status": "string"
+    },
+    "status_codes": {
+      "200": "Updated successfully",
+      "404": "Research project not found"
+    }
+  },
+  {
+    "endpoint": "DELETE /api/research/:id",
+    "description": "Removes a research project tracking record.",
+    "auth": "Bearer JWT (admin)",
+    "response": {
+      "success": "boolean"
+    },
+    "status_codes": {
+      "200": "Deleted successfully",
+      "404": "Project not found"
+    }
+  },
+  {
+    "endpoint": "POST /api/submissions/synopsis",
+    "description": "Submits a research synopsis with file attachment (multipart/form-data).",
+    "auth": "Bearer JWT (scholar)",
+    "request_multipart": {
+      "topic": "string (required)",
+      "file": "Binary/PDF file (required)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "scholarName": "string",
+      "topic": "string",
+      "fileUrl": "string",
+      "status": "Pending Supervisor Approval",
+      "submittedAt": "string"
+    },
+    "status_codes": {
+      "201": "Submitted",
+      "400": "Missing file or description"
+    }
+  },
+  {
+    "endpoint": "PUT /api/submissions/synopsis/:id/status",
+    "description": "Approves or requests revisions on a synopsis submission.",
+    "auth": "Bearer JWT (supervisor, drc)",
+    "request": {
+      "status": "string (required, e.g. Approved by Supervisor, Approved by DRC, Needs DRC Revision)",
+      "remarks": "string (optional)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "status": "string",
+      "remarks": "string"
+    },
+    "status_codes": {
+      "200": "Status updated",
+      "400": "Invalid status transition"
+    }
+  },
+  {
+    "endpoint": "POST /api/meetings",
+    "description": "Schedules a new meeting or defense session.",
+    "auth": "Bearer JWT (admin, supervisor, drc)",
+    "request": {
+      "scholar": "string (required)",
+      "type": "string (required, e.g. Viva Voce, Synopsis Review, Doctoral Committee, Regular Review)",
+      "date": "string (required, YYYY-MM-DD)",
+      "time": "string (required, e.g. 10:30)",
+      "venue": "string (optional)",
+      "panel": "string (optional)",
+      "status": "string (optional, default: Scheduled)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "scholar": "string",
+      "type": "string",
+      "date": "string",
+      "time": "string",
+      "venue": "string",
+      "panel": "string",
+      "status": "string"
+    },
+    "status_codes": {
+      "201": "Scheduled successfully",
+      "400": "Missing required date/time fields"
+    }
+  },
+  {
+    "endpoint": "PUT /api/meetings/:id",
+    "description": "Edits meeting schedules.",
+    "auth": "Bearer JWT (admin, supervisor, drc)",
+    "request": {
+      "scholar": "string (optional)",
+      "type": "string (optional)",
+      "date": "string (optional)",
+      "time": "string (optional)",
+      "venue": "string (optional)",
+      "panel": "string (optional)",
+      "status": "string (optional)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "scholar": "string",
+      "date": "string",
+      "time": "string",
+      "status": "string"
+    },
+    "status_codes": {
+      "200": "Updated successfully",
+      "404": "Meeting not found"
+    }
+  },
+  {
+    "endpoint": "DELETE /api/meetings/:id",
+    "description": "Cancels and deletes a scheduled meeting.",
+    "auth": "Bearer JWT (admin, supervisor, drc)",
+    "response": {
+      "success": "boolean"
+    },
+    "status_codes": {
+      "200": "Deleted successfully",
+      "404": "Meeting not found"
+    }
+  },
+  {
+    "endpoint": "POST /api/minutes",
+    "description": "Saves resolutions of review panel meetings (Minutes of Meeting).",
+    "auth": "Bearer JWT (drc)",
+    "request": {
+      "committee": "string (required)",
+      "meetingDate": "string (required)",
+      "agenda": "string (required)",
+      "decisions": "string (required)",
+      "writer": "string (optional)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "committee": "string",
+      "meetingDate": "string",
+      "decisions": "string",
+      "status": "Draft"
+    },
+    "status_codes": {
+      "201": "Saved successfully"
+    }
+  }
+]
