@@ -1,0 +1,169 @@
+[
+  {
+    "collection": "users",
+    "description": "Stores user credentials, profiles, system roles, and scholar-supervisor linkages.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true, "description": "Unique user ID" },
+      { "name": "name", "type": "string", "required": true, "description": "Full name" },
+      { "name": "email", "type": "string", "required": true, "unique": true, "description": "Login email address" },
+      { "name": "password", "type": "string", "required": true, "description": "Hashed password" },
+      { "name": "role", "type": "string", "required": true, "enum": ["admin", "supervisor", "scholar", "hod", "drc", "librarian"], "description": "System role" },
+      { "name": "dept", "type": "string", "required": true, "description": "Department/Unit" },
+      { "name": "status", "type": "string", "required": true, "default": "Active", "enum": ["Active", "Inactive"], "description": "Account status" },
+      { "name": "joined", "type": "string", "required": true, "description": "Joined date YYYY-MM-DD" },
+      { "name": "assignedSupervisor", "type": "string", "required": false, "description": "Name of assigned supervisor (for Scholars only)" },
+      { "name": "assignedSupervisorId", "type": "ObjectId", "required": false, "ref": "users", "description": "Supervisor user reference (for Scholars only)" }
+    ],
+    "indexes": [ "email", "role", "assignedSupervisorId" ],
+    "sample_document": {
+      "_id": "60d5ec49f3323a1a98ec561a",
+      "name": "Rahul Sharma",
+      "email": "scholar@rms.edu",
+      "password": "$2b$10$Z3dK9...",
+      "role": "scholar",
+      "dept": "Computer Science",
+      "status": "Active",
+      "joined": "2023-08-15",
+      "assignedSupervisor": "Dr. Priya Kumar",
+      "assignedSupervisorId": "60d5ec49f3323a1a98ec561f"
+    }
+  },
+  {
+    "collection": "research_projects",
+    "description": "Tracks all active, completed, or discontinued research topics, progress levels, and academic stages.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true },
+      { "name": "scholar", "type": "string", "required": true, "description": "Name of the scholar candidate" },
+      { "name": "scholarId", "type": "ObjectId", "required": true, "ref": "users", "description": "Scholar user reference" },
+      { "name": "topic", "type": "string", "required": true, "description": "Research project topic/title" },
+      { "name": "supervisor", "type": "string", "required": true, "description": "Name of primary research supervisor" },
+      { "name": "supervisorId", "type": "ObjectId", "required": true, "ref": "users", "description": "Supervisor user reference" },
+      { "name": "dept", "type": "string", "required": true, "description": "Enrolled department" },
+      { "name": "startDate", "type": "string", "required": true, "description": "Date project began (YYYY-MM-DD)" },
+      { "name": "stage", "type": "string", "required": true, "enum": ["Course Work", "Synopsis Preparation", "Literature Review", "Data Collection", "Thesis Writing", "Viva Voce", "Completed"], "description": "Current academic stage" },
+      { "name": "progress", "type": "number", "required": true, "min": 0, "max": 100, "description": "Percentage progress" },
+      { "name": "status", "type": "string", "required": true, "enum": ["Active", "Completed", "Discontinued"], "description": "Status level" }
+    ],
+    "indexes": [ "scholarId", "supervisorId", "status", "stage" ],
+    "sample_document": {
+      "_id": "60d5ec49f3323a1a98ec5620",
+      "scholar": "Rahul Sharma",
+      "scholarId": "60d5ec49f3323a1a98ec561a",
+      "topic": "Artificial Intelligence in Healthcare Diagnostics",
+      "supervisor": "Dr. Priya Kumar",
+      "supervisorId": "60d5ec49f3323a1a98ec561f",
+      "dept": "CS",
+      "startDate": "2021-08-01",
+      "stage": "Thesis Writing",
+      "progress": 75,
+      "status": "Active"
+    }
+  },
+  {
+    "collection": "submissions",
+    "description": "Handles research submissions (synopses/theses) uploaded by scholars, including evaluation workflow loops.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true },
+      { "name": "scholarId", "type": "ObjectId", "required": true, "ref": "users" },
+      { "name": "scholarName", "type": "string", "required": true },
+      { "name": "topic", "type": "string", "required": true },
+      { "name": "type", "type": "string", "required": true, "enum": ["synopsis", "thesis"] },
+      { "name": "fileUrl", "type": "string", "required": true, "description": "Storage path/URL of uploaded file" },
+      { "name": "status", "type": "string", "required": true, "enum": ["Pending Supervisor Approval", "Approved by Supervisor", "Pending DRC Review", "Approved by DRC", "Needs DRC Revision"], "description": "Review status" },
+      { "name": "remarks", "type": "string", "required": false, "description": "Reviewer comments/feedback" },
+      { "name": "submittedAt", "type": "string", "required": true, "description": "Timestamp of submission" }
+    ],
+    "indexes": [ "scholarId", "status", "type" ],
+    "sample_document": {
+      "_id": "60d5ec49f3323a1a98ec5630",
+      "scholarId": "60d5ec49f3323a1a98ec561a",
+      "scholarName": "Rahul Sharma",
+      "topic": "Artificial Intelligence in Healthcare Diagnostics",
+      "type": "synopsis",
+      "fileUrl": "/uploads/synopsis/1684394850_rahul.pdf",
+      "status": "Pending DRC Review",
+      "remarks": "Formally forwarded by supervisor.",
+      "submittedAt": "2024-06-12T14:30:00Z"
+    }
+  },
+  {
+    "collection": "meetings",
+    "description": "Schedules, panels, links, and locations of research reviews and viva sessions.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true },
+      { "name": "scholar", "type": "string", "required": true, "description": "Scholar candidate name" },
+      { "name": "type", "type": "string", "required": true, "enum": ["Viva Voce", "Synopsis Review", "Doctoral Committee", "Progress Review", "Regular Review", "Other"] },
+      { "name": "date", "type": "string", "required": true, "description": "Date YYYY-MM-DD" },
+      { "name": "time", "type": "string", "required": true, "description": "Time HH:MM (24h format)" },
+      { "name": "venue", "type": "string", "required": true, "description": "Room number or virtual meet link" },
+      { "name": "panel", "type": "string", "required": false, "description": "Review panel members names list" },
+      { "name": "supervisor", "type": "string", "required": false, "description": "Supervisor name" },
+      { "name": "status", "type": "string", "required": true, "default": "Scheduled", "enum": ["Scheduled", "Completed", "Cancelled"] }
+    ],
+    "indexes": [ "date", "status", "type" ],
+    "sample_document": {
+      "_id": "60d5ec49f3323a1a98ec5640",
+      "scholar": "Rahul Sharma",
+      "type": "Viva Voce",
+      "date": "2024-07-25",
+      "time": "10:00",
+      "venue": "Board Room 1",
+      "panel": "Dr. Mohan Reddy, Prof. R. Iyer",
+      "supervisor": "Dr. Priya Kumar",
+      "status": "Scheduled"
+    }
+  },
+  {
+    "collection": "minutes",
+    "description": "Stores review board minutes (Minutes of Meeting) and decisions.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true },
+      { "name": "committee", "type": "string", "required": true },
+      { "name": "meetingDate", "type": "string", "required": true },
+      { "name": "agenda", "type": "string", "required": true },
+      { "name": "decisions", "type": "string", "required": true },
+      { "name": "writer", "type": "string", "required": true },
+      { "name": "status", "type": "string", "required": true, "default": "Draft", "enum": ["Draft", "Signed"] }
+    ],
+    "indexes": [ "meetingDate", "status" ],
+    "sample_document": {
+      "_id": "60d5ec49f3323a1a98ec5650",
+      "committee": "CS & AI Evaluation Panel",
+      "meetingDate": "2023-10-15",
+      "agenda": "Review of Ph.D. Batch 2021 Synopses",
+      "decisions": "Approved 3 synopses, requested revisions on 1.",
+      "writer": "Dr. Mohan Reddy",
+      "status": "Signed"
+    }
+  },
+  {
+    "collection": "system_settings",
+    "description": "Stores site-wide variables, university info, deadlines, and configs.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true },
+      { "name": "uniName", "type": "string", "required": true },
+      { "name": "uniCode", "type": "string", "required": true },
+      { "name": "address", "type": "string", "required": true },
+      { "name": "phone", "type": "string", "required": true },
+      { "name": "email", "type": "string", "required": true },
+      { "name": "website", "type": "string", "required": true },
+      { "name": "synopsisDeadline", "type": "string", "required": true },
+      { "name": "thesisDeadline", "type": "string", "required": true },
+      { "name": "vivaWindow", "type": "string", "required": true },
+      { "name": "maxScholarsPerSupervisor", "type": "string", "required": true }
+    ],
+    "sample_document": {
+      "_id": "default_settings",
+      "uniName": "University of Excellence",
+      "uniCode": "UOE-2024",
+      "address": "123 Research Park, Tech City",
+      "phone": "+91 80 2222 3333",
+      "email": "admin@uoe.edu",
+      "website": "https://www.uoe.edu",
+      "synopsisDeadline": "2024-09-30",
+      "thesisDeadline": "2024-12-31",
+      "vivaWindow": "30",
+      "maxScholarsPerSupervisor": "6"
+    }
+  }
+]
