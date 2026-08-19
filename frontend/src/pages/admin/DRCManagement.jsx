@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -109,7 +110,7 @@ export default function MeetingManagement() {
   const fetchMeetings = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch('/api/meetings', {
+      const response = await apiFetch('/api/meetings', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
@@ -160,7 +161,7 @@ export default function MeetingManagement() {
     if (!window.confirm('Delete this meeting schedule?')) return
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch(`/api/meetings/${id}`, {
+      const response = await apiFetch(`/api/meetings/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       })

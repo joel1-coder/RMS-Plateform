@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -458,7 +459,7 @@ export default function ScholarPublications() {
       const userObj = storedUser ? JSON.parse(storedUser) : null
       const scholarId = userObj?.id || userObj?._id || ''
 
-      const response = await fetch(`/api/publication?scholarId=${scholarId}`, {
+      const response = await apiFetch(`/api/publication?scholarId=${scholarId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
@@ -502,7 +503,7 @@ export default function ScholarPublications() {
         date: form.year ? `${form.year}-01-01` : new Date().toISOString().slice(0, 10)
       }
 
-      const response = await fetch('/api/publication', {
+      const response = await apiFetch('/api/publication', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -531,7 +532,7 @@ export default function ScholarPublications() {
         status: changes.status || 'Published'
       }
 
-      const response = await fetch(`/api/publication/${id}`, {
+      const response = await apiFetch(`/api/publication/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -553,7 +554,7 @@ export default function ScholarPublications() {
     if (window.confirm('Are you sure you want to delete this publication?')) {
       try {
         const token = localStorage.getItem('rms_token')
-        const response = await fetch(`/api/publication/${id}`, {
+        const response = await apiFetch(`/api/publication/${id}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         })

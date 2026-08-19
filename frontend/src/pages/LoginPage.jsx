@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
+import { apiFetch } from '../utils/api'
 
 const ROLES = [
   { id: 'admin', label: 'Admin' },
@@ -56,14 +57,26 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password: password.trim(), role: selectedRole.toLowerCase() })
-      })
-      
-      const data = await response.json()
-      
+      let response
+      try {
+        response = await apiFetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), password: password.trim(), role: selectedRole.toLowerCase() })
+        })
+      } catch (networkErr) {
+        // Network error — server is completely unreachable
+        throw new Error('Cannot connect to server. Please check your internet connection or try again later.')
+      }
+
+      // Safely parse JSON — server may return empty body on 502/504 errors
+      let data = {}
+      try {
+        data = await response.json()
+      } catch {
+        throw new Error('Server returned an invalid response. The backend may be down or unreachable.')
+      }
+
       if (!response.ok) {
         throw new Error(data.message || 'Invalid credentials. Check email and password.')
       }

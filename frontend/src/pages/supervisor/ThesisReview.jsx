@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -124,7 +125,7 @@ export default function ThesisReview() {
       const supervisorObj = storedUser ? JSON.parse(storedUser) : null
       const supervisorId = supervisorObj?.id || supervisorObj?._id || ''
 
-      const response = await fetch(`/api/thesis?supervisorId=${supervisorId}`, {
+      const response = await apiFetch(`/api/thesis?supervisorId=${supervisorId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
@@ -144,7 +145,7 @@ export default function ThesisReview() {
       const supervisorObj = storedUser ? JSON.parse(storedUser) : null
       const supervisorId = supervisorObj?.id || supervisorObj?._id || ''
 
-      const response = await fetch(`/api/users?role=scholar&supervisorId=${supervisorId}`, {
+      const response = await apiFetch(`/api/users?role=scholar&supervisorId=${supervisorId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
@@ -163,7 +164,7 @@ export default function ThesisReview() {
   const handleAction = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch(`/api/thesis/${id}`, {
+      const response = await apiFetch(`/api/thesis/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +193,7 @@ export default function ThesisReview() {
       formData.append('scholarId', newSubmission.scholarId)
       formData.append('file', newSubmission.file)
 
-      const response = await fetch('/api/thesis', {
+      const response = await apiFetch('/api/thesis', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

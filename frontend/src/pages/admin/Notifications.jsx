@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -18,7 +19,7 @@ export default function Notifications() {
   const fetchNotifications = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch('/api/notifications', {
+      const response = await apiFetch('/api/notifications', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
@@ -40,7 +41,7 @@ export default function Notifications() {
   const markAllRead = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch('/api/notifications/read', {
+      const response = await apiFetch('/api/notifications/read', {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -55,7 +56,7 @@ export default function Notifications() {
   const handleClearAll = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch('/api/notifications/clear', {
+      const response = await apiFetch('/api/notifications/clear', {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       })

@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -36,7 +37,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const token = localStorage.getItem('rms_token')
 
-    fetch('/api/reports/admin-dashboard', {
+    apiFetch('/api/reports/admin-dashboard', {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
       .then(r => {

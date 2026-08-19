@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -18,7 +19,7 @@ export default function AssignScholar() {
   const loadUsers = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch('/api/users', {
+      const response = await apiFetch('/api/users', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
@@ -61,7 +62,7 @@ export default function AssignScholar() {
 
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch(`/api/users/${selectedScholar}/assign-supervisor`, {
+      const response = await apiFetch(`/api/users/${selectedScholar}/assign-supervisor`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ export default function AssignScholar() {
   const handleReassign = async (scholarId, newSupId) => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch(`/api/users/${scholarId}/assign-supervisor`, {
+      const response = await apiFetch(`/api/users/${scholarId}/assign-supervisor`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ export default function AssignScholar() {
     if (!window.confirm("Remove this scholar's supervisor assignment?")) return
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch(`/api/users/${scholarId}/unassign-supervisor`, {
+      const response = await apiFetch(`/api/users/${scholarId}/unassign-supervisor`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`

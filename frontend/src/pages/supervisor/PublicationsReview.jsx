@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -119,7 +120,7 @@ export default function PublicationsReview() {
   const fetchPublications = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch('/api/publication', {
+      const response = await apiFetch('/api/publication', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
@@ -152,7 +153,7 @@ export default function PublicationsReview() {
   const handleAction = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch(`/api/publication/${id}`, {
+      const response = await apiFetch(`/api/publication/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

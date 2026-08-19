@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -109,7 +110,7 @@ export default function ResearchManagement() {
       const token = localStorage.getItem('rms_token')
       const statusParam = filterStatus === 'All' ? '' : filterStatus
       const stageParam = filterStage === 'All' ? '' : filterStage
-      const response = await fetch(`/api/research?status=${statusParam}&stage=${stageParam}`, {
+      const response = await apiFetch(`/api/research?status=${statusParam}&stage=${stageParam}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -133,7 +134,7 @@ export default function ResearchManagement() {
       const token = localStorage.getItem('rms_token')
       if (editingProject) {
         // Edit mode
-        const response = await fetch(`/api/research/${editingProject.id || editingProject._id}`, {
+        const response = await apiFetch(`/api/research/${editingProject.id || editingProject._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -149,7 +150,7 @@ export default function ResearchManagement() {
         setEditingProject(null)
       } else {
         // Add mode
-        const response = await fetch('/api/research', {
+        const response = await apiFetch('/api/research', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -173,7 +174,7 @@ export default function ResearchManagement() {
     if (window.confirm('Delete this research project?')) {
       try {
         const token = localStorage.getItem('rms_token')
-        const response = await fetch(`/api/research/${id}`, {
+        const response = await apiFetch(`/api/research/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`

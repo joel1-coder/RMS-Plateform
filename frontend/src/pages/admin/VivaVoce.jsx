@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
@@ -144,7 +145,7 @@ export default function VivaVoce() {
     try {
       const token = localStorage.getItem('rms_token')
       const statusParam = status === 'All' ? '' : status
-      const response = await fetch(`/api/viva-voce?status=${statusParam}`, {
+      const response = await apiFetch(`/api/viva-voce?status=${statusParam}`, {
         headers: { 'Authorization': `Bearer ${token}` },
         signal: vivaAbortRef.current.signal
       })
@@ -164,7 +165,7 @@ export default function VivaVoce() {
     scholarAbortRef.current = new AbortController()
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch('/api/users?role=scholar', {
+      const response = await apiFetch('/api/users?role=scholar', {
         headers: { 'Authorization': `Bearer ${token}` },
         signal: scholarAbortRef.current.signal
       })
@@ -192,7 +193,7 @@ export default function VivaVoce() {
       const token = localStorage.getItem('rms_token')
       if (editingViva) {
         // Edit mode
-        const response = await fetch(`/api/viva-voce/${editingViva.id || editingViva._id}`, {
+        const response = await apiFetch(`/api/viva-voce/${editingViva.id || editingViva._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -205,7 +206,7 @@ export default function VivaVoce() {
         setEditingViva(null)
       } else {
         // Add mode
-        const response = await fetch('/api/viva-voce', {
+        const response = await apiFetch('/api/viva-voce', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -229,7 +230,7 @@ export default function VivaVoce() {
     if (window.confirm('Delete this scheduled viva voce examination?')) {
       try {
         const token = localStorage.getItem('rms_token')
-        const response = await fetch(`/api/viva-voce/${id}`, {
+        const response = await apiFetch(`/api/viva-voce/${id}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         })
@@ -245,7 +246,7 @@ export default function VivaVoce() {
   const handleToggleStatus = async (viva, newStatus) => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch(`/api/viva-voce/${viva.id || viva._id}`, {
+      const response = await apiFetch(`/api/viva-voce/${viva.id || viva._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

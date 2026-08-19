@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -22,7 +23,7 @@ export default function ScholarThesis() {
       const userObj = storedUser ? JSON.parse(storedUser) : null
       const scholarId = userObj?.id || userObj?._id || ''
 
-      const response = await fetch(`/api/thesis?scholarId=${scholarId}`, {
+      const response = await apiFetch(`/api/thesis?scholarId=${scholarId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -54,7 +55,7 @@ export default function ScholarThesis() {
       formData.append('title', title)
       formData.append('file', file)
 
-      const response = await fetch('/api/thesis', {
+      const response = await apiFetch('/api/thesis', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

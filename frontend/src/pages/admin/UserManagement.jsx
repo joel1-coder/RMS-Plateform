@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
@@ -166,7 +167,7 @@ export default function UserManagement() {
 
       if (editingUser) {
         // Edit mode
-        const response = await fetch(`/api/users/${editingUser.id || editingUser._id}`, {
+        const response = await apiFetch(`/api/users/${editingUser.id || editingUser._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -183,7 +184,7 @@ export default function UserManagement() {
         setEditingUser(null)
       } else {
         // Add mode
-        const response = await fetch('/api/users', {
+        const response = await apiFetch('/api/users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -211,7 +212,7 @@ export default function UserManagement() {
     try {
       const token = localStorage.getItem('rms_token')
       const newStatus = user.status === 'Active' ? 'Inactive' : 'Active'
-      const response = await fetch(`/api/users/${user.id || user._id}`, {
+      const response = await apiFetch(`/api/users/${user.id || user._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -231,7 +232,7 @@ export default function UserManagement() {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
         const token = localStorage.getItem('rms_token')
-        const response = await fetch(`/api/users/${id}`, {
+        const response = await apiFetch(`/api/users/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`

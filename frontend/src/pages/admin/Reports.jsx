@@ -1,3 +1,4 @@
+﻿import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
@@ -55,7 +56,7 @@ export default function Reports() {
   const fetchResearch = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch('/api/research', {
+      const response = await apiFetch('/api/research', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
