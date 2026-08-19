@@ -41,6 +41,7 @@ function authenticate() {
 function authorize(allowedRoles = []) {
   return (req, res, next) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
+      console.log('AUTHORIZE FAILED', { reqUser: req.user, allowedRoles, url: req.originalUrl, method: req.method });
       return next(new AppError('Access Denied', 403));
     }
 

@@ -15,7 +15,7 @@ function signToken(user) {
  */
 const login = asyncHandler(async (req, res) => {
   const { email, password, role } = req.body;
-  const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+  const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
 
   if (!user || user.role !== role || !(await user.comparePassword(password))) {
     throw new AppError('Invalid email, password, or role mismatched', 401);
