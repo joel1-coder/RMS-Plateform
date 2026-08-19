@@ -22,3 +22,8 @@ Inference: Updated createThesis controller dynamically to assign the scholarId p
 Reason: Fully wire the Admin's AssignScholar.jsx, AuditLog.jsx, and Reports.jsx pages. Integrated HTML5 search datalist for supervisors dropdown, log audits for user allocation modifications, and create notification events to display on the Notifications.jsx view.
 Result: merged
 Inference: Set up Mongoose schemas for notifications and audit logs with custom Express router layers.
+
+2026-08-19 20:38:00 UTC - Admin Meetings & Viva Assigning Integration
+Reason: Fully wire the Meetings dashboard (DRCManagement.jsx) to live Express API. Implement audit log actions for meeting scheduling/modifications, search scholar by name case-insensitively, and dispatch real-time notifications to the scholar (and supervisor if assigned).
+Result: merged
+Inference: Updated createMeeting, updateMeeting, and deleteMeeting controllers in meetings.controller.js to perform lookup on the User database.

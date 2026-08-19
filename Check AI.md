@@ -87,6 +87,19 @@
 
 ---
 
+## [2026-08-19 20:38 IST] — Backend Integration Phase (Meetings & Scholar Notifications)
+
+### Completed:
+- **Meetings Schedule Database Wireup**:
+  - Connected `DRCManagement.jsx` page (Meetings menu) to live `/api/meetings` Express API CRUD routes.
+- **Dynamic Scholar Alerts**:
+  - Configured `meetings.controller.js` on creation/modification of slots to locate the scholar user in the database case-insensitively.
+  - Automatically dispatches real-time allocation notification alerts to the Scholar (and their assigned Supervisor).
+- **Meetings Audit Records**:
+  - Enabled audit trails to log scheduled slots and cancellations to the DB logs automatically.
+
+---
+
 ## Status Tracker
 
 | Role | Page | Status |

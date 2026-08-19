@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-const DEFAULT_MEETINGS = [
-  { id: 1, type: 'Viva Voce', scholar: 'Rahul Sharma', panel: 'Dr. Mohan Reddy, Prof. R. Iyer', date: '2024-07-25', time: '10:00 AM', venue: 'Board Room 1', status: 'Scheduled' },
-  { id: 2, type: 'Synopsis Review', scholar: 'Neha Patel', panel: 'Dr. A. Sharma, Prof. K. Das', date: '2024-06-15', time: '02:00 PM', venue: 'Conference Room 2', status: 'Completed' },
-  { id: 3, type: 'Doctoral Committee', scholar: 'Amit Kumar', panel: 'Dr. Mohan Reddy', date: '2024-08-10', time: '11:00 AM', venue: 'Seminar Hall', status: 'Scheduled' },
-  { id: 4, type: 'Progress Review', scholar: 'Sonal Joshi', panel: 'Prof. P. Singh (External)', date: '2024-08-12', time: '09:30 AM', venue: 'Virtual - Meet Link', status: 'Scheduled' },
-]
-
 const MEETING_TYPES = ['Viva Voce', 'Synopsis Review', 'Doctoral Committee', 'Progress Review', 'Other']
 
 function AssignMeetingModal({ onClose, onSave, editData = null }) {
@@ -53,40 +46,40 @@ function AssignMeetingModal({ onClose, onSave, editData = null }) {
     <div className="modal-backdrop">
       <div className="modal">
         <div className="modal-header">
-          <span className="modal-title">{editData ? 'Edit Meeting' : 'Assign New Meeting'}</span>
+          <span className="modal-title">{editData ? 'Edit Meeting Details' : 'Assign New Meeting'}</span>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             <div className="grid-2">
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label className="form-label">Scholar Name / Topic *</label>
+                <label className="form-label" style={{ fontWeight: 600 }}>Scholar Name / Topic *</label>
                 <input name="scholar" required className="form-control" placeholder="e.g. Rahul Sharma" value={form.scholar} onChange={handleChange} />
               </div>
               <div className="form-group">
-                <label className="form-label">Meeting Type</label>
+                <label className="form-label" style={{ fontWeight: 600 }}>Meeting Type</label>
                 <select name="type" className="form-control form-select" value={form.type} onChange={handleChange}>
                   {MEETING_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Venue / Link</label>
+                <label className="form-label" style={{ fontWeight: 600 }}>Venue / Link</label>
                 <input name="venue" className="form-control" placeholder="e.g. Board Room 1" value={form.venue} onChange={handleChange} />
               </div>
               <div className="form-group">
-                <label className="form-label">Date *</label>
+                <label className="form-label" style={{ fontWeight: 600 }}>Date *</label>
                 <input name="date" type="date" required className="form-control" value={form.date} onChange={handleChange} />
               </div>
               <div className="form-group">
-                <label className="form-label">Time *</label>
+                <label className="form-label" style={{ fontWeight: 600 }}>Time *</label>
                 <input name="time" type="time" required className="form-control" value={form.time} onChange={handleChange} />
               </div>
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label className="form-label">Assigned Panel Members / Examiners</label>
+                <label className="form-label" style={{ fontWeight: 600 }}>Assigned Panel Members / Examiners</label>
                 <input name="panel" className="form-control" placeholder="e.g. Dr. Mohan, Prof. Iyer" value={form.panel} onChange={handleChange} />
               </div>
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label className="form-label">Status</label>
+                <label className="form-label" style={{ fontWeight: 600 }}>Status</label>
                 <select name="status" className="form-control form-select" value={form.status} onChange={handleChange}>
                   {['Scheduled', 'Completed', 'Cancelled'].map(s => <option key={s}>{s}</option>)}
                 </select>
@@ -111,48 +104,76 @@ export default function MeetingManagement() {
   const [editingMeeting, setEditingMeeting] = useState(null)
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState('All')
+  const [loading, setLoading] = useState(true)
+
+  const fetchMeetings = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const response = await fetch('/api/meetings', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      const data = await response.json()
+      setMeetings(data)
+    } catch {
+      toast.error('Failed to load scheduled meetings')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('rms_meetings')
-      if (stored) {
-        setMeetings(JSON.parse(stored))
-      } else {
-        setMeetings(DEFAULT_MEETINGS)
-        localStorage.setItem('rms_meetings', JSON.stringify(DEFAULT_MEETINGS))
-      }
-    } catch {
-      setMeetings(DEFAULT_MEETINGS)
-    }
+    fetchMeetings()
   }, [])
 
-  const saveToStorage = (updated) => {
-    setMeetings(updated)
-    localStorage.setItem('rms_meetings', JSON.stringify(updated))
-  }
+  const handleSave = async (formData) => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const isEdit = !!editingMeeting
+      const url = isEdit ? `/api/meetings/${editingMeeting.id || editingMeeting._id}` : '/api/meetings'
+      const method = isEdit ? 'PUT' : 'POST'
 
-  const handleSave = (formData) => {
-    if (editingMeeting) {
-      const updated = meetings.map(m => m.id === editingMeeting.id ? { ...m, ...formData } : m)
-      saveToStorage(updated)
-      toast.success('Meeting updated!')
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Operation failed')
+      }
+
+      toast.success(isEdit ? 'Meeting rescheduled successfully!' : 'Meeting scheduled and scholar notified!')
       setEditingMeeting(null)
-    } else {
-      const newMeeting = { ...formData, id: Date.now() }
-      saveToStorage([newMeeting, ...meetings])
-      toast.success('Meeting assigned successfully!')
+      setShowModal(false)
+      fetchMeetings()
+    } catch (err) {
+      toast.error(err.message || 'Failed to save meeting details')
     }
   }
 
-  const handleDelete = (id) => {
-    if (window.confirm('Delete this meeting?')) {
-      saveToStorage(meetings.filter(m => m.id !== id))
-      toast.success('Meeting removed')
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this meeting schedule?')) return
+    try {
+      const token = localStorage.getItem('rms_token')
+      const response = await fetch(`/api/meetings/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      toast.success('Meeting schedule cancelled.')
+      fetchMeetings()
+    } catch {
+      toast.error('Failed to cancel meeting schedule')
     }
   }
 
   const filtered = meetings.filter(m => {
-    const matchSearch = m.scholar.toLowerCase().includes(search.toLowerCase()) || m.type.toLowerCase().includes(search.toLowerCase())
+    const matchSearch = (m.scholar || '').toLowerCase().includes(search.toLowerCase()) || (m.type || '').toLowerCase().includes(search.toLowerCase())
     const matchType = filterType === 'All' || m.type === filterType
     return matchSearch && matchType
   })
@@ -191,7 +212,7 @@ export default function MeetingManagement() {
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
               <div className="stat-info">
-                <div className="stat-value">{s.value}</div>
+                <div className="stat-value">{loading ? '--' : s.value}</div>
                 <div className="stat-label">{s.label}</div>
               </div>
             </div>
@@ -211,53 +232,52 @@ export default function MeetingManagement() {
           </div>
 
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Scholar</th>
-                  <th>Date & Time</th>
-                  <th>Venue / Link</th>
-                  <th>Panel</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(m => (
-                  <tr key={m.id}>
-                    <td>
-                      <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{m.type}</span>
-                    </td>
-                    <td style={{ fontWeight: 500 }}>{m.scholar}</td>
-                    <td>
-                      <div style={{ fontSize: '12.5px', fontWeight: 600 }}>{m.date}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{m.time}</div>
-                    </td>
-                    <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{m.venue}</td>
-                    <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{m.panel}</td>
-                    <td>
-                      <span className={`badge ${m.status === 'Completed' ? 'badge-success' : m.status === 'Cancelled' ? 'badge-danger' : 'badge-warning'}`}>
-                        {m.status}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '4px' }}>
-                        <button className="btn btn-secondary btn-sm" title="Edit" onClick={() => setEditingMeeting(m)}>✏️</button>
-                        <button className="btn btn-ghost btn-sm" title="Delete" style={{ color: '#EF4444' }} onClick={() => handleDelete(m.id)}>🗑️</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
+            {loading ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading scheduled slots...</div>
+            ) : filtered.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No meetings found matching parameters</div>
+            ) : (
+              <table className="table">
+                <thead>
                   <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                      No meetings found.
-                    </td>
+                    <th>Type</th>
+                    <th>Scholar</th>
+                    <th>Date & Time</th>
+                    <th>Venue / Link</th>
+                    <th>Panel</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filtered.map(m => (
+                    <tr key={m.id || m._id}>
+                      <td>
+                        <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{m.type}</span>
+                      </td>
+                      <td style={{ fontWeight: 500 }}>{m.scholar}</td>
+                      <td>
+                        <div style={{ fontSize: '12.5px', fontWeight: 600 }}>{m.date}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{m.time}</div>
+                      </td>
+                      <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{m.venue}</td>
+                      <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{m.panel || '—'}</td>
+                      <td>
+                        <span className={`badge ${m.status === 'Completed' ? 'badge-success' : m.status === 'Cancelled' ? 'badge-danger' : 'badge-warning'}`}>
+                          {m.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          <button className="btn btn-secondary btn-sm" title="Edit" onClick={() => setEditingMeeting(m)}>✏️</button>
+                          <button className="btn btn-ghost btn-sm" title="Delete" style={{ color: '#EF4444' }} onClick={() => handleDelete(m.id || m._id)}>🗑️</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
