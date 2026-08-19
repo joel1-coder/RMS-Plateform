@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
 const ROLES = ['All', 'Admin', 'Supervisor', 'Scholar', 'HOD', 'DRC', 'Librarian']
@@ -111,29 +111,42 @@ export default function UserManagement() {
   const [editingUser, setEditingUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchUsers = async () => {
+  const abortRef = useRef(null)
+
+  const fetchUsers = useCallback(async (role, status, searchTerm) => {
+    // Cancel any previous in-flight request
+    if (abortRef.current) abortRef.current.abort()
+    abortRef.current = new AbortController()
+
     try {
       const token = localStorage.getItem('rms_token')
-      const roleParam = filterRole === 'All' ? '' : filterRole.toLowerCase()
-      const statusParam = filterStatus === 'All' ? '' : filterStatus
-      const response = await fetch(`/api/users?role=${roleParam}&status=${statusParam}&search=${search}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const roleParam = role === 'All' ? '' : role.toLowerCase()
+      const statusParam = status === 'All' ? '' : status
+      const response = await fetch(
+        `/api/users?role=${roleParam}&status=${statusParam}&search=${searchTerm}`,
+        {
+          headers: { 'Authorization': `Bearer ${token}` },
+          signal: abortRef.current.signal
         }
-      })
+      )
       if (!response.ok) throw new Error('Failed to load users')
       const data = await response.json()
       setUsers(data)
     } catch (err) {
+      if (err.name === 'AbortError') return // Ignore cancelled requests
       toast.error('Failed to load users from backend database')
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
+  // Debounce: only call API 500ms after user stops typing/changing filters
   useEffect(() => {
-    fetchUsers()
-  }, [filterRole, filterStatus, search])
+    const timer = setTimeout(() => {
+      fetchUsers(filterRole, filterStatus, search)
+    }, search ? 500 : 0)
+    return () => clearTimeout(timer)
+  }, [filterRole, filterStatus, search, fetchUsers])
 
   const handleAddOrEdit = async (formData) => {
     try {
@@ -186,7 +199,7 @@ export default function UserManagement() {
         }
         toast.success('User registered successfully!')
       }
-      fetchUsers()
+      fetchUsers(filterRole, filterStatus, search)
     } catch (err) {
       toast.error(err.message || 'An error occurred during save operation')
     }
@@ -206,7 +219,7 @@ export default function UserManagement() {
       })
       if (!response.ok) throw new Error('Failed to update status')
       toast.success('Status toggled successfully')
-      fetchUsers()
+      fetchUsers(filterRole, filterStatus, search)
     } catch (err) {
       toast.error('Failed to toggle status')
     }
@@ -224,7 +237,7 @@ export default function UserManagement() {
         })
         if (!response.ok) throw new Error('Failed to delete user')
         toast.success('User deleted successfully')
-        fetchUsers()
+        fetchUsers(filterRole, filterStatus, search)
       } catch (err) {
         toast.error('Failed to delete user')
       }

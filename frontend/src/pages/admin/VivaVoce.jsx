@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
 const STATUS_COLORS = { Scheduled: 'badge-info', Completed: 'badge-success', Pending: 'badge-warning', Cancelled: 'badge-danger' }
@@ -135,41 +135,57 @@ export default function VivaVoce() {
   const [filterStatus, setFilterStatus] = useState('All')
   const [loading, setLoading] = useState(true)
 
-  const fetchVivas = async () => {
+  const vivaAbortRef = useRef(null)
+  const scholarAbortRef = useRef(null)
+
+  const fetchVivas = useCallback(async (status) => {
+    if (vivaAbortRef.current) vivaAbortRef.current.abort()
+    vivaAbortRef.current = new AbortController()
     try {
       const token = localStorage.getItem('rms_token')
-      const statusParam = filterStatus === 'All' ? '' : filterStatus
+      const statusParam = status === 'All' ? '' : status
       const response = await fetch(`/api/viva-voce?status=${statusParam}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        signal: vivaAbortRef.current.signal
       })
       if (!response.ok) throw new Error('Failed to fetch scheduled viva voce exams')
       const data = await response.json()
       setVivas(data)
     } catch (err) {
+      if (err.name === 'AbortError') return
       toast.error('Failed to load viva voce list')
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const fetchScholars = async () => {
+  const fetchScholars = useCallback(async () => {
+    if (scholarAbortRef.current) scholarAbortRef.current.abort()
+    scholarAbortRef.current = new AbortController()
     try {
       const token = localStorage.getItem('rms_token')
       const response = await fetch('/api/users?role=scholar', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        signal: scholarAbortRef.current.signal
       })
       if (!response.ok) throw new Error()
       const data = await response.json()
       setScholars(data)
     } catch (err) {
+      if (err.name === 'AbortError') return
       console.error('Failed to load scholar selection dropdown data')
     }
-  }
+  }, [])
 
+  // Scholars only load once on mount
   useEffect(() => {
-    fetchVivas()
     fetchScholars()
-  }, [filterStatus])
+  }, [fetchScholars])
+
+  // Vivas reload when filter changes
+  useEffect(() => {
+    fetchVivas(filterStatus)
+  }, [filterStatus, fetchVivas])
 
   const handleSave = async (formData) => {
     try {
@@ -203,7 +219,7 @@ export default function VivaVoce() {
         }
         toast.success('Viva scheduled successfully!')
       }
-      fetchVivas()
+      fetchVivas(filterStatus)
     } catch (err) {
       toast.error(err.message || 'Error occurred during save operation')
     }
@@ -219,7 +235,7 @@ export default function VivaVoce() {
         })
         if (!response.ok) throw new Error('Failed to delete scheduled viva voce')
         toast.success('Viva schedule deleted successfully')
-        fetchVivas()
+        fetchVivas(filterStatus)
       } catch (err) {
         toast.error('Failed to delete scheduled viva')
       }
@@ -239,7 +255,7 @@ export default function VivaVoce() {
       })
       if (!response.ok) throw new Error()
       toast.success(`Viva status updated to ${newStatus}`)
-      fetchVivas()
+      fetchVivas(filterStatus)
     } catch (err) {
       toast.error('Failed to update status')
     }

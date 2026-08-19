@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
 const SEVERITY_MAP = {
@@ -14,25 +14,34 @@ export default function AuditLog() {
   const [filterSeverity, setFilterSeverity] = useState('All')
   const [loading, setLoading] = useState(true)
 
-  const fetchLogs = async () => {
+  const abortRef = useRef(null)
+
+  const fetchLogs = useCallback(async (severity, searchTerm) => {
+    if (abortRef.current) abortRef.current.abort()
+    abortRef.current = new AbortController()
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await fetch(`/api/audit?severity=${filterSeverity === 'All' ? '' : filterSeverity}&search=${search}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      const response = await fetch(
+        `/api/audit?severity=${severity === 'All' ? '' : severity}&search=${searchTerm}`,
+        { headers: { 'Authorization': `Bearer ${token}` }, signal: abortRef.current.signal }
+      )
       if (!response.ok) throw new Error()
       const data = await response.json()
       setLogs(data)
-    } catch {
+    } catch (err) {
+      if (err.name === 'AbortError') return
       toast.error('Failed to load audit logs from system database')
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    fetchLogs()
-  }, [filterSeverity, search])
+    const timer = setTimeout(() => {
+      fetchLogs(filterSeverity, search)
+    }, search ? 500 : 0)
+    return () => clearTimeout(timer)
+  }, [filterSeverity, search, fetchLogs])
 
   return (
     <div className="animate-fade">
@@ -43,7 +52,7 @@ export default function AuditLog() {
         </div>
         <div className="topbar-actions">
           <button className="btn btn-ghost btn-sm" onClick={() => toast.success('CSV export generated successfully')}>📥 Export CSV</button>
-          <button className="btn btn-primary btn-sm" onClick={fetchLogs}>🔄 Refresh</button>
+          <button className="btn btn-primary btn-sm" onClick={() => fetchLogs(filterSeverity, search)}>🔄 Refresh</button>
         </div>
       </div>
 

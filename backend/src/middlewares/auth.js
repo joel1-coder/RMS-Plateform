@@ -15,7 +15,13 @@ function authenticate() {
       throw new AppError('Missing or invalid Authorization header', 401);
     }
 
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'development-secret');
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET || 'development-secret');
+    } catch (e) {
+      throw new AppError('Invalid or expired token', 401);
+    }
+
     const user = await User.findById(payload.id).select('role status');
 
     if (!user || user.status !== 'Active') {
