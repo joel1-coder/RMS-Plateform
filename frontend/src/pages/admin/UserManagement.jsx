@@ -1,18 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-const DEFAULT_USERS = [
-  { id: 1, name: 'Dr. Priya Kumar', email: 'supervisor@rms.edu', password: 'super123', role: 'supervisor', dept: 'Computer Science', status: 'Active', joined: '2023-06-01', scholars: 8 },
-  { id: 2, name: 'Rahul Sharma', email: 'scholar@rms.edu', password: 'scholar123', role: 'scholar', dept: 'Computer Science', status: 'Active', joined: '2023-08-15', scholars: '-' },
-  { id: 3, name: 'Prof. Anita Verma', email: 'hod@rms.edu', password: 'hod123', role: 'hod', dept: 'Computer Science', status: 'Active', joined: '2022-01-10', scholars: '-' },
-  { id: 4, name: 'Dr. Mohan Reddy', email: 'drc@rms.edu', password: 'drc123', role: 'drc', dept: 'Research Committee', status: 'Active', joined: '2022-03-20', scholars: '-' },
-  { id: 5, name: 'Neha Patel', email: 'neha@rms.edu', password: 'scholar123', role: 'scholar', dept: 'Electronics', status: 'Inactive', joined: '2024-01-05', scholars: '-' },
-  { id: 6, name: 'Dr. Rajan Mehta', email: 'rajan@rms.edu', password: 'super123', role: 'supervisor', dept: 'Mechanical', status: 'Active', joined: '2021-09-01', scholars: 5 },
-  { id: 7, name: 'Amit Kumar', email: 'amit@rms.edu', password: 'scholar123', role: 'scholar', dept: 'Civil', status: 'Active', joined: '2024-07-01', scholars: '-' },
-  { id: 8, name: 'Ms. Deepa Nair', email: 'librarian@rms.edu', password: 'library123', role: 'librarian', dept: 'Central Library', status: 'Active', joined: '2020-05-15', scholars: '-' },
-  { id: 9, name: 'Dr. Admin Singh', email: 'admin@rms.edu', password: 'admin123', role: 'admin', dept: 'Administration', status: 'Active', joined: '2020-01-01', scholars: '-' },
-]
-
 const ROLES = ['All', 'Admin', 'Supervisor', 'Scholar', 'HOD', 'DRC', 'Librarian']
 const STATUSES = ['All', 'Active', 'Inactive']
 const ROLE_COLORS = {
@@ -35,8 +23,8 @@ function UserModal({ onClose, onSave, userToEdit = null }) {
       setForm({
         name: userToEdit.name || '',
         email: userToEdit.email || '',
-        password: userToEdit.password || '',
-        role: userToEdit.role || 'Scholar',
+        password: userToEdit.plainPassword || '', // display plain text password for admin edit
+        role: userToEdit.role ? userToEdit.role.charAt(0).toUpperCase() + userToEdit.role.slice(1) : 'Scholar',
         dept: userToEdit.dept || 'Computer Science',
         status: userToEdit.status || 'Active'
       })
@@ -47,7 +35,7 @@ function UserModal({ onClose, onSave, userToEdit = null }) {
 
   const handleSubmit = e => {
     e.preventDefault()
-    if (!form.name || !form.email || !form.password) {
+    if (!form.name || !form.email || (!userToEdit && !form.password)) {
       toast.error('Name, email, and password are required.')
       return
     }
@@ -74,8 +62,8 @@ function UserModal({ onClose, onSave, userToEdit = null }) {
                 <input name="email" type="email" required className="form-control" placeholder="john@rms.edu" value={form.email} onChange={handleChange} />
               </div>
               <div className="form-group">
-                <label className="form-label">Login Password *</label>
-                <input name="password" type="text" required className="form-control" placeholder="e.g. secret123" value={form.password} onChange={handleChange} />
+                <label className="form-label">Login Password {userToEdit ? '(Leave empty to keep current)' : '*'}</label>
+                <input name="password" type="text" required={!userToEdit} className="form-control" placeholder="e.g. secret123" value={form.password} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label className="form-label">System Role *</label>
@@ -121,72 +109,127 @@ export default function UserManagement() {
   const [filterStatus, setFilterStatus] = useState('All')
   const [showModal, setShowModal] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  // Initialize from LocalStorage
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const roleParam = filterRole === 'All' ? '' : filterRole.toLowerCase()
+      const statusParam = filterStatus === 'All' ? '' : filterStatus
+      const response = await fetch(`/api/users?role=${roleParam}&status=${statusParam}&search=${search}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      if (!response.ok) throw new Error('Failed to load users')
+      const data = await response.json()
+      setUsers(data)
+    } catch (err) {
+      toast.error('Failed to load users from backend database')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    const stored = localStorage.getItem('rms_all_users')
-    if (stored) {
-      try {
-        // Normalize roles to lowercase to prevent route mismatch loops
-        const parsed = JSON.parse(stored).map(u => ({ ...u, role: u.role ? u.role.toLowerCase() : u.role }))
-        setUsers(parsed)
-        // Re-save normalized data back
-        localStorage.setItem('rms_all_users', JSON.stringify(parsed))
-      } catch (e) {
-        setUsers(DEFAULT_USERS)
+    fetchUsers()
+  }, [filterRole, filterStatus, search])
+
+  const handleAddOrEdit = async (formData) => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role.toLowerCase(),
+        dept: formData.dept,
+        status: formData.status
       }
-    } else {
-      setUsers(DEFAULT_USERS)
-      localStorage.setItem('rms_all_users', JSON.stringify(DEFAULT_USERS))
-    }
-  }, [])
 
-  const saveToStorage = (updatedUsers) => {
-    setUsers(updatedUsers)
-    localStorage.setItem('rms_all_users', JSON.stringify(updatedUsers))
-  }
-
-  const handleAddOrEdit = (formData) => {
-    if (editingUser) {
-      // Edit mode
-      const updated = users.map(u => u.id === editingUser.id ? { ...u, ...formData } : u)
-      saveToStorage(updated)
-      toast.success('User updated successfully!')
-      setEditingUser(null)
-    } else {
-      // Add mode
-      const newUser = {
-        ...formData,
-        id: Date.now(),
-        joined: new Date().toISOString().slice(0, 10),
-        scholars: formData.role?.toLowerCase() === 'supervisor' ? 0 : '-'
+      // Only send password if provided
+      if (formData.password) {
+        payload.password = formData.password
       }
-      const updated = [newUser, ...users]
-      saveToStorage(updated)
-      toast.success('User registered successfully!')
+
+      if (editingUser) {
+        // Edit mode
+        const response = await fetch(`/api/users/${editingUser.id || editingUser._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        })
+        if (!response.ok) {
+          const errData = await response.json()
+          throw new Error(errData.message || 'Failed to update user')
+        }
+        toast.success('User updated successfully!')
+        setEditingUser(null)
+      } else {
+        // Add mode
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            ...payload,
+            joined: new Date().toISOString().slice(0, 10)
+          })
+        })
+        if (!response.ok) {
+          const errData = await response.json()
+          throw new Error(errData.message || 'Failed to create user')
+        }
+        toast.success('User registered successfully!')
+      }
+      fetchUsers()
+    } catch (err) {
+      toast.error(err.message || 'An error occurred during save operation')
     }
   }
 
-  const handleToggleStatus = (id) => {
-    const updated = users.map(u => u.id === id ? { ...u, status: u.status === 'Active' ? 'Inactive' : 'Active' } : u)
-    saveToStorage(updated)
-    toast.success('Status toggled successfully')
+  const handleToggleStatus = async (user) => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const newStatus = user.status === 'Active' ? 'Inactive' : 'Active'
+      const response = await fetch(`/api/users/${user.id || user._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      })
+      if (!response.ok) throw new Error('Failed to update status')
+      toast.success('Status toggled successfully')
+      fetchUsers()
+    } catch (err) {
+      toast.error('Failed to toggle status')
+    }
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
-      const updated = users.filter(u => u.id !== id)
-      saveToStorage(updated)
-      toast.success('User deleted successfully')
+      try {
+        const token = localStorage.getItem('rms_token')
+        const response = await fetch(`/api/users/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        if (!response.ok) throw new Error('Failed to delete user')
+        toast.success('User deleted successfully')
+        fetchUsers()
+      } catch (err) {
+        toast.error('Failed to delete user')
+      }
     }
   }
-
-  const filtered = users.filter(u => {
-    const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
-    const matchRole = filterRole === 'All' || u.role?.toLowerCase() === filterRole.toLowerCase()
-    const matchStatus = filterStatus === 'All' || u.status === filterStatus
-    return matchSearch && matchRole && matchStatus
-  })
 
   return (
     <div className="animate-fade">
@@ -221,13 +264,13 @@ export default function UserManagement() {
           {[
             { label: 'Total Users', value: users.length, icon: '👥', color: 'purple' },
             { label: 'Active', value: users.filter(u => u.status === 'Active').length, icon: '✅', color: 'green' },
-            { label: 'Scholars', value: users.filter(u => u.role === 'Scholar').length, icon: '🎓', color: 'blue' },
-            { label: 'Supervisors', value: users.filter(u => u.role === 'Supervisor').length, icon: '👨‍🏫', color: 'orange' },
+            { label: 'Scholars', value: users.filter(u => u.role?.toLowerCase() === 'scholar').length, icon: '🎓', color: 'blue' },
+            { label: 'Supervisors', value: users.filter(u => u.role?.toLowerCase() === 'supervisor').length, icon: '👨‍🏫', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
               <div className="stat-info">
-                <div className="stat-value">{s.value}</div>
+                <div className="stat-value">{loading ? '--' : s.value}</div>
                 <div className="stat-label">{s.label}</div>
               </div>
             </div>
@@ -264,79 +307,89 @@ export default function UserManagement() {
               {STATUSES.map(s => <option key={s}>{s}</option>)}
             </select>
             <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginLeft: 'auto' }}>
-              {filtered.length} of {users.length} users
+              {users.length} users listed
             </span>
           </div>
 
           {/* Table */}
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Password</th>
-                  <th>Role</th>
-                  <th>Department</th>
-                  <th>Joined</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((user, i) => (
-                  <tr key={user.id}>
-                    <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div className="avatar avatar-sm" style={{ background: `hsl(${(user.id * 60) % 360}, 60%, 55%)` }}>
-                          {user.name.charAt(0)}
-                        </div>
-                        <span style={{ fontWeight: 600 }}>{user.name}</span>
-                      </div>
-                    </td>
-                    <td style={{ color: 'var(--text-secondary)' }}>{user.email}</td>
-                    <td style={{ color: 'var(--text-muted)', fontFamily: 'monospace', fontSize: '12px' }}>{user.password || '—'}</td>
-                    <td><span className={`badge ${ROLE_COLORS[user.role] || 'badge-gray'}`}>{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '—'}</span></td>
-                    <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{user.dept}</td>
-                    <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{user.joined}</td>
-                    <td>
-                      <span className={`badge ${user.status === 'Active' ? 'badge-success' : 'badge-gray'}`}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => handleToggleStatus(user.id)}
-                          title={user.status === 'Active' ? 'Deactivate' : 'Activate'}
-                        >
-                          {user.status === 'Active' ? '⏸' : '▶'}
-                        </button>
-                        <button 
-                          className="btn btn-secondary btn-sm" 
-                          onClick={() => setEditingUser(user)}
-                          title="Edit"
-                        >✏️</button>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          style={{ color: '#EF4444' }}
-                          onClick={() => handleDelete(user.id)}
-                          title="Delete"
-                        >🗑️</button>
-                      </div>
-                    </td>
+            {loading ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                Loading users...
+              </div>
+            ) : users.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                No users found
+              </div>
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {users.map((user, i) => (
+                    <tr key={user.id || user._id}>
+                      <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div className="avatar avatar-sm" style={{ background: `hsl(${((user.id || user._id).toString().charCodeAt(0) * 60) % 360}, 60%, 55%)` }}>
+                            {user.name.charAt(0)}
+                          </div>
+                          <span style={{ fontWeight: 600 }}>{user.name}</span>
+                        </div>
+                      </td>
+                      <td style={{ color: 'var(--text-secondary)' }}>{user.email}</td>
+                      <td style={{ color: 'var(--text-muted)', fontFamily: 'monospace', fontSize: '12px' }}>{user.plainPassword || '—'}</td>
+                      <td><span className={`badge ${ROLE_COLORS[user.role?.toLowerCase()] || 'badge-gray'}`}>{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '—'}</span></td>
+                      <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{user.dept}</td>
+                      <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{user.joined}</td>
+                      <td>
+                        <span className={`badge ${user.status === 'Active' ? 'badge-success' : 'badge-gray'}`}>
+                          {user.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => handleToggleStatus(user)}
+                            title={user.status === 'Active' ? 'Deactivate' : 'Activate'}
+                          >
+                            {user.status === 'Active' ? '⏸' : '▶'}
+                          </button>
+                          <button 
+                            className="btn btn-secondary btn-sm" 
+                            onClick={() => setEditingUser(user)}
+                            title="Edit"
+                          >✏️</button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            style={{ color: '#EF4444' }}
+                            onClick={() => handleDelete(user.id || user._id)}
+                            title="Delete"
+                          >🗑️</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
 
           {/* Pagination */}
           <div className="pagination">
-            <span className="pagination-info">Showing {filtered.length} entries</span>
+            <span className="pagination-info">Showing {users.length} entries</span>
             <button className="page-btn active">1</button>
           </div>
         </div>

@@ -23,6 +23,21 @@
 
 ---
 
+## [2026-08-19 19:00 IST] — Backend Integration Phase (Admin Panel)
+
+### Completed:
+- **MongoDB Atlas Connectivity**: Configured and successfully connected backend to the remote Atlas database. Implemented Google public DNS override (`8.8.8.8`) in Mongoose `connectDB` config to resolve SRV resolution failures in restrictive network environments.
+- **Vite Reverse Proxy**: Set up `/api` reverse proxy in `vite.config.js` to automatically route API calls to the local Node.js server on port 5000, eliminating CORS issues.
+- **Admin Dashboard Integration**:
+  - Removed the profile icon and `+ Add User` button from the top right topbar header per user requests.
+  - Created a unified `GET /api/reports/admin-dashboard` stats endpoint in the Express app.
+  - Hooked the React `AdminDashboard.jsx` to fetch live counts (scholars, supervisors, active research, pending thesis, viva scheduled, departments) and month-by-month research trend charts directly from the database.
+- **User Management CRUD Integration**:
+  - Connected `UserManagement.jsx` to backend endpoints for user lookup, creation, status-toggling, and deletion.
+  - Added `plainPassword` tracking to the backend schema and endpoint responses (under admin-specific JWT checks) to preserve the admin's visibility of login passwords in the table.
+
+---
+
 ## Status Tracker
 
 | Role | Page | Status |

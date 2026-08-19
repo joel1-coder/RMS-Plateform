@@ -1,0 +1,9 @@
+2026-08-18 22:42:00 UTC - Admin Dashboard Connection
+Reason: Create GET /api/reports/admin-dashboard to fetch statistics for total scholars, supervisors, active research, pending thesis, viva voce scheduled, unique department count, and dynamic monthly research activity charts.
+Result: created
+Inference: Built aggregation counters and last 7-month calendar mapper in reports.controller.js.
+
+2026-08-19 18:49:00 UTC - User Management Integration
+Reason: Connect UserManagement.jsx frontend to Express backend endpoints. Enabled CRUD operations (creation, updates, status toggling, deletion) directly with MongoDB Atlas database.
+Result: merged
+Inference: Added plainPassword storage to User.model.js to display plain text passwords for admin roles; implemented query parameters on GET /api/users for role, status, and search filters.

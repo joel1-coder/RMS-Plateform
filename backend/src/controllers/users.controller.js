@@ -7,32 +7,53 @@ function publicUser(user) {
 
 const listUsers = asyncHandler(async (req, res) => {
   const filters = {};
-  if (req.query.role) filters.role = req.query.role;
+  if (req.query.role) filters.role = req.query.role.toLowerCase();
   if (req.query.status) filters.status = req.query.status;
+  if (req.query.search) {
+    const s = new RegExp(req.query.search, 'i');
+    filters.$or = [{ name: s }, { email: s }];
+  }
 
-  const users = await User.find(filters).sort({ name: 1 });
-  res.json(users.map(publicUser));
+  // Admin gets plainPassword field for the User Management table display
+  const isAdmin = req.user?.role === 'admin';
+  const query = User.find(filters).sort({ name: 1 });
+  if (isAdmin) query.select('+plainPassword');
+
+  const users = await query;
+  res.json(users.map(u => u.toPublicJSON({ includePassword: isAdmin })));
 });
 
 const createUser = asyncHandler(async (req, res) => {
-  const exists = await User.exists({ email: req.body.email.toLowerCase() });
+  const email = req.body.email?.toLowerCase();
+  const exists = await User.exists({ email });
   if (exists) {
     throw new AppError('Email already exists', 400);
   }
 
-  const user = await User.create(req.body);
-  res.status(201).json(publicUser(user));
+  const joined = req.body.joined || new Date().toISOString().slice(0, 10);
+  const role = req.body.role?.toLowerCase();
+  const user = await User.create({ ...req.body, email, role, joined });
+  
+  // Re-fetch with plainPassword so admin can see the credentials
+  const fresh = await User.findById(user._id).select('+plainPassword');
+  res.status(201).json(fresh.toPublicJSON({ includePassword: true }));
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select('+password');
+  const user = await User.findById(req.params.id).select('+password +plainPassword');
   if (!user) {
     throw new AppError('User not found', 404);
   }
 
+  // Handle role normalization
+  if (req.body.role) req.body.role = req.body.role.toLowerCase();
+  if (req.body.email) req.body.email = req.body.email.toLowerCase();
+
   Object.assign(user, req.body);
   await user.save();
-  res.json(publicUser(user));
+  
+  const fresh = await User.findById(user._id).select('+plainPassword');
+  res.json(fresh.toPublicJSON({ includePassword: true }));
 });
 
 const deleteUser = asyncHandler(async (req, res) => {

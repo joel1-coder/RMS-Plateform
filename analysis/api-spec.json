@@ -363,5 +363,57 @@
     "status_codes": {
       "201": "Saved successfully"
     }
+  },
+  {
+    "endpoint": "GET /api/reports/admin-dashboard",
+    "description": "Fetch aggregated admin dashboard stats (flashcard counts), department distributions, recent activity, and monthly research activity trends from the database.",
+    "auth": "Bearer JWT (admin)",
+    "response": {
+      "stats": {
+        "totalScholars": "number",
+        "supervisors": "number",
+        "activeResearch": "number",
+        "pendingThesis": "number",
+        "vivaScheduled": "number",
+        "departments": "number"
+      },
+      "deptData": [
+        {
+          "name": "string",
+          "value": "number",
+          "color": "string"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "string",
+          "scholars": "number",
+          "thesis": "number",
+          "viva": "number"
+        }
+      ],
+      "recentActivities": [
+        {
+          "id": "string",
+          "user": "string",
+          "action": "string",
+          "target": "string",
+          "time": "string",
+          "type": "string"
+        }
+      ],
+      "pendingActions": [
+        {
+          "title": "string",
+          "count": "number",
+          "color": "string",
+          "icon": "string"
+        }
+      ]
+    },
+    "status_codes": {
+      "200": "Success",
+      "403": "Access Denied"
+    }
   }
 ]

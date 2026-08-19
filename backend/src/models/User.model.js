@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, select: false },
+    plainPassword: { type: String, select: false }, // Admin-visible plain text copy
     role: {
       type: String,
       required: true,
@@ -27,7 +28,8 @@ userSchema.pre('save', async function hashPassword(next) {
   if (!this.isModified('password')) {
     return next();
   }
-
+  // Store the plain-text password for admin display before hashing
+  this.plainPassword = this.password;
   this.password = await bcrypt.hash(this.password, 10);
   return next();
 });
@@ -45,12 +47,15 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword)
  * Returns a public user object with an `id` field and no password.
  * @returns {object}
  */
-userSchema.methods.toPublicJSON = function toPublicJSON() {
-  const user = this.toObject();
+userSchema.methods.toPublicJSON = function toPublicJSON({ includePassword = false } = {}) {
+  const user = this.toObject({ versionKey: false });
   user.id = user._id;
   delete user._id;
   delete user.password;
   delete user.__v;
+  if (!includePassword) {
+    delete user.plainPassword;
+  }
   return user;
 };
 

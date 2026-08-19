@@ -1,42 +1,65 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Area, AreaChart } from 'recharts'
+import { useState, useEffect } from 'react'
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts'
 
-const monthlyData = [
-  { month: 'Jan', scholars: 12, thesis: 4, viva: 2 },
-  { month: 'Feb', scholars: 15, thesis: 6, viva: 3 },
-  { month: 'Mar', scholars: 18, thesis: 5, viva: 4 },
-  { month: 'Apr', scholars: 22, thesis: 8, viva: 6 },
-  { month: 'May', scholars: 20, thesis: 7, viva: 5 },
-  { month: 'Jun', scholars: 25, thesis: 10, viva: 8 },
-  { month: 'Jul', scholars: 28, thesis: 12, viva: 9 },
+// ── fallback defaults used while loading or if DB is empty ──────────────────
+const DEFAULT_MONTHLY = [
+  { month: 'Jan', scholars: 0, thesis: 0, viva: 0 },
+  { month: 'Feb', scholars: 0, thesis: 0, viva: 0 },
+  { month: 'Mar', scholars: 0, thesis: 0, viva: 0 },
+  { month: 'Apr', scholars: 0, thesis: 0, viva: 0 },
+  { month: 'May', scholars: 0, thesis: 0, viva: 0 },
+  { month: 'Jun', scholars: 0, thesis: 0, viva: 0 },
+  { month: 'Jul', scholars: 0, thesis: 0, viva: 0 },
 ]
 
-const deptData = [
-  { name: 'CS', value: 35, color: '#6C63FF' },
-  { name: 'ECE', value: 20, color: '#10B981' },
-  { name: 'Mech', value: 18, color: '#F59E0B' },
-  { name: 'Civil', value: 15, color: '#3B82F6' },
-  { name: 'Chem', value: 12, color: '#EF4444' },
-]
-
-const recentActivities = [
-  { id: 1, user: 'Dr. Priya Kumar', action: 'Approved synopsis', target: 'Rahul Sharma', time: '2 min ago', type: 'success' },
-  { id: 2, user: 'Prof. Anita Verma', action: 'Scheduled viva voce', target: 'Neha Patel', time: '15 min ago', type: 'info' },
-  { id: 3, user: 'Admin', action: 'Added new scholar', target: 'Amit Kumar', time: '1 hr ago', type: 'primary' },
-  { id: 4, user: 'Dr. Rajan Mehta', action: 'Rejected thesis draft', target: 'Sonal Joshi', time: '3 hrs ago', type: 'danger' },
-  { id: 5, user: 'HOD', action: 'Updated department settings', target: 'CS Dept', time: '5 hrs ago', type: 'warning' },
-]
-
-const pendingActions = [
-  { title: 'Synopsis Approvals', count: 8, color: '#F59E0B', icon: '📋' },
-  { title: 'Thesis Reviews', count: 5, color: '#3B82F6', icon: '📚' },
-  { title: 'Viva Scheduling', count: 3, color: '#6C63FF', icon: '🎓' },
-  { title: 'User Registrations', count: 12, color: '#10B981', icon: '👥' },
+const STAT_META = [
+  { key: 'totalScholars',  label: 'Total Scholars',  icon: '🎓', color: 'purple' },
+  { key: 'supervisors',    label: 'Supervisors',      icon: '👨‍🏫', color: 'blue'   },
+  { key: 'activeResearch', label: 'Active Research',  icon: '🔬', color: 'green'  },
+  { key: 'pendingThesis',  label: 'Pending Thesis',   icon: '📄', color: 'orange' },
+  { key: 'vivaScheduled',  label: 'Viva Scheduled',   icon: '📅', color: 'indigo' },
+  { key: 'departments',    label: 'Departments',      icon: '🏛️', color: 'red'    },
 ]
 
 export default function AdminDashboard() {
+  const [stats, setStats]             = useState({ totalScholars: 0, supervisors: 0, activeResearch: 0, pendingThesis: 0, vivaScheduled: 0, departments: 0 })
+  const [deptData, setDeptData]       = useState([])
+  const [monthlyData, setMonthlyData] = useState(DEFAULT_MONTHLY)
+  const [recentAct, setRecentAct]     = useState([])
+  const [pendingAct, setPendingAct]   = useState([])
+  const [loading, setLoading]         = useState(true)
+  const [error, setError]             = useState(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('rms_token')
+
+    fetch('/api/reports/admin-dashboard', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
+      .then(data => {
+        setStats(data.stats || {})
+        if (data.deptData?.length)    setDeptData(data.deptData)
+        if (data.monthlyData?.length) setMonthlyData(data.monthlyData)
+        if (data.recentActivities)    setRecentAct(data.recentActivities)
+        if (data.pendingActions)      setPendingAct(data.pendingActions)
+      })
+      .catch(err => {
+        console.warn('Dashboard stats fetch failed – showing fallback data.', err)
+        setError('Could not load live data. Showing cached values.')
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
   return (
     <div className="animate-fade">
-      {/* Topbar */}
+      {/* ── Topbar (icons removed as requested) ── */}
       <div className="topbar">
         <div>
           <div className="topbar-title">Admin Dashboard</div>
@@ -44,50 +67,38 @@ export default function AdminDashboard() {
             Welcome back! Here's what's happening today.
           </span>
         </div>
-        <div className="topbar-actions">
-          <button className="topbar-btn" title="Notifications">
-            🔔
-            <span className="badge-dot" />
-          </button>
-          <button className="topbar-btn" title="Profile">👤</button>
-          <button className="btn btn-primary btn-sm">
-            ＋ Add User
-          </button>
-        </div>
+        {error && (
+          <span style={{ fontSize: '11px', color: '#F59E0B', background: '#FEF3C7', padding: '4px 10px', borderRadius: 6 }}>
+            ⚠ {error}
+          </span>
+        )}
       </div>
 
       <div className="page-body">
-        {/* Stats Grid */}
+        {/* ── Stat Flashcards ── */}
         <div className="stat-cards-grid">
-          {[
-            { label: 'Total Scholars', value: '248', icon: '🎓', color: 'purple', change: '+12%', up: true },
-            { label: 'Supervisors', value: '42', icon: '👨‍🏫', color: 'blue', change: '+3%', up: true },
-            { label: 'Active Research', value: '186', icon: '🔬', color: 'green', change: '+8%', up: true },
-            { label: 'Pending Thesis', value: '23', icon: '📄', color: 'orange', change: '-5%', up: false },
-            { label: 'Viva Scheduled', value: '11', icon: '📅', color: 'indigo', change: '+2', up: true },
-            { label: 'Departments', value: '8', icon: '🏛️', color: 'red', change: 'Active', up: true },
-          ].map((stat, i) => (
-            <div className="stat-card" key={i}>
-              <div className={`stat-icon ${stat.color}`}>{stat.icon}</div>
+          {STAT_META.map(({ key, label, icon, color }) => (
+            <div className="stat-card" key={key}>
+              <div className={`stat-icon ${color}`}>{icon}</div>
               <div className="stat-info">
-                <div className="stat-value">{stat.value}</div>
-                <div className="stat-label">{stat.label}</div>
-                <div className={`stat-change ${stat.up ? 'up' : 'down'}`}>
-                  {stat.up ? '↑' : '↓'} {stat.change} this month
+                <div className="stat-value">
+                  {loading ? <span className="skeleton-text" style={{ width: 40, display:'inline-block' }}>--</span> : (stats[key] ?? 0)}
                 </div>
+                <div className="stat-label">{label}</div>
+                <div className="stat-change up">Live from DB</div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Charts Row */}
+        {/* ── Charts Row ── */}
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '20px' }}>
-          {/* Bar Chart */}
+          {/* Bar Chart – Monthly Research Activity */}
           <div className="card">
             <div className="card-header">
               <div>
                 <div className="card-title">Monthly Research Activity</div>
-                <div className="card-subtitle">Scholars, Thesis & Viva trends</div>
+                <div className="card-subtitle">Scholars, Thesis &amp; Viva trends</div>
               </div>
               <select className="form-control form-select" style={{ width: 'auto', fontSize: '12px', padding: '6px 28px 6px 10px' }}>
                 <option>Last 7 months</option>
@@ -100,16 +111,18 @@ export default function AdminDashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                   <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 12, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', fontSize: '12px' }} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                  />
                   <Bar dataKey="scholars" fill="#6C63FF" radius={[4, 4, 0, 0]} name="Scholars" />
-                  <Bar dataKey="thesis" fill="#10B981" radius={[4, 4, 0, 0]} name="Thesis" />
-                  <Bar dataKey="viva" fill="#F59E0B" radius={[4, 4, 0, 0]} name="Viva" />
+                  <Bar dataKey="thesis"   fill="#10B981" radius={[4, 4, 0, 0]} name="Thesis" />
+                  <Bar dataKey="viva"     fill="#F59E0B" radius={[4, 4, 0, 0]} name="Viva" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Pie Chart */}
+          {/* Pie Chart – By Department */}
           <div className="card">
             <div className="card-header">
               <div>
@@ -118,29 +131,46 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="card-body" style={{ padding: '16px 20px' }}>
-              <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
-                  <Pie data={deptData} cx="50%" cy="50%" innerRadius={45} outerRadius={72} paddingAngle={3} dataKey="value">
-                    {deptData.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
+              {deptData.length === 0 ? (
+                <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 0', fontSize: '13px' }}>
+                  {loading ? 'Loading department data...' : 'No department data yet'}
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={160}>
+                    <PieChart>
+                      <Pie
+                        data={deptData}
+                        cx="50%" cy="50%"
+                        innerRadius={45} outerRadius={72}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {deptData.map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(v) => [`${v} scholars`, '']}
+                        contentStyle={{ borderRadius: '8px', fontSize: '12px' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                    {deptData.map((d, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: d.color, display: 'inline-block' }} />
+                        {d.name}: {d.value}
+                      </div>
                     ))}
-                  </Pie>
-                  <Tooltip formatter={(v) => [`${v} scholars`, '']} contentStyle={{ borderRadius: '8px', fontSize: '12px' }} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
-                {deptData.map((d, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11.5px', color: 'var(--text-secondary)' }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: d.color, display: 'inline-block' }} />
-                    {d.name}: {d.value}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Bottom Row */}
+        {/* ── Bottom Row ── */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           {/* Recent Activity */}
           <div className="card">
@@ -148,27 +178,34 @@ export default function AdminDashboard() {
               <div className="card-title">Recent Activity</div>
               <button className="btn btn-ghost btn-sm">View All</button>
             </div>
-            <div>
-              {recentActivities.map(act => (
-                <div key={act.id} style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                  padding: '12px 20px',
-                  borderBottom: '1px solid var(--border)',
-                }}>
-                  <div style={{
-                    width: 8, height: 8, borderRadius: '50%', marginTop: 6, flexShrink: 0,
-                    background: act.type === 'success' ? '#10B981' : act.type === 'danger' ? '#EF4444' : act.type === 'info' ? '#3B82F6' : act.type === 'warning' ? '#F59E0B' : '#6C63FF',
-                  }} />
-                  <div style={{ flex: 1 }}>
-                    <span style={{ fontSize: '13px', fontWeight: 600 }}>{act.user}</span>
-                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}> {act.action} </span>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)' }}>{act.target}</span>
-                  </div>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{act.time}</span>
+            <div className="card-body" style={{ padding: '8px 0' }}>
+              {loading ? (
+                <div style={{ padding: '20px', color: 'var(--text-secondary)', fontSize: '13px' }}>Loading activity...</div>
+              ) : recentAct.length === 0 ? (
+                <div style={{ padding: '20px', color: 'var(--text-secondary)', fontSize: '13px', textAlign: 'center' }}>
+                  No recent activity found
                 </div>
-              ))}
+              ) : (
+                recentAct.map((a, i) => (
+                  <div key={a.id || i} style={{
+                    display: 'flex', alignItems: 'center', gap: '12px',
+                    padding: '10px 20px', borderBottom: i < recentAct.length - 1 ? '1px solid var(--border-color)' : 'none'
+                  }}>
+                    <span style={{
+                      width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                      background: a.type === 'success' ? '#10B981' : a.type === 'danger' ? '#EF4444' : a.type === 'warning' ? '#F59E0B' : '#6C63FF'
+                    }} />
+                    <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
+                      <span style={{ fontWeight: 600 }}>{a.user}</span>
+                      {' '}{a.action}{' '}
+                      <span style={{ color: '#6C63FF', fontWeight: 500 }}>{a.target}</span>
+                    </div>
+                    <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                      {a.time}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -176,41 +213,39 @@ export default function AdminDashboard() {
           <div className="card">
             <div className="card-header">
               <div className="card-title">Pending Actions</div>
-              <span className="badge badge-danger">28 total</span>
+              {pendingAct.length > 0 && (
+                <span style={{
+                  background: '#EF4444', color: '#fff',
+                  borderRadius: 20, padding: '2px 10px', fontSize: '12px', fontWeight: 600
+                }}>
+                  {pendingAct.reduce((sum, p) => sum + (p.count || 0), 0)} total
+                </span>
+              )}
             </div>
-            <div className="card-body">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {pendingActions.map((action, i) => (
-                  <div key={i}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span>{action.icon}</span>
-                        <span style={{ fontSize: '13px', fontWeight: 500 }}>{action.title}</span>
-                      </div>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: action.color }}>{action.count}</span>
+            <div className="card-body" style={{ padding: '8px 20px 20px' }}>
+              {loading ? (
+                <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Loading actions...</div>
+              ) : pendingAct.length === 0 ? (
+                <div style={{ color: 'var(--text-secondary)', fontSize: '13px', textAlign: 'center', paddingTop: 20 }}>
+                  ✅ No pending actions
+                </div>
+              ) : (
+                pendingAct.map((p, i) => (
+                  <div key={i} style={{ marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{p.icon} {p.title}</span>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: p.color }}>{p.count}</span>
                     </div>
-                    <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: `${(action.count / 15) * 100}%`, background: action.color }} />
+                    <div style={{ background: 'var(--bg-secondary)', borderRadius: 4, height: 4 }}>
+                      <div style={{
+                        width: `${Math.min((p.count / 20) * 100, 100)}%`,
+                        background: p.color, height: '100%', borderRadius: 4,
+                        transition: 'width 0.6s ease'
+                      }} />
                     </div>
                   </div>
-                ))}
-              </div>
-
-              <div style={{ marginTop: '24px' }}>
-                <div className="card-subtitle" style={{ marginBottom: '12px' }}>Quick Actions</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  {[
-                    { label: 'Add Scholar', icon: '🎓' },
-                    { label: 'Schedule Viva', icon: '📅' },
-                    { label: 'Send Notice', icon: '📢' },
-                    { label: 'Generate Report', icon: '📊' },
-                  ].map((action, i) => (
-                    <button key={i} className="btn btn-ghost btn-sm" style={{ justifyContent: 'center', gap: '6px' }}>
-                      {action.icon} {action.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                ))
+              )}
             </div>
           </div>
         </div>

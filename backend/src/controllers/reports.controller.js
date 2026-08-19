@@ -4,6 +4,149 @@ const Meeting = require('../models/Meeting.model');
 const User = require('../models/User.model');
 const { asyncHandler } = require('../middlewares/errorHandler');
 
+const getAdminDashboardStats = asyncHandler(async (req, res) => {
+  const [
+    totalScholars,
+    supervisors,
+    activeResearch,
+    pendingThesis,
+    vivaScheduled,
+    allDepts,
+    users,
+    projects,
+    submissions,
+    meetings
+  ] = await Promise.all([
+    User.countDocuments({ role: 'scholar' }),
+    User.countDocuments({ role: 'supervisor' }),
+    ResearchProject.countDocuments({ status: 'Active' }),
+    Submission.countDocuments({ type: 'thesis', status: { $ne: 'Approved by DRC' } }),
+    Meeting.countDocuments({ type: 'Viva Voce', status: 'Scheduled' }),
+    User.distinct('dept'),
+    User.find({ role: 'scholar' }, 'dept'),
+    ResearchProject.find({}, 'startDate'),
+    Submission.find({ type: 'thesis' }, 'submittedAt'),
+    Meeting.find({ type: 'Viva Voce' }, 'date')
+  ]);
+
+  // Compute By Department Pie Chart data
+  const deptCounts = {};
+  users.forEach(u => {
+    if (u.dept) {
+      deptCounts[u.dept] = (deptCounts[u.dept] || 0) + 1;
+    }
+  });
+  
+  const colors = ['#6C63FF', '#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#EC4899', '#8B5CF6'];
+  const deptData = Object.keys(deptCounts).map((name, i) => ({
+    name,
+    value: deptCounts[name],
+    color: colors[i % colors.length]
+  }));
+
+  // Compute last 7 months trends
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  
+  // Let's dynamically find the last 7 months
+  const monthlyDataMap = {};
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const mName = monthNames[d.getMonth()];
+    monthlyDataMap[mName] = { month: mName, scholars: 0, thesis: 0, viva: 0 };
+  }
+
+  // Populate scholars (Research projects)
+  projects.forEach(p => {
+    if (p.startDate) {
+      const date = new Date(p.startDate);
+      if (!isNaN(date.getTime())) {
+        const mName = monthNames[date.getMonth()];
+        if (monthlyDataMap[mName]) {
+          monthlyDataMap[mName].scholars += 1;
+        }
+      }
+    }
+  });
+
+  // Populate thesis submissions
+  submissions.forEach(s => {
+    if (s.submittedAt) {
+      const date = new Date(s.submittedAt);
+      if (!isNaN(date.getTime())) {
+        const mName = monthNames[date.getMonth()];
+        if (monthlyDataMap[mName]) {
+          monthlyDataMap[mName].thesis += 1;
+        }
+      }
+    }
+  });
+
+  // Populate viva voce meetings
+  meetings.forEach(m => {
+    if (m.date) {
+      const date = new Date(m.date);
+      if (!isNaN(date.getTime())) {
+        const mName = monthNames[date.getMonth()];
+        if (monthlyDataMap[mName]) {
+          monthlyDataMap[mName].viva += 1;
+        }
+      }
+    }
+  });
+
+  const monthlyData = Object.values(monthlyDataMap);
+
+  // Recent activity: get recent user events or mock them using actual database logs/submissions/meetings
+  const recentActivities = [];
+  
+  // 1. Get recent users
+  const recentUsers = await User.find().sort({ _id: -1 }).limit(3);
+  recentUsers.forEach(u => {
+    recentActivities.push({
+      id: `u-${u._id}`,
+      user: 'Admin',
+      action: `Added new ${u.role}`,
+      target: u.name,
+      time: 'New',
+      type: u.role === 'scholar' ? 'primary' : 'info'
+    });
+  });
+
+  // 2. Get recent meetings
+  const recentMeets = await Meeting.find().sort({ _id: -1 }).limit(2);
+  recentMeets.forEach(m => {
+    recentActivities.push({
+      id: `m-${m._id}`,
+      user: m.supervisor || 'DRC Convener',
+      action: `Scheduled ${m.type}`,
+      target: m.scholar,
+      time: 'Recent',
+      type: 'success'
+    });
+  });
+
+  res.json({
+    stats: {
+      totalScholars,
+      supervisors,
+      activeResearch,
+      pendingThesis,
+      vivaScheduled,
+      departments: allDepts.length
+    },
+    deptData,
+    monthlyData,
+    recentActivities: recentActivities.slice(0, 5),
+    pendingActions: [
+      { title: 'Synopsis Approvals', count: await Submission.countDocuments({ type: 'synopsis', status: 'Pending Supervisor Approval' }), color: '#F59E0B', icon: '📋' },
+      { title: 'Thesis Reviews', count: pendingThesis, color: '#3B82F6', icon: '📚' },
+      { title: 'Viva Scheduling', count: vivaScheduled, color: '#6C63FF', icon: '🎓' },
+      { title: 'Active Accounts', count: await User.countDocuments({ status: 'Active' }), color: '#10B981', icon: '👥' }
+    ]
+  });
+});
+
 const scholarReport = asyncHandler(async (req, res) => {
   // TODO: VERIFY_INFERENCE Route is present in route-map.json but absent from api-spec.json.
   const name = new RegExp(req.query.name, 'i');
@@ -34,4 +177,4 @@ const generateReport = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { scholarReport, generateReport };
+module.exports = { getAdminDashboardStats, scholarReport, generateReport };

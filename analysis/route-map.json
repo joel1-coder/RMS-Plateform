@@ -19,6 +19,13 @@
     "title": "Admin Dashboard",
     "actions": [
       {
+        "selector": "useEffect",
+        "label": "Load Stats & Trends",
+        "type": "api",
+        "target": "GET /api/reports/admin-dashboard",
+        "description": "Loads dynamic database counts and monthly trends to populate the flashcards and charts"
+      },
+      {
         "selector": "NavLink to='/admin/users'",
         "label": "User Management",
         "type": "navigate",
