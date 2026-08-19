@@ -54,36 +54,32 @@ export default function LoginPage() {
       return
     }
     setLoading(true)
-    await new Promise(r => setTimeout(r, 900))
 
-    // First check against localStorage users (dynamic database)
-    let matchedUser = null
     try {
-      const storedUsers = JSON.parse(localStorage.getItem('rms_all_users') || '[]')
-      matchedUser = storedUsers.find(
-        u => u.email === email &&
-             u.password === password &&
-             u.role.toLowerCase() === selectedRole.toLowerCase() &&
-             u.status === 'Active'
-      )
-    } catch {}
-
-    if (matchedUser) {
-      login({ email: matchedUser.email, name: matchedUser.name, role: selectedRole.toLowerCase(), department: matchedUser.dept })
-      toast.success(`Welcome back, ${matchedUser.name.split(' ').pop()}!`)
-      navigate(`/${selectedRole.toLowerCase()}`)
-    } else {
-      // Fallback to default credentials
-      const demo = DEFAULT_CREDENTIALS[selectedRole]
-      if (demo && email === demo.email && password === demo.password) {
-        login(demo)
-        toast.success(`Welcome back, ${demo.name.split(' ')[1] || demo.name}!`)
-        navigate(`/${selectedRole}`)
-      } else {
-        toast.error('Invalid credentials. Check email and password.')
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role: selectedRole.toLowerCase() })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Invalid credentials. Check email and password.')
       }
+
+      // Store JWT token for API calls
+      localStorage.setItem('rms_token', data.token)
+      
+      // Update Context
+      login(data.user)
+      toast.success(`Welcome back, ${data.user.name.split(' ').pop()}!`)
+      navigate(`/${selectedRole.toLowerCase()}`)
+    } catch (err) {
+      toast.error(err.message)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const currentDemo = DEFAULT_CREDENTIALS[selectedRole]

@@ -176,7 +176,8 @@ export default function UserManagement() {
         })
         if (!response.ok) {
           const errData = await response.json()
-          throw new Error(errData.message || 'Failed to update user')
+          const details = errData.errors ? Object.values(errData.errors).map(e => e.message).join(', ') : ''
+          throw new Error(details || errData.message || 'Failed to update user')
         }
         toast.success('User updated successfully!')
         setEditingUser(null)
@@ -195,7 +196,8 @@ export default function UserManagement() {
         })
         if (!response.ok) {
           const errData = await response.json()
-          throw new Error(errData.message || 'Failed to create user')
+          const details = errData.errors ? Object.values(errData.errors).map(e => e.message).join(', ') : ''
+          throw new Error(details || errData.message || 'Failed to create user')
         }
         toast.success('User registered successfully!')
       }

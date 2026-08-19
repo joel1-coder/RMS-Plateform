@@ -1,8 +1,5 @@
-﻿/**
- * resetUsers.js - Wipes all users and seeds a fresh Admin account.
- */
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
-const mongoose = require('mongoose');
+﻿require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+const { connectDB } = require('../src/config/db');
 const User = require('../src/models/User.model');
 
 const ADMIN = {
@@ -16,8 +13,8 @@ const ADMIN = {
 };
 
 async function run() {
-  console.log('Connecting to MongoDB...');
-  await mongoose.connect(process.env.MONGO_URI);
+  console.log('Connecting to MongoDB Atlas...');
+  await connectDB();
   console.log('Connected.');
 
   const deleted = await User.deleteMany({});
@@ -32,7 +29,6 @@ async function run() {
   console.log('===========================');
   console.log('Done! Login at http://localhost:5173');
 
-  await mongoose.disconnect();
   process.exit(0);
 }
 

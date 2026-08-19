@@ -57,8 +57,8 @@ const schemas = {
     supervisorId: objectId.required()
   }),
   listUsers: Joi.object({
-    role: Joi.string().valid(...roles),
-    status: Joi.string().valid(...userStatus)
+    role: Joi.string().valid(...roles).allow(''),
+    status: Joi.string().valid(...userStatus).allow('')
   }),
   createResearch: Joi.object({
     scholar: Joi.string().required(),
@@ -81,8 +81,8 @@ const schemas = {
     status: Joi.string().valid(...researchStatus)
   }).min(1),
   listResearch: Joi.object({
-    status: Joi.string().valid(...researchStatus),
-    stage: Joi.string().valid(...researchStages)
+    status: Joi.string().valid(...researchStatus).allow(''),
+    stage: Joi.string().valid(...researchStages).allow('')
   }),
   createSubmission: Joi.object({
     topic: Joi.string().required()
