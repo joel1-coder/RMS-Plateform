@@ -1,29 +1,71 @@
-import { useState } from 'react'
-
-const notifData = [
-  { id: 1, title: 'New Synopsis Submitted', msg: 'Rahul Sharma submitted synopsis for review (Topic: AI in Healthcare)', time: '5 min ago', read: false, type: 'info', icon: '📋' },
-  { id: 2, title: 'Viva Voce Scheduled', msg: 'Viva for Neha Patel has been scheduled on Aug 10, 2024 at 10:00 AM', time: '20 min ago', read: false, type: 'success', icon: '🎓' },
-  { id: 3, title: 'Thesis Submitted', msg: 'Amit Kumar submitted final thesis. Awaiting DRC review.', time: '1 hr ago', read: false, type: 'primary', icon: '📚' },
-  { id: 4, title: 'Login Alert', msg: 'Suspicious login attempt detected from IP 10.0.0.55 for Neha Patel.', time: '3 hrs ago', read: true, type: 'danger', icon: '🚨' },
-  { id: 5, title: 'DRC Meeting Reminder', msg: 'DRC review meeting for CS Dept scheduled on July 25, 2024', time: '5 hrs ago', read: true, type: 'warning', icon: '📅' },
-  { id: 6, title: 'Report Ready', msg: 'Monthly progress report for July 2024 has been generated.', time: '1 day ago', read: true, type: 'success', icon: '📊' },
-  { id: 7, title: 'New User Registration', msg: 'New scholar application received from Sonal Joshi (Electronics dept)', time: '1 day ago', read: true, type: 'info', icon: '👤' },
-  { id: 8, title: 'Deadline Approaching', msg: 'Synopsis submission deadline is in 14 days (Sep 30, 2024)', time: '2 days ago', read: true, type: 'warning', icon: '⏰' },
-]
+import { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 const TYPE_COLORS = {
-  info: '#3B82F6', success: '#10B981', danger: '#EF4444', warning: '#F59E0B', primary: '#6C63FF',
+  info: '#3B82F6', 
+  success: '#10B981', 
+  danger: '#EF4444', 
+  warning: '#F59E0B', 
+  primary: '#6C63FF',
+  allocation: '#8B5CF6'
 }
 
 export default function Notifications() {
-  const [notifs, setNotifs] = useState(notifData)
+  const [notifs, setNotifs] = useState([])
   const [filter, setFilter] = useState('all')
+  const [loading, setLoading] = useState(true)
+
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const response = await fetch('/api/notifications', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      const data = await response.json()
+      setNotifs(data)
+    } catch {
+      toast.error('Failed to load notifications')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchNotifications()
+  }, [])
 
   const unreadCount = notifs.filter(n => !n.read).length
 
-  const markAllRead = () => setNotifs(prev => prev.map(n => ({ ...n, read: true })))
-  const markRead = (id) => setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
-  const deleteNotif = (id) => setNotifs(prev => prev.filter(n => n.id !== id))
+  const markAllRead = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const response = await fetch('/api/notifications/read', {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      toast.success('All notifications marked as read')
+      fetchNotifications()
+    } catch {
+      toast.error('Failed to update notifications status')
+    }
+  }
+
+  const handleClearAll = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const response = await fetch('/api/notifications/clear', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      toast.success('Notifications cleared')
+      fetchNotifications()
+    } catch {
+      toast.error('Failed to clear notifications')
+    }
+  }
 
   const filtered = notifs.filter(n => {
     if (filter === 'unread') return !n.read
@@ -42,7 +84,7 @@ export default function Notifications() {
         </div>
         <div className="topbar-actions">
           <button className="btn btn-ghost btn-sm" onClick={markAllRead}>✓ Mark all as read</button>
-          <button className="btn btn-primary btn-sm">🔔 Settings</button>
+          <button className="btn btn-danger btn-sm" style={{ background: '#EF4444', borderColor: '#EF4444' }} onClick={handleClearAll}>✕ Clear all</button>
         </div>
       </div>
 
@@ -50,15 +92,15 @@ export default function Notifications() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '20px' }}>
           {[
-            { label: 'Total', value: notifs.length, icon: '🔔', color: 'purple' },
-            { label: 'Unread', value: unreadCount, icon: '📩', color: 'blue' },
-            { label: 'Alerts', value: notifs.filter(n => n.type === 'danger').length, icon: '🚨', color: 'red' },
-            { label: 'Reminders', value: notifs.filter(n => n.type === 'warning').length, icon: '⏰', color: 'orange' },
+            { label: 'Total Alerts', value: notifs.length, icon: '🔔', color: 'purple' },
+            { label: 'Unread Logs', value: unreadCount, icon: '📩', color: 'blue' },
+            { label: 'Allocations', value: notifs.filter(n => n.type === 'allocation').length, icon: '🔗', color: 'green' },
+            { label: 'General Alerts', value: notifs.filter(n => n.type === 'general' || n.type === 'info').length, icon: '📢', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
               <div className="stat-info">
-                <div className="stat-value">{s.value}</div>
+                <div className="stat-value">{loading ? '--' : s.value}</div>
                 <div className="stat-label">{s.label}</div>
               </div>
             </div>
@@ -94,7 +136,9 @@ export default function Notifications() {
           </div>
 
           {/* Notification List */}
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading alerts...</div>
+          ) : filtered.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">🔕</div>
               <h3>No notifications</h3>
@@ -103,30 +147,28 @@ export default function Notifications() {
           ) : (
             filtered.map(notif => (
               <div
-                key={notif.id}
+                key={notif.id || notif._id}
                 className={`notification-item${notif.read ? '' : ' unread'}`}
-                onClick={() => markRead(notif.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 20px', borderBottom: '1px solid var(--border)' }}
               >
                 <div style={{
                   width: 42, height: 42, borderRadius: 'var(--radius-md)',
-                  background: `${TYPE_COLORS[notif.type]}18`,
+                  background: `${TYPE_COLORS[notif.type || 'info'] || '#6C63FF'}18`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '18px', flexShrink: 0,
                 }}>
-                  {notif.icon}
+                  {notif.type === 'allocation' ? '🔗' : '🔔'}
                 </div>
-                <div className="notification-body">
-                  <div className="notification-title">{notif.title}</div>
-                  <div className="notification-text">{notif.msg}</div>
-                  <div className="notification-time">{notif.time}</div>
+                <div className="notification-body" style={{ flex: 1 }}>
+                  <div className="notification-title" style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>{notif.title}</div>
+                  <div className="notification-text" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{notif.message}</div>
+                  <div className="notification-time" style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    {new Date(notif.createdAt).toLocaleString()}
+                  </div>
                 </div>
                 {!notif.read && (
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: TYPE_COLORS[notif.type], flexShrink: 0, marginTop: 6 }} />
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: TYPE_COLORS[notif.type || 'info'] || '#6C63FF', flexShrink: 0 }} />
                 )}
-                <button
-                  onClick={e => { e.stopPropagation(); deleteNotif(notif.id) }}
-                  style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '14px', padding: '4px', borderRadius: '50%' }}
-                >✕</button>
               </div>
             ))
           )}

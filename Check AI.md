@@ -68,6 +68,25 @@
 
 ---
 
+## [2026-08-19 19:40 IST] — Backend Integration Phase (Assign Scholar, Audit Log, & Reports)
+
+### Completed:
+- **Scholar-Supervisor Allocation**:
+  - Implemented dynamic filtering on the Admin's "Select Scholar" dropdown to display only unassigned scholars.
+  - Designed an HTML5 datalist searchable input overlay for the supervisor selection dropdown to allow searching among hundreds of staff items.
+  - Added double notification trigger triggers to `Notification` collection to notify both scholar and supervisor upon allocation.
+- **System Audit Log**:
+  - Created `AuditLog` model (`AuditLog.model.js`) and logging utility helper (`auditLogger.js`).
+  - Added audit logger hooks on User CRUD (Create, Update, Delete) and Scholar Assignment.
+  - Connected `AuditLog.jsx` page to dynamic `/api/audit` API endpoint.
+- **Reports & Analytics**:
+  - Connected `Reports.jsx` to live `/api/research` backend API.
+  - Enabled dynamic Scholar Lookup matching in MongoDB database.
+- **Notifications Display**:
+  - Wired `Notifications.jsx` to fetch personal notifications from `/api/notifications`.
+
+---
+
 ## Status Tracker
 
 | Role | Page | Status |

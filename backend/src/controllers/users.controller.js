@@ -1,5 +1,7 @@
 const User = require('../models/User.model');
 const { AppError, asyncHandler } = require('../middlewares/errorHandler');
+const { logAudit } = require('../utils/auditLogger');
+const { createNotification } = require('../utils/notificationHelper');
 
 function publicUser(user) {
   return user.toPublicJSON ? user.toPublicJSON() : user;
@@ -34,6 +36,13 @@ const createUser = asyncHandler(async (req, res) => {
   const role = req.body.role?.toLowerCase();
   const user = await User.create({ ...req.body, email, role, joined });
   
+  await logAudit({
+    user: req.user?.name || 'System',
+    action: 'User Created',
+    detail: `Created user account for ${user.name} (${user.role})`,
+    severity: 'Info'
+  });
+
   // Re-fetch with plainPassword so admin can see the credentials
   const fresh = await User.findById(user._id).select('+plainPassword');
   res.status(201).json(fresh.toPublicJSON({ includePassword: true }));
@@ -52,6 +61,13 @@ const updateUser = asyncHandler(async (req, res) => {
   Object.assign(user, req.body);
   await user.save();
   
+  await logAudit({
+    user: req.user?.name || 'System',
+    action: 'User Updated',
+    detail: `Updated user account details for ${user.name}`,
+    severity: 'Info'
+  });
+
   const fresh = await User.findById(user._id).select('+plainPassword');
   res.json(fresh.toPublicJSON({ includePassword: true }));
 });
@@ -61,6 +77,13 @@ const deleteUser = asyncHandler(async (req, res) => {
   if (!user) {
     throw new AppError('User not found', 404);
   }
+
+  await logAudit({
+    user: req.user?.name || 'System',
+    action: 'User Deleted',
+    detail: `Deleted user account for ${user.name}`,
+    severity: 'Warning'
+  });
 
   res.json({ success: true });
 });
@@ -79,10 +102,33 @@ const assignSupervisor = asyncHandler(async (req, res) => {
   scholar.assignedSupervisorId = supervisor._id;
   await scholar.save();
 
+  // Log Audit
+  await logAudit({
+    user: req.user?.name || 'System',
+    action: 'Scholar Assigned',
+    detail: `Assigned scholar ${scholar.name} to supervisor ${supervisor.name}`,
+    severity: 'Success'
+  });
+
+  // Create notifications for both scholar and supervisor
+  await createNotification({
+    userId: scholar._id,
+    title: 'Supervisor Assigned',
+    message: `${supervisor.name} has been assigned as your supervisor.`,
+    type: 'allocation'
+  });
+
+  await createNotification({
+    userId: supervisor._id,
+    title: 'Scholar Assigned',
+    message: `Scholar ${scholar.name} has been assigned to you.`,
+    type: 'allocation'
+  });
+
   res.json({
     id: scholar._id,
     name: scholar.name,
-    role: 'Scholar',
+    role: 'scholar',
     assignedSupervisor: scholar.assignedSupervisor,
     assignedSupervisorId: scholar.assignedSupervisorId
   });
@@ -94,14 +140,42 @@ const unassignSupervisor = asyncHandler(async (req, res) => {
     throw new AppError('Scholar not found', 404);
   }
 
+  const supervisorId = scholar.assignedSupervisorId;
+  const supervisorName = scholar.assignedSupervisor;
+
   scholar.assignedSupervisor = undefined;
   scholar.assignedSupervisorId = undefined;
   await scholar.save();
 
+  // Log Audit
+  await logAudit({
+    user: req.user?.name || 'System',
+    action: 'Scholar Unassigned',
+    detail: `Unlinked scholar ${scholar.name} from supervisor ${supervisorName}`,
+    severity: 'Warning'
+  });
+
+  // Notifications
+  await createNotification({
+    userId: scholar._id,
+    title: 'Supervisor Unassigned',
+    message: `You have been unassigned from supervisor ${supervisorName}.`,
+    type: 'allocation'
+  });
+
+  if (supervisorId) {
+    await createNotification({
+      userId: supervisorId,
+      title: 'Scholar Unassigned',
+      message: `Scholar ${scholar.name} is no longer assigned to you.`,
+      type: 'allocation'
+    });
+  }
+
   res.json({
     id: scholar._id,
     name: scholar.name,
-    role: 'Scholar',
+    role: 'scholar',
     assignedSupervisor: null,
     assignedSupervisorId: null
   });

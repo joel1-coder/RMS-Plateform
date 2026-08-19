@@ -17,3 +17,8 @@ Inference: Created separate database collections to simplify data layout as requ
 Reason: Fully wire the Supervisor's ThesisReview.jsx and PublicationsReview.jsx pages to Mongoose backend API endpoints. Enable upload actions by supervisors on behalf of scholars and status updates (Approve, Reject, Verify) synchronized with MongoDB.
 Result: merged
 Inference: Updated createThesis controller dynamically to assign the scholarId parameter when submitted by supervisor/admin.
+
+2026-08-19 19:40:00 UTC - Admin Scholar Assignment, Audit Logs, and Reports & Analytics Integration
+Reason: Fully wire the Admin's AssignScholar.jsx, AuditLog.jsx, and Reports.jsx pages. Integrated HTML5 search datalist for supervisors dropdown, log audits for user allocation modifications, and create notification events to display on the Notifications.jsx view.
+Result: merged
+Inference: Set up Mongoose schemas for notifications and audit logs with custom Express router layers.

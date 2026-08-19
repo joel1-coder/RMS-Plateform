@@ -1,16 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts'
-
-const DEFAULT_RESEARCH = [
-  { id: 1, scholar: 'Rahul Sharma', topic: 'Artificial Intelligence in Healthcare Diagnostics', supervisor: 'Dr. Priya Kumar', dept: 'CS', startDate: '2021-08-01', status: 'Active', progress: 75, stage: 'Thesis Writing' },
-  { id: 2, scholar: 'Neha Patel', topic: 'IoT-based Smart Agriculture System', supervisor: 'Dr. Rajan Mehta', dept: 'ECE', startDate: '2022-01-15', status: 'Active', progress: 60, stage: 'Data Collection' },
-  { id: 3, scholar: 'Amit Kumar', topic: 'Blockchain for Supply Chain Management', supervisor: 'Dr. Sunita Rao', dept: 'CS', startDate: '2020-07-01', status: 'Completed', progress: 100, stage: 'Completed' },
-  { id: 4, scholar: 'Sonal Joshi', topic: 'Deep Learning for NLP Tasks', supervisor: 'Dr. Priya Kumar', dept: 'CS', startDate: '2022-08-01', status: 'Active', progress: 45, stage: 'Literature Review' },
-  { id: 5, scholar: 'Vikram Singh', topic: 'Renewable Energy in Urban Grids', supervisor: 'Dr. Rajan Mehta', dept: 'Mech', startDate: '2019-08-01', status: 'Completed', progress: 100, stage: 'Completed' },
-  { id: 6, scholar: 'Pooja Mehta', topic: 'Quantum Computing in Cryptography', supervisor: 'Dr. A. Kapoor', dept: 'CS', startDate: '2023-01-01', status: 'Active', progress: 25, stage: 'Synopsis Preparation' },
-  { id: 7, scholar: 'Kiran Rao', topic: 'Machine Learning for Predictive Analytics', supervisor: 'Dr. Sunita Rao', dept: 'CS', startDate: '2023-08-01', status: 'Active', progress: 15, stage: 'Course Work' },
-]
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
 
 const monthlyProgress = [
   { month: 'Jan', submitted: 4, approved: 3, rejected: 1 },
@@ -54,18 +44,32 @@ export default function Reports() {
   const [department, setDepartment] = useState('All Departments')
   const [generated, setGenerated] = useState(false)
 
-  // Work 3: Scholar lookup
+  // Scholar lookup
   const [scholarName, setScholarName] = useState('')
   const [scholarResult, setScholarResult] = useState(null)
   const [scholarSearched, setScholarSearched] = useState(false)
 
-  const [research, setResearch] = useState(DEFAULT_RESEARCH)
+  const [research, setResearch] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchResearch = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const response = await fetch('/api/research', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      const data = await response.json()
+      setResearch(data)
+    } catch {
+      toast.error('Failed to load research project analytics')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('rms_research') || '[]')
-      if (stored.length) setResearch(stored)
-    } catch {}
+    fetchResearch()
   }, [])
 
   const handleGenerate = () => {
@@ -78,7 +82,7 @@ export default function Reports() {
 
   const handleScholarSearch = () => {
     if (!scholarName.trim()) { toast.error('Please enter a scholar name'); return }
-    const found = research.find(r => r.scholar.toLowerCase().includes(scholarName.toLowerCase()))
+    const found = research.find(r => r.scholar?.toLowerCase().includes(scholarName.toLowerCase()))
     if (found) {
       setScholarResult(found)
       setScholarSearched(true)
@@ -128,7 +132,7 @@ export default function Reports() {
           ))}
         </div>
 
-        {/* Work 3: Scholar Name Lookup Card */}
+        {/* Scholar Name Lookup Card */}
         <div className="card" style={{ marginBottom: '20px', border: '2px solid #EFF6FF' }}>
           <div className="card-header" style={{ background: 'linear-gradient(90deg, #EFF6FF, #DBEAFE)' }}>
             <div>
@@ -166,7 +170,7 @@ export default function Reports() {
                 <div style={{ background: 'linear-gradient(135deg, #1E3A5F, #0F172A)', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <div className="avatar" style={{ background: 'linear-gradient(135deg,#6C63FF,#4F46E5)', width: 50, height: 50, fontSize: 20 }}>
-                      {scholarResult.scholar.charAt(0)}
+                      {scholarResult.scholar?.charAt(0)}
                     </div>
                     <div>
                       <div style={{ fontWeight: 800, fontSize: '16px', color: '#fff' }}>{scholarResult.scholar}</div>
@@ -309,41 +313,47 @@ export default function Reports() {
             <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{research.length} total entries</span>
           </div>
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Scholar</th>
-                  <th>Research Topic</th>
-                  <th>Supervisor</th>
-                  <th>Start Date</th>
-                  <th>Stage</th>
-                  <th>Progress</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {research.map(r => (
-                  <tr key={r.id}>
-                    <td style={{ fontWeight: 600, fontSize: '13px' }}>{r.scholar} <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>({r.dept})</span></td>
-                    <td style={{ fontSize: '12px', maxWidth: '200px' }}>{r.topic}</td>
-                    <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{r.supervisor}</td>
-                    <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{r.startDate}</td>
-                    <td><span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 700, background: '#F1F5F9', color: '#475569' }}>{r.stage}</span></td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <div className="progress-bar" style={{ width: '80px' }}>
-                          <div className="progress-fill" style={{ width: `${r.progress}%`, background: r.progress === 100 ? '#10B981' : '#6C63FF' }} />
-                        </div>
-                        <span style={{ fontSize: '11.5px', fontWeight: 700 }}>{r.progress}%</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`badge ${r.status === 'Active' ? 'badge-success' : r.status === 'Completed' ? 'badge-info' : 'badge-danger'}`}>{r.status}</span>
-                    </td>
+            {loading ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading analytical metrics...</div>
+            ) : research.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No research projects registered</div>
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Scholar</th>
+                    <th>Research Topic</th>
+                    <th>Supervisor</th>
+                    <th>Start Date</th>
+                    <th>Stage</th>
+                    <th>Progress</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {research.map(r => (
+                    <tr key={r.id || r._id}>
+                      <td style={{ fontWeight: 600, fontSize: '13px' }}>{r.scholar} <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>({r.dept})</span></td>
+                      <td style={{ fontSize: '12px', maxWidth: '200px' }}>{r.topic}</td>
+                      <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{r.supervisor}</td>
+                      <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{r.startDate}</td>
+                      <td><span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 700, background: '#F1F5F9', color: '#475569' }}>{r.stage}</span></td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div className="progress-bar" style={{ width: '80px' }}>
+                            <div className="progress-fill" style={{ width: `${r.progress}%`, background: r.progress === 100 ? '#10B981' : '#6C63FF' }} />
+                          </div>
+                          <span style={{ fontSize: '11.5px', fontWeight: 700 }}>{r.progress}%</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`badge ${r.status === 'Active' ? 'badge-success' : r.status === 'Completed' ? 'badge-info' : 'badge-danger'}`}>{r.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
