@@ -7,3 +7,13 @@ Inference: Built aggregation counters and last 7-month calendar mapper in report
 Reason: Connect UserManagement.jsx frontend to Express backend endpoints. Enabled CRUD operations (creation, updates, status toggling, deletion) directly with MongoDB Atlas database.
 Result: merged
 Inference: Added plainPassword storage to User.model.js to display plain text passwords for admin roles; implemented query parameters on GET /api/users for role, status, and search filters.
+
+2026-08-19 19:20:00 UTC - Research, Viva, Thesis, and Publication Modules Integration
+Reason: Set up dedicated MongoDB collections (viva_voces, theses, publications) and controllers/routes to handle scholar, supervisor, and admin interactions. Connected frontend ResearchManagement, VivaVoce, ScholarThesis, and ScholarPublications pages to backend APIs.
+Result: merged
+Inference: Created separate database collections to simplify data layout as requested. Resolved reference mapping for candidate names case-insensitively dynamically in controllers.
+
+2026-08-19 19:28:00 UTC - Supervisor Thesis and Publications Review Integration
+Reason: Fully wire the Supervisor's ThesisReview.jsx and PublicationsReview.jsx pages to Mongoose backend API endpoints. Enable upload actions by supervisors on behalf of scholars and status updates (Approve, Reject, Verify) synchronized with MongoDB.
+Result: merged
+Inference: Updated createThesis controller dynamically to assign the scholarId parameter when submitted by supervisor/admin.

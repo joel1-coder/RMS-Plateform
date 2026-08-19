@@ -38,6 +38,36 @@
 
 ---
 
+## [2026-08-19 19:25 IST] — Backend Integration Phase (Research, Viva, Thesis, Publications)
+
+### Completed:
+- **Research Module Connectivity**: Connected `ResearchManagement.jsx` to live `/api/research` backend endpoints (full CRUD operations integrated with MongoDB Atlas).
+- **Dedicated Viva Voce Collection & API**:
+  - Created `viva_voces` MongoDB collection/model (`VivaVoce.model.js`).
+  - Created Express routes & controller under `/api/viva-voce`.
+  - Hooked up `VivaVoce.jsx` to load vivas, select scholars from registered users, auto-fill supervisor, and schedule/edit/delete/complete.
+- **Dedicated Thesis Collection & API**:
+  - Created `theses` MongoDB collection/model (`Thesis.model.js`).
+  - Hooked up `ScholarThesis.jsx` to list submissions, upload new drafts via multipart FormData, and display feedback remarks.
+- **Dedicated Publications Collection & API**:
+  - Created `publications` MongoDB collection/model (`Publication.model.js`).
+  - Hooked up `ScholarPublications.jsx` to list, save, edit, and delete publications of all types (Patents, Journals, Chapters, etc.) mapping `pubType` and `journal` fields.
+
+---
+
+## [2026-08-19 19:28 IST] — Backend Integration Phase (Supervisor Thesis & Publications Review)
+
+### Completed:
+- **Supervisor Thesis Review Connection**:
+  - Wired `ThesisReview.jsx` to fetch pending thesis submissions directly from the `theses` collection.
+  - Allowed supervisors to upload thesis drafts for a specific scholar dynamically.
+  - Hooked up the review actions (Approve, Reject, Request Revisions) to the backend API `PUT /api/thesis/:id`.
+- **Supervisor Publications Review Connection**:
+  - Connected `PublicationsReview.jsx` to load all publication submissions.
+  - Integrated status verification (Verify, Approve) and detailed view modals with live MongoDB operations.
+
+---
+
 ## Status Tracker
 
 | Role | Page | Status |

@@ -415,5 +415,140 @@
       "200": "Success",
       "403": "Access Denied"
     }
+  },
+  {
+    "endpoint": "GET /api/viva-voce",
+    "description": "Lists scheduled viva voce examinations, filterable by status, scholarId, and search keyword.",
+    "auth": "Bearer JWT (admin, supervisor, scholar)",
+    "response": [
+      {
+        "id": "number/ObjectId",
+        "scholar": "string",
+        "scholarId": "number/ObjectId",
+        "thesis": "string",
+        "supervisor": "string",
+        "supervisorId": "number/ObjectId",
+        "dept": "string",
+        "date": "string",
+        "time": "string",
+        "venue": "string",
+        "panel": "string",
+        "status": "string"
+      }
+    ],
+    "status_codes": { "200": "Success" }
+  },
+  {
+    "endpoint": "POST /api/viva-voce",
+    "description": "Schedules a new viva voce session (automatically resolves user IDs case-insensitively).",
+    "auth": "Bearer JWT (admin)",
+    "request": {
+      "scholar": "string (required)",
+      "thesis": "string (required)",
+      "supervisor": "string (required)",
+      "date": "string (required, YYYY-MM-DD)",
+      "time": "string (required)",
+      "venue": "string (required)",
+      "panel": "string (optional)",
+      "instructions": "string (optional)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "scholar": "string",
+      "thesis": "string",
+      "status": "Scheduled"
+    },
+    "status_codes": { "201": "Created", "400": "Validation error" }
+  },
+  {
+    "endpoint": "PUT /api/viva-voce/:id",
+    "description": "Updates scheduled details or toggles status.",
+    "auth": "Bearer JWT (admin, supervisor)",
+    "request": {
+      "date": "string",
+      "time": "string",
+      "venue": "string",
+      "panel": "string",
+      "status": "string"
+    },
+    "response": { "id": "number/ObjectId", "status": "string" },
+    "status_codes": { "200": "Updated", "404": "Not found" }
+  },
+  {
+    "endpoint": "GET /api/thesis",
+    "description": "Lists thesis submissions, filterable by scholarId, supervisorId, and status.",
+    "auth": "Bearer JWT (admin, supervisor, scholar)",
+    "response": [
+      {
+        "id": "number/ObjectId",
+        "scholar": "string",
+        "title": "string",
+        "supervisor": "string",
+        "status": "string",
+        "submittedAt": "string",
+        "fileUrl": "string"
+      }
+    ],
+    "status_codes": { "200": "Success" }
+  },
+  {
+    "endpoint": "POST /api/thesis",
+    "description": "Upload a new thesis draft file (multipart/form-data).",
+    "auth": "Bearer JWT (scholar)",
+    "request_multipart": {
+      "title": "string (required)",
+      "file": "Binary PDF file (required)"
+    },
+    "response": {
+      "id": "number/ObjectId",
+      "title": "string",
+      "fileUrl": "string",
+      "status": "Pending"
+    },
+    "status_codes": { "201": "Created", "400": "Upload failure" }
+  },
+  {
+    "endpoint": "PUT /api/thesis/:id",
+    "description": "Approve, reject, or comment on a thesis submission.",
+    "auth": "Bearer JWT (admin, supervisor)",
+    "request": {
+      "status": "string (Approved/Rejected)",
+      "remarks": "string"
+    },
+    "response": { "id": "number/ObjectId", "status": "string", "remarks": "string" },
+    "status_codes": { "200": "Updated", "404": "Not found" }
+  },
+  {
+    "endpoint": "GET /api/publication",
+    "description": "Lists scholar publications, filterable by scholarId, status, and search string.",
+    "auth": "Bearer JWT (admin, supervisor, scholar)",
+    "response": [
+      {
+        "id": "number/ObjectId",
+        "scholar": "string",
+        "title": "string",
+        "journal": "string",
+        "pubType": "string",
+        "doi": "string",
+        "status": "string",
+        "date": "string"
+      }
+    ],
+    "status_codes": { "200": "Success" }
+  },
+  {
+    "endpoint": "POST /api/publication",
+    "description": "Submits a new scholar publication entry.",
+    "auth": "Bearer JWT (scholar)",
+    "request": {
+      "title": "string (required)",
+      "journal": "string (required)",
+      "pubType": "string (required)",
+      "doi": "string (optional)",
+      "status": "string (optional)",
+      "date": "string (optional)"
+    },
+    "response": { "id": "number/ObjectId", "title": "string", "status": "Submitted" },
+    "status_codes": { "201": "Created" }
   }
 ]

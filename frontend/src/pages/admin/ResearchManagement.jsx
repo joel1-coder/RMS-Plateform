@@ -1,16 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-const DEFAULT_RESEARCH = [
-  { id: 1, scholar: 'Rahul Sharma', topic: 'Artificial Intelligence in Healthcare Diagnostics', supervisor: 'Dr. Priya Kumar', dept: 'CS', startDate: '2021-08-01', status: 'Active', progress: 75, stage: 'Thesis Writing' },
-  { id: 2, scholar: 'Neha Patel', topic: 'IoT-based Smart Agriculture System', supervisor: 'Dr. Rajan Mehta', dept: 'ECE', startDate: '2022-01-15', status: 'Active', progress: 60, stage: 'Data Collection' },
-  { id: 3, scholar: 'Amit Kumar', topic: 'Blockchain for Supply Chain Management', supervisor: 'Dr. Sunita Rao', dept: 'CS', startDate: '2020-07-01', status: 'Completed', progress: 100, stage: 'Completed' },
-  { id: 4, scholar: 'Sonal Joshi', topic: 'Deep Learning for NLP Tasks', supervisor: 'Dr. Priya Kumar', dept: 'CS', startDate: '2022-08-01', status: 'Active', progress: 45, stage: 'Literature Review' },
-  { id: 5, scholar: 'Vikram Singh', topic: 'Renewable Energy in Urban Grids', supervisor: 'Dr. Rajan Mehta', dept: 'Mech', startDate: '2019-08-01', status: 'Completed', progress: 100, stage: 'Completed' },
-  { id: 6, scholar: 'Pooja Mehta', topic: 'Quantum Computing in Cryptography', supervisor: 'Dr. A. Kapoor', dept: 'CS', startDate: '2023-01-01', status: 'Active', progress: 25, stage: 'Synopsis Preparation' },
-  { id: 7, scholar: 'Kiran Rao', topic: 'Machine Learning for Predictive Analytics', supervisor: 'Dr. Sunita Rao', dept: 'CS', startDate: '2023-08-01', status: 'Active', progress: 15, stage: 'Course Work' },
-]
-
 const STAGES = ['Course Work', 'Synopsis Preparation', 'Literature Review', 'Data Collection', 'Thesis Writing', 'Viva Voce', 'Completed']
 const STATUSES_OPT = ['Active', 'Completed', 'Discontinued']
 
@@ -112,49 +102,97 @@ export default function ResearchManagement() {
   const [filterStage, setFilterStage] = useState('All')
   const [showModal, setShowModal] = useState(false)
   const [editingProject, setEditingProject] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchProjects = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const statusParam = filterStatus === 'All' ? '' : filterStatus
+      const stageParam = filterStage === 'All' ? '' : filterStage
+      const response = await fetch(`/api/research?status=${statusParam}&stage=${stageParam}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      if (!response.ok) throw new Error('Failed to fetch research projects')
+      const data = await response.json()
+      setProjects(data)
+    } catch (err) {
+      toast.error('Failed to load projects from database')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const stored = localStorage.getItem('rms_research')
-    if (stored) {
-      try { setProjects(JSON.parse(stored)) } catch { setProjects(DEFAULT_RESEARCH) }
-    } else {
-      setProjects(DEFAULT_RESEARCH)
-      localStorage.setItem('rms_research', JSON.stringify(DEFAULT_RESEARCH))
-    }
-  }, [])
+    fetchProjects()
+  }, [filterStatus, filterStage])
 
-  const saveAll = (updated) => {
-    setProjects(updated)
-    localStorage.setItem('rms_research', JSON.stringify(updated))
+  const handleSave = async (formData) => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      if (editingProject) {
+        // Edit mode
+        const response = await fetch(`/api/research/${editingProject.id || editingProject._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        })
+        if (!response.ok) {
+          const errData = await response.json()
+          throw new Error(errData.message || 'Failed to update research project')
+        }
+        toast.success('Research project updated!')
+        setEditingProject(null)
+      } else {
+        // Add mode
+        const response = await fetch('/api/research', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        })
+        if (!response.ok) {
+          const errData = await response.json()
+          throw new Error(errData.message || 'Failed to add research project')
+        }
+        toast.success('Research project added!')
+      }
+      fetchProjects()
+    } catch (err) {
+      toast.error(err.message || 'An error occurred during save operation')
+    }
   }
 
-  const handleSave = (formData) => {
-    if (editingProject) {
-      const updated = projects.map(p => p.id === editingProject.id ? { ...p, ...formData } : p)
-      saveAll(updated)
-      toast.success('Research project updated!')
-      setEditingProject(null)
-    } else {
-      const newProject = { ...formData, id: Date.now() }
-      saveAll([newProject, ...projects])
-      toast.success('Research project added!')
-    }
-  }
-
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Delete this research project?')) {
-      saveAll(projects.filter(p => p.id !== id))
-      toast.success('Project removed')
+      try {
+        const token = localStorage.getItem('rms_token')
+        const response = await fetch(`/api/research/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        if (!response.ok) throw new Error('Failed to delete research project')
+        toast.success('Project removed')
+        fetchProjects()
+      } catch (err) {
+        toast.error('Failed to remove research project')
+      }
     }
   }
 
   const filtered = projects.filter(p =>
-    (p.scholar.toLowerCase().includes(search.toLowerCase()) || p.topic.toLowerCase().includes(search.toLowerCase())) &&
-    (filterStatus === 'All' || p.status === filterStatus) &&
-    (filterStage === 'All' || p.stage === filterStage)
+    (p.scholar?.toLowerCase().includes(search.toLowerCase()) || p.topic?.toLowerCase().includes(search.toLowerCase()))
   )
 
-  const avgProgress = projects.length ? Math.round(projects.reduce((a, r) => a + r.progress, 0) / projects.length) : 0
+  const avgProgress = projects.length ? Math.round(projects.reduce((a, r) => a + (r.progress || 0), 0) / projects.length) : 0
 
   return (
     <div className="animate-fade">
@@ -190,7 +228,7 @@ export default function ResearchManagement() {
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
               <div className="stat-info">
-                <div className="stat-value">{s.value}</div>
+                <div className="stat-value">{loading ? '--' : s.value}</div>
                 <div className="stat-label">{s.label}</div>
               </div>
             </div>
@@ -213,79 +251,81 @@ export default function ResearchManagement() {
           </div>
 
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Scholar</th>
-                  <th>Research Topic</th>
-                  <th>Supervisor</th>
-                  <th>Start Date</th>
-                  <th>Stage</th>
-                  <th>Progress</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((r, i) => (
-                  <tr key={r.id}>
-                    <td style={{ color: 'var(--text-muted)' }}>{i + 1}</td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="avatar avatar-sm" style={{ background: `hsl(${(r.id * 55) % 360},60%,55%)` }}>{r.scholar.charAt(0)}</div>
-                        <div>
-                          <div style={{ fontWeight: 600, fontSize: '13px' }}>{r.scholar}</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{r.dept}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ fontSize: '12.5px', maxWidth: '200px', color: 'var(--text-primary)', fontWeight: 500 }}>{r.topic}</td>
-                    <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{r.supervisor}</td>
-                    <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{r.startDate}</td>
-                    <td>
-                      <span style={{
-                        padding: '3px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 700,
-                        background: `${STAGE_COLORS[r.stage] || '#6C63FF'}18`,
-                        color: STAGE_COLORS[r.stage] || '#6C63FF',
-                      }}>{r.stage}</span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '100px' }}>
-                        <div className="progress-bar" style={{ flex: 1 }}>
-                          <div className="progress-fill" style={{
-                            width: `${r.progress}%`,
-                            background: r.progress === 100 ? '#10B981' : r.progress >= 60 ? '#3B82F6' : '#F59E0B'
-                          }} />
-                        </div>
-                        <span style={{ fontSize: '11.5px', fontWeight: 700, minWidth: '28px' }}>{r.progress}%</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`badge ${r.status === 'Active' ? 'badge-success' : r.status === 'Completed' ? 'badge-info' : 'badge-danger'}`}>
-                        {r.status}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '4px' }}>
-                        <button className="btn btn-ghost btn-sm" title="View">👁️</button>
-                        <button className="btn btn-secondary btn-sm" onClick={() => setEditingProject(r)} title="Edit">✏️</button>
-                        <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }} onClick={() => handleDelete(r.id)} title="Delete">🗑️</button>
-                      </div>
-                    </td>
+            {loading ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading projects...</div>
+            ) : filtered.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">🔬</div>
+                <h3>No research projects found</h3>
+                <p>Try adjusting filters or add a new project.</p>
+              </div>
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Scholar</th>
+                    <th>Research Topic</th>
+                    <th>Supervisor</th>
+                    <th>Start Date</th>
+                    <th>Stage</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filtered.map((r, i) => (
+                    <tr key={r.id || r._id}>
+                      <td style={{ color: 'var(--text-muted)' }}>{i + 1}</td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div className="avatar avatar-sm" style={{ background: `hsl(${((r.id || r._id).toString().charCodeAt(0) * 55) % 360},60%,55%)` }}>{r.scholar?.charAt(0)}</div>
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: '13px' }}>{r.scholar}</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{r.dept}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ fontSize: '12.5px', maxWidth: '200px', color: 'var(--text-primary)', fontWeight: 500 }}>{r.topic}</td>
+                      <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{r.supervisor}</td>
+                      <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{r.startDate}</td>
+                      <td>
+                        <span style={{
+                          padding: '3px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 700,
+                          background: `${STAGE_COLORS[r.stage] || '#6C63FF'}18`,
+                          color: STAGE_COLORS[r.stage] || '#6C63FF',
+                        }}>{r.stage}</span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '100px' }}>
+                          <div className="progress-bar" style={{ flex: 1 }}>
+                            <div className="progress-fill" style={{
+                              width: `${r.progress}%`,
+                              background: r.progress === 100 ? '#10B981' : r.progress >= 60 ? '#3B82F6' : '#F59E0B'
+                            }} />
+                          </div>
+                          <span style={{ fontSize: '11.5px', fontWeight: 700, minWidth: '28px' }}>{r.progress}%</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`badge ${r.status === 'Active' ? 'badge-success' : r.status === 'Completed' ? 'badge-info' : 'badge-danger'}`}>
+                          {r.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          <button className="btn btn-ghost btn-sm" title="View">👁️</button>
+                          <button className="btn btn-secondary btn-sm" onClick={() => setEditingProject(r)} title="Edit">✏️</button>
+                          <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }} onClick={() => handleDelete(r.id || r._id)} title="Delete">🗑️</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
-
-          {filtered.length === 0 && (
-            <div className="empty-state">
-              <div className="empty-icon">🔬</div>
-              <h3>No research projects found</h3>
-              <p>Try adjusting filters or add a new project.</p>
-            </div>
-          )}
         </div>
       </div>
     </div>

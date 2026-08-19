@@ -1,27 +1,83 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-const chapters = [
-  { no: 1, title: 'Introduction',                    pages: 32, status: 'Approved',  feedback: 'Well structured, clear objectives.' },
-  { no: 2, title: 'Literature Review',               pages: 45, status: 'Approved',  feedback: 'Comprehensive coverage, minor formatting fixes required.' },
-  { no: 3, title: 'Research Methodology',            pages: 38, status: 'Approved',  feedback: 'Methodology is sound and reproducible.' },
-  { no: 4, title: 'Experimental Results & Analysis', pages: 42, status: 'Under Review', feedback: 'Awaiting supervisor review.' },
-  { no: 5, title: 'Discussion & Conclusion',         pages: 0,  status: 'Not Submitted', feedback: '' },
-  { no: 6, title: 'References & Bibliography',       pages: 0,  status: 'Not Submitted', feedback: '' },
-]
-
 const STATUS_MAP = {
+  'Pending':   { cls: 'badge-warning', icon: '🔍' },
   'Approved':       { cls: 'badge-success', icon: '✅' },
-  'Under Review':   { cls: 'badge-warning', icon: '🔍' },
-  'Not Submitted':  { cls: 'badge-gray',    icon: '⭕' },
-  'Revision Required': { cls: 'badge-danger', icon: '↩' },
+  'Rejected': { cls: 'badge-danger', icon: '❌' },
 }
 
 export default function ScholarThesis() {
   const [showUpload, setShowUpload] = useState(false)
   const [file, setFile] = useState(null)
-  const totalPages = chapters.reduce((a, c) => a + c.pages, 0)
-  const approved = chapters.filter(c => c.status === 'Approved').length
+  const [title, setTitle] = useState('')
+  const [theses, setTheses] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchTheses = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      // Retrieve the current logged-in user profile
+      const storedUser = localStorage.getItem('rms_user')
+      const userObj = storedUser ? JSON.parse(storedUser) : null
+      const scholarId = userObj?.id || userObj?._id || ''
+
+      const response = await fetch(`/api/thesis?scholarId=${scholarId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      if (!response.ok) throw new Error()
+      const data = await response.json()
+      setTheses(data)
+    } catch (err) {
+      toast.error('Failed to load thesis submissions')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchTheses()
+  }, [])
+
+  const handleUpload = async (e) => {
+    e.preventDefault()
+    if (!file || !title) {
+      toast.error('Thesis title/chapter and file are required')
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('rms_token')
+      const formData = new FormData()
+      formData.append('title', title)
+      formData.append('file', file)
+
+      const response = await fetch('/api/thesis', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errData = await response.json()
+        throw new Error(errData.message || 'Failed to upload thesis draft')
+      }
+
+      toast.success('Thesis draft uploaded successfully!')
+      setShowUpload(false)
+      setFile(null)
+      setTitle('')
+      fetchTheses()
+    } catch (err) {
+      toast.error(err.message || 'An error occurred during file upload')
+    }
+  }
+
+  const approvedCount = theses.filter(t => t.status === 'Approved').length
 
   return (
     <div className="animate-fade">
@@ -29,56 +85,46 @@ export default function ScholarThesis() {
         <div className="modal-backdrop">
           <div className="modal">
             <div className="modal-header">
-              <span className="modal-title">Upload Chapter / Thesis Draft</span>
+              <span className="modal-title">Upload Thesis Draft / Chapter</span>
               <button className="modal-close" onClick={() => setShowUpload(false)}>✕</button>
             </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label className="form-label">Chapter</label>
-                <select className="form-control form-select">
-                  {chapters.map(c => <option key={c.no}>Chapter {c.no} – {c.title}</option>)}
-                  <option>Full Thesis Draft</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Version</label>
-                <input className="form-control" placeholder="e.g. v1.0" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Upload File (PDF)</label>
-                <div
-                  style={{ border: '2px dashed var(--border)', borderRadius: 'var(--radius-md)', padding: '32px', textAlign: 'center', cursor: 'pointer' }}
-                  onClick={() => document.getElementById('thesis-file').click()}
-                >
-                  <div style={{ fontSize: '32px', marginBottom: '8px' }}>📚</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{file ? file.name : 'Click to upload PDF'}</div>
+            <form onSubmit={handleUpload}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">Thesis Title or Chapter Name *</label>
+                  <input className="form-control" placeholder="e.g. Chapter 1 - Introduction / Final Draft" value={title} onChange={e => setTitle(e.target.value)} required />
                 </div>
-                <input id="thesis-file" type="file" accept=".pdf,.docx" style={{ display: 'none' }} onChange={e => setFile(e.target.files[0])} />
+                <div className="form-group">
+                  <label className="form-label">Upload File (PDF) *</label>
+                  <div
+                    style={{ border: '2px dashed var(--border)', borderRadius: 'var(--radius-md)', padding: '32px', textAlign: 'center', cursor: 'pointer' }}
+                    onClick={() => document.getElementById('thesis-file').click()}
+                  >
+                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>📚</div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{file ? file.name : 'Click to select and upload PDF'}</div>
+                  </div>
+                  <input id="thesis-file" type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => setFile(e.target.files[0])} required />
+                </div>
               </div>
-              <div className="form-group">
-                <label className="form-label">Notes for Supervisor</label>
-                <textarea className="form-control" rows={2} placeholder="Any specific areas to review..." />
+              <div className="modal-footer">
+                <button type="button" className="btn btn-ghost" onClick={() => setShowUpload(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}>
+                  📤 Upload Draft
+                </button>
               </div>
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-ghost" onClick={() => setShowUpload(false)}>Cancel</button>
-              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }} onClick={() => { setShowUpload(false); toast.success('Chapter uploaded successfully!') }}>
-                📤 Upload Chapter
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       )}
 
       <div className="topbar">
         <div>
-          <div className="topbar-title">Thesis</div>
+          <div className="topbar-title">Thesis Management</div>
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Track your thesis chapters and get supervisor feedback</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📄 Download Draft</button>
           <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }} onClick={() => setShowUpload(true)}>
-            📤 Upload Chapter
+            📤 Upload Thesis Draft
           </button>
         </div>
       </div>
@@ -87,93 +133,75 @@ export default function ScholarThesis() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Chapters',   value: chapters.length, icon: '📚', color: 'purple' },
-            { label: 'Approved',         value: approved,         icon: '✅', color: 'green' },
-            { label: 'Under Review',     value: chapters.filter(c => c.status === 'Under Review').length, icon: '🔍', color: 'orange' },
-            { label: 'Pages Written',    value: totalPages,       icon: '📝', color: 'blue' },
+            { label: 'Total Submissions',   value: theses.length, icon: '📚', color: 'purple' },
+            { label: 'Approved Drafts',     value: approvedCount,  icon: '✅', color: 'green' },
+            { label: 'Under Review',        value: theses.filter(t => t.status === 'Pending').length, icon: '🔍', color: 'orange' },
+            { label: 'Rejections / Revision', value: theses.filter(t => t.status === 'Rejected').length, icon: '↩', color: 'red' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
               <div className="stat-info">
-                <div className="stat-value">{s.value}</div>
+                <div className="stat-value">{loading ? '--' : s.value}</div>
                 <div className="stat-label">{s.label}</div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Thesis Progress Bar */}
-        <div className="card" style={{ marginBottom: '20px' }}>
-          <div className="card-header">
-            <div>
-              <div className="card-title">Overall Thesis Completion</div>
-              <div className="card-subtitle">{approved} of {chapters.length} chapters approved</div>
-            </div>
-            <span style={{ fontSize: '22px', fontWeight: 800, color: '#10B981' }}>{Math.round((approved / chapters.length) * 100)}%</span>
-          </div>
-          <div style={{ padding: '16px 24px' }}>
-            <div className="progress-bar" style={{ height: '10px' }}>
-              <div className="progress-fill" style={{ width: `${(approved / chapters.length) * 100}%`, background: 'linear-gradient(90deg,#10B981,#059669)' }} />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
-              <span>Start</span>
-              <span>50%</span>
-              <span>Final Submission</span>
-            </div>
-          </div>
-        </div>
-
         {/* Chapters */}
         <div className="card" style={{ marginBottom: '20px' }}>
-          <div className="card-header"><div className="card-title">Chapter-wise Status</div></div>
+          <div className="card-header"><div className="card-title">Thesis Draft Submission History</div></div>
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Ch.</th><th>Title</th><th>Pages</th><th>Status</th><th>Supervisor Feedback</th><th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {chapters.map(ch => (
-                  <tr key={ch.no}>
-                    <td style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '16px' }}>{ch.no}</td>
-                    <td style={{ fontWeight: 600 }}>{ch.title}</td>
-                    <td>{ch.pages > 0 ? ch.pages : '—'}</td>
-                    <td>
-                      <span className={`badge ${STATUS_MAP[ch.status].cls}`}>
-                        {STATUS_MAP[ch.status].icon} {ch.status}
-                      </span>
-                    </td>
-                    <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: '250px' }}>
-                      {ch.feedback || '—'}
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '5px' }}>
-                        {ch.pages > 0 && <button className="btn btn-ghost btn-sm">📄</button>}
-                        <button className="btn btn-secondary btn-sm" onClick={() => setShowUpload(true)}>
-                          {ch.status === 'Not Submitted' ? '📤 Upload' : '↩ Re-upload'}
-                        </button>
-                      </div>
-                    </td>
+            {loading ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading history...</div>
+            ) : theses.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No thesis drafts uploaded yet</div>
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Thesis / Chapter Title</th>
+                    <th>Submitted Date</th>
+                    <th>Supervisor</th>
+                    <th>Status</th>
+                    <th>Feedback / Remarks</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Final Submission */}
-        <div className="card" style={{ border: '2px dashed var(--border)' }}>
-          <div className="card-body" style={{ textAlign: 'center', padding: '36px' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🎓</div>
-            <div style={{ fontSize: '17px', fontWeight: 700, marginBottom: '6px' }}>Ready for Final Submission?</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
-              Complete all chapters and get supervisor approval before submitting the final thesis.
-              Expected submission date: <strong>Sep 30, 2024</strong>
-            </div>
-            <button className="btn btn-primary btn-lg" disabled style={{ background: 'linear-gradient(90deg,#10B981,#059669)', opacity: 0.5 }}>
-              🚀 Submit Final Thesis (Complete all chapters first)
-            </button>
+                </thead>
+                <tbody>
+                  {theses.map((ch, i) => (
+                    <tr key={ch.id || ch._id}>
+                      <td style={{ color: 'var(--text-muted)' }}>{i + 1}</td>
+                      <td style={{ fontWeight: 600 }}>{ch.title}</td>
+                      <td>{ch.submittedAt}</td>
+                      <td>{ch.supervisor}</td>
+                      <td>
+                        <span className={`badge ${STATUS_MAP[ch.status]?.cls || 'badge-gray'}`}>
+                          {STATUS_MAP[ch.status]?.icon} {ch.status}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: '250px' }}>
+                        {ch.remarks || '—'}
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <a
+                            href={ch.fileUrl ? `${import.meta.env.VITE_API_URL || ''}${ch.fileUrl}` : '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-secondary btn-sm"
+                            style={{ textDecoration: 'none' }}
+                          >
+                            👁️ View
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>

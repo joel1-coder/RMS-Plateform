@@ -200,8 +200,36 @@
         "selector": "form",
         "label": "Submit Thesis",
         "type": "api",
-        "target": "POST /api/submissions/thesis",
-        "description": "Uploads final thesis copy and references metadata"
+        "target": "POST /api/thesis",
+        "description": "Uploads thesis draft copy"
+      }
+    ]
+  },
+  {
+    "page": "/admin/viva",
+    "file": "frontend/src/pages/admin/VivaVoce.jsx",
+    "title": "Viva Voce Management",
+    "actions": [
+      {
+        "selector": "button",
+        "label": "Schedule Viva",
+        "type": "api",
+        "target": "POST /api/viva-voce",
+        "description": "Schedules a new viva voce session"
+      }
+    ]
+  },
+  {
+    "page": "/scholar/publications",
+    "file": "frontend/src/pages/scholar/ScholarPublications.jsx",
+    "title": "Publications",
+    "actions": [
+      {
+        "selector": "button",
+        "label": "Add Publication",
+        "type": "api",
+        "target": "POST /api/publication",
+        "description": "Add new research publication"
       }
     ]
   },

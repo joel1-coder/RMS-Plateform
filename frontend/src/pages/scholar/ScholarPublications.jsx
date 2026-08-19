@@ -445,36 +445,128 @@ function EditPublicationModal({ pub, onClose, onUpdate }) {
    Main Page
 ═══════════════════════════════════════════════ */
 export default function ScholarPublications() {
-  const [pubs, setPubs] = useState(myPubs)
+  const [pubs, setPubs] = useState([])
   const [filterType, setFilterType] = useState('All')
   const [showModal, setShowModal] = useState(false)
   const [editPub, setEditPub] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchPublications = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const storedUser = localStorage.getItem('rms_user')
+      const userObj = storedUser ? JSON.parse(storedUser) : null
+      const scholarId = userObj?.id || userObj?._id || ''
+
+      const response = await fetch(`/api/publication?scholarId=${scholarId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      const data = await response.json()
+      
+      const mapped = data.map(p => ({
+        id: p.id || p._id,
+        title: p.title,
+        venue: p.journal || '—',
+        year: p.date ? new Date(p.date).getFullYear() : '—',
+        type: p.pubType || 'Journal Publishing',
+        indexed: p.indexed || '—',
+        status: p.status || 'Published',
+        citations: p.citations || 0,
+        impactFactor: p.impactFactor || null,
+        doi: p.doi || '',
+        date: p.date || '',
+        fileUrl: p.fileUrl || ''
+      }))
+      setPubs(mapped)
+    } catch (err) {
+      toast.error('Failed to load publications')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPublications()
+  }, [])
+
+  const handleSave = async (form) => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const payload = {
+        title: form.title,
+        journal: form.journalName || form.conferenceName || form.bookTitle || form.bookAuthoredTitle || form.bookEditedTitle || form.patentOffice || form.copyrightOffice || '—',
+        pubType: form.pubType,
+        doi: form.doi || '',
+        status: form.status || form.patentStatus || 'Published',
+        date: form.year ? `${form.year}-01-01` : new Date().toISOString().slice(0, 10)
+      }
+
+      const response = await fetch('/api/publication', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) throw new Error()
+      toast.success(`${form.pubType} added successfully!`)
+      setShowModal(false)
+      fetchPublications()
+    } catch (err) {
+      toast.error('Failed to save publication')
+    }
+  }
+
+  const handleUpdate = async (id, changes) => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const payload = {
+        title: changes.title,
+        journal: changes.venue || changes.journal || changes.journalName || changes.conferenceName,
+        pubType: changes.type || changes.pubType,
+        doi: changes.doi || '',
+        status: changes.status || 'Published'
+      }
+
+      const response = await fetch(`/api/publication/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) throw new Error()
+      toast.success('Publication updated!')
+      setEditPub(null)
+      fetchPublications()
+    } catch (err) {
+      toast.error('Failed to update publication')
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this publication?')) {
+      try {
+        const token = localStorage.getItem('rms_token')
+        const response = await fetch(`/api/publication/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (!response.ok) throw new Error()
+        toast.success('Publication deleted successfully')
+        fetchPublications()
+      } catch (err) {
+        toast.error('Failed to delete publication')
+      }
+    }
+  }
 
   const filtered = pubs.filter(p => filterType === 'All' || p.type === filterType)
-
-  const handleSave = (form) => {
-    const newPub = {
-      id: Date.now(),
-      title: form.title,
-      venue: form.conferenceName || form.journalName || form.bookTitle || form.bookAuthoredTitle || form.bookEditedTitle || form.patentOffice || form.copyrightOffice || '—',
-      year: parseInt(form.year),
-      type: form.pubType,
-      indexed: form.indexed || form.journalIndexed || '—',
-      status: form.status || form.patentStatus || 'Published',
-      citations: 0,
-      impactFactor: form.impactFactor ? parseFloat(form.impactFactor) : null,
-      doi: form.doi,
-    }
-    setPubs(prev => [newPub, ...prev])
-    setShowModal(false)
-    toast.success(`${form.pubType} added successfully!`)
-  }
-
-  const handleUpdate = (id, changes) => {
-    setPubs(prev => prev.map(p => p.id === id ? { ...p, ...changes } : p))
-    setEditPub(null)
-    toast.success('Publication updated!')
-  }
 
   /* ── Stats ── */
   const stats = [
@@ -516,7 +608,7 @@ export default function ScholarPublications() {
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
               <div className="stat-info">
-                <div className="stat-value">{s.value}</div>
+                <div className="stat-value">{loading ? '--' : s.value}</div>
                 <div className="stat-label">{s.label}</div>
               </div>
             </div>
@@ -561,61 +653,66 @@ export default function ScholarPublications() {
           </div>
 
           <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {filtered.length === 0 && (
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-secondary)' }}>
+                Loading publication history...
+              </div>
+            ) : filtered.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-muted)' }}>
                 <div style={{ fontSize: '40px', marginBottom: '10px' }}>📭</div>
                 <div style={{ fontWeight: 600 }}>No publications found</div>
                 <div style={{ fontSize: '13px', marginTop: '6px' }}>Click "Add Publication" to get started</div>
               </div>
+            ) : (
+              filtered.map((pub) => (
+                <div
+                  key={pub.id}
+                  style={{ padding: '18px', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-lg)', transition: 'box-shadow 0.2s, border-color 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#10B981'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(16,185,129,0.1)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1 }}>
+                      <span style={{ fontSize: '20px', marginTop: '1px' }}>{TYPE_ICONS[pub.type] || '📄'}</span>
+                      <div style={{ fontWeight: 700, fontSize: '14.5px', color: 'var(--text-primary)', lineHeight: 1.4 }}>{pub.title}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                      <span className={`badge ${STATUS_CLS[pub.status] || 'badge-gray'}`}>{pub.status}</span>
+                      <span className="badge badge-primary" style={{ fontSize: '10px', background: '#EDE9FE', color: '#4F46E5' }}>{pub.type}</span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '10px', paddingLeft: '30px' }}>
+                    <strong>{pub.venue}</strong> · {pub.year}
+                  </div>
+                  <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', paddingLeft: '30px' }}>
+                    {pub.doi && (
+                      <span style={{ fontSize: '12px', color: '#3B82F6', cursor: 'pointer' }}>🔗 DOI: {pub.doi}</span>
+                    )}
+                    {pub.indexed && pub.indexed !== '—' && (
+                      <span className={`badge ${pub.indexed === 'SCI' || pub.indexed === 'SCI-E' ? 'badge-warning' : 'badge-info'}`} style={{ fontSize: '11px' }}>
+                        {pub.indexed}
+                      </span>
+                    )}
+                    {pub.impactFactor && (
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#059669' }}>IF: {pub.impactFactor}</span>
+                    )}
+                    {pub.citations > 0 && (
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>📖 {pub.citations} citations</span>
+                    )}
+                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setEditPub(pub)}>✏️ Edit</button>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        style={{ color: '#EF4444' }}
+                        onClick={() => handleDelete(pub.id)}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
             )}
-            {filtered.map((pub) => (
-              <div
-                key={pub.id}
-                style={{ padding: '18px', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-lg)', transition: 'box-shadow 0.2s, border-color 0.2s' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#10B981'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(16,185,129,0.1)' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none' }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1 }}>
-                    <span style={{ fontSize: '20px', marginTop: '1px' }}>{TYPE_ICONS[pub.type] || '📄'}</span>
-                    <div style={{ fontWeight: 700, fontSize: '14.5px', color: 'var(--text-primary)', lineHeight: 1.4 }}>{pub.title}</div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
-                    <span className={`badge ${STATUS_CLS[pub.status] || 'badge-gray'}`}>{pub.status}</span>
-                    <span className="badge badge-primary" style={{ fontSize: '10px', background: '#EDE9FE', color: '#4F46E5' }}>{pub.type}</span>
-                  </div>
-                </div>
-                <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '10px', paddingLeft: '30px' }}>
-                  <strong>{pub.venue}</strong> · {pub.year}
-                </div>
-                <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', paddingLeft: '30px' }}>
-                  {pub.doi && (
-                    <span style={{ fontSize: '12px', color: '#3B82F6', cursor: 'pointer' }}>🔗 DOI: {pub.doi}</span>
-                  )}
-                  {pub.indexed && pub.indexed !== '—' && (
-                    <span className={`badge ${pub.indexed === 'SCI' || pub.indexed === 'SCI-E' ? 'badge-warning' : 'badge-info'}`} style={{ fontSize: '11px' }}>
-                      {pub.indexed}
-                    </span>
-                  )}
-                  {pub.impactFactor && (
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#059669' }}>IF: {pub.impactFactor}</span>
-                  )}
-                  {pub.citations > 0 && (
-                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>📖 {pub.citations} citations</span>
-                  )}
-                  <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
-                    <button className="btn btn-ghost btn-sm" onClick={() => setEditPub(pub)}>✏️ Edit</button>
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      style={{ color: '#EF4444' }}
-                      onClick={() => { setPubs(prev => prev.filter(p => p.id !== pub.id)); toast.success('Removed') }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>

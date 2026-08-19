@@ -1,40 +1,10 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-const initialThesisSubmissions = [
-  { id: 1, scholarName: 'Ahmed Mansoor', scholarId: 'PH2021008', dept: 'Computer Science', title: 'Deep Learning Architectures for Real-time Signal Processing', date: 'Oct 14, 2023', status: 'Under Review' },
-  { id: 2, scholarName: 'Elena Lopez', scholarId: 'PH2022045', dept: 'Data Science', title: 'Ethical Implications of AI-driven Recruitment Systems', date: 'Oct 12, 2023', status: 'Approved' },
-  { id: 3, scholarName: 'Rajesh Kumar', scholarId: 'PH2021088', dept: 'Quantum Physics', title: 'Thermal Stability and Entanglement in Non-equilibrium Systems', date: 'Oct 08, 2023', status: 'Revision Required' },
-  { id: 4, scholarName: 'Sarah Wong', scholarId: 'PH2022019', dept: 'Molecular Biology', title: 'CRISPR-Cas9 Mediated Gene Editing for Drought-Resistant Crops', date: 'Oct 05, 2023', status: 'Under Review' },
-]
-
-function loadScholars() {
-  try {
-    const raw = localStorage.getItem('rms_all_users')
-    if (raw) {
-      return JSON.parse(raw)
-        .filter(u => (u.role || '').toLowerCase() === 'scholar')
-        .map(u => ({ id: u.id || 'PH' + Math.floor(100000 + Math.random() * 900000), name: u.name, dept: u.dept || 'Computer Science' }))
-    }
-  } catch { /* ignore */ }
-  // Fallback defaults
-  return [
-    { id: 'PH2021008', name: 'Ahmed Mansoor', dept: 'Computer Science' },
-    { id: 'PH2022045', name: 'Elena Lopez', dept: 'Data Science' },
-    { id: 'PH2021088', name: 'Rajesh Kumar', dept: 'Quantum Physics' },
-    { id: 'PH2022019', name: 'Sarah Wong', dept: 'Molecular Biology' },
-  ]
-}
-
-function UploadThesisModal({ onClose, onUpload }) {
-  const [scholars, setScholars] = useState([])
+function UploadThesisModal({ onClose, onUpload, scholars }) {
   const [selectedScholar, setSelectedScholar] = useState('')
   const [title, setTitle] = useState('')
   const [file, setFile] = useState(null)
-
-  useEffect(() => {
-    setScholars(loadScholars())
-  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -42,18 +12,17 @@ function UploadThesisModal({ onClose, onUpload }) {
       toast.error('Please select a scholar, enter thesis title, and choose a file.')
       return
     }
-    const scholarObj = scholars.find(s => s.name === selectedScholar) || { id: 'PH' + Date.now().toString().slice(-6), dept: 'Research' }
+    const scholarObj = scholars.find(s => s.name === selectedScholar)
+    if (!scholarObj) {
+      toast.error('Selected scholar not found')
+      return
+    }
     
     onUpload({
-      id: Date.now(),
-      scholarName: scholarObj.name,
-      scholarId: scholarObj.id,
-      dept: scholarObj.dept,
+      scholarId: scholarObj.id || scholarObj._id,
       title: title,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      status: 'Under Review'
+      file: file
     })
-    toast.success('Thesis draft uploaded successfully!')
     onClose()
   }
 
@@ -76,7 +45,7 @@ function UploadThesisModal({ onClose, onUpload }) {
               >
                 <option value="">-- Choose Scholar --</option>
                 {scholars.map(s => (
-                  <option key={s.id} value={s.name}>{s.name} ({s.id})</option>
+                  <option key={s.id || s._id} value={s.name}>{s.name} ({s.dept})</option>
                 ))}
               </select>
             </div>
@@ -114,12 +83,13 @@ function UploadThesisModal({ onClose, onUpload }) {
                 ) : (
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '13px' }}>Click to select thesis draft</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>PDF or DOCX format</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>PDF format</div>
                   </div>
                 )}
                 <input 
                   id="thesisFileInput" 
                   type="file" 
+                  accept=".pdf"
                   style={{ display: 'none' }} 
                   onChange={e => {
                     if (e.target.files?.[0]) setFile(e.target.files[0])
@@ -140,55 +110,114 @@ function UploadThesisModal({ onClose, onUpload }) {
 
 export default function ThesisReview() {
   const [submissions, setSubmissions] = useState([])
+  const [scholars, setScholars] = useState([])
   const [search, setSearch] = useState('')
   const [selectedSub, setSelectedSub] = useState(null)
   const [remarks, setRemarks] = useState('')
   const [showUploadModal, setShowUploadModal] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  const fetchSubmissions = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const storedUser = localStorage.getItem('rms_user')
+      const supervisorObj = storedUser ? JSON.parse(storedUser) : null
+      const supervisorId = supervisorObj?.id || supervisorObj?._id || ''
+
+      const response = await fetch(`/api/thesis?supervisorId=${supervisorId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      const data = await response.json()
+      setSubmissions(data)
+    } catch (err) {
+      toast.error('Failed to load thesis submissions')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchScholars = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const storedUser = localStorage.getItem('rms_user')
+      const supervisorObj = storedUser ? JSON.parse(storedUser) : null
+      const supervisorId = supervisorObj?.id || supervisorObj?._id || ''
+
+      const response = await fetch(`/api/users?role=scholar&supervisorId=${supervisorId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!response.ok) throw new Error()
+      const data = await response.json()
+      setScholars(data)
+    } catch (err) {
+      console.error('Failed to load supervisor scholars')
+    }
+  }
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('rms_thesis_submissions')
-      if (stored) {
-        setSubmissions(JSON.parse(stored))
-      } else {
-        setSubmissions(initialThesisSubmissions)
-        localStorage.setItem('rms_thesis_submissions', JSON.stringify(initialThesisSubmissions))
-      }
-    } catch {
-      setSubmissions(initialThesisSubmissions)
-    }
+    fetchSubmissions()
+    fetchScholars()
   }, [])
 
-  const saveToStorage = (updated) => {
-    setSubmissions(updated)
-    localStorage.setItem('rms_thesis_submissions', JSON.stringify(updated))
+  const handleAction = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const response = await fetch(`/api/thesis/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          remarks: remarks
+        })
+      })
+      if (!response.ok) throw new Error()
+      toast.success(`Thesis status updated to ${newStatus}`)
+      setSelectedSub(null)
+      setRemarks('')
+      fetchSubmissions()
+    } catch (err) {
+      toast.error('Failed to submit thesis review decision')
+    }
   }
 
-  const handleAction = (id, newStatus) => {
-    const updated = submissions.map(sub => sub.id === id ? { ...sub, status: newStatus } : sub)
-    saveToStorage(updated)
-    toast.success(`Thesis status updated to ${newStatus}`)
-    setSelectedSub(null)
-    setRemarks('')
-  }
+  const handleUpload = async (newSubmission) => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const formData = new FormData()
+      formData.append('title', newSubmission.title)
+      formData.append('scholarId', newSubmission.scholarId)
+      formData.append('file', newSubmission.file)
 
-  const handleUpload = (newSubmission) => {
-    const updated = [newSubmission, ...submissions]
-    saveToStorage(updated)
+      const response = await fetch('/api/thesis', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      })
+      if (!response.ok) throw new Error()
+      toast.success('Thesis draft uploaded successfully!')
+      fetchSubmissions()
+    } catch (err) {
+      toast.error('Failed to upload thesis draft')
+    }
   }
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Approved': return 'badge-success'
-      case 'Under Review': return 'badge-warning'
-      case 'Revision Required': return 'badge-warning'
+      case 'Pending': return 'badge-warning'
       case 'Rejected': return 'badge-danger'
       default: return 'badge-gray'
     }
   }
 
   const filtered = submissions.filter(sub => 
-    (sub.scholarName || '').toLowerCase().includes(search.toLowerCase()) || 
+    (sub.scholar || '').toLowerCase().includes(search.toLowerCase()) || 
     (sub.title || '').toLowerCase().includes(search.toLowerCase())
   )
 
@@ -199,6 +228,7 @@ export default function ThesisReview() {
         <UploadThesisModal 
           onClose={() => setShowUploadModal(false)}
           onUpload={handleUpload}
+          scholars={scholars}
         />
       )}
 
@@ -214,7 +244,7 @@ export default function ThesisReview() {
               <div style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
                 <div>
                   <label className="form-label" style={{ fontWeight: 700 }}>Scholar</label>
-                  <div style={{ fontSize: '13.5px' }}>{selectedSub.scholarName} ({selectedSub.scholarId}) · {selectedSub.dept}</div>
+                  <div style={{ fontSize: '13.5px' }}>{selectedSub.scholar}</div>
                 </div>
                 <div>
                   <label className="form-label" style={{ fontWeight: 700 }}>Thesis Title</label>
@@ -234,13 +264,10 @@ export default function ThesisReview() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-danger btn-sm" onClick={() => handleAction(selectedSub.id, 'Rejected')}>
+              <button className="btn btn-danger btn-sm" onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Rejected')}>
                 Reject Draft
               </button>
-              <button className="btn btn-warning btn-sm" onClick={() => handleAction(selectedSub.id, 'Revision Required')}>
-                Request Revisions
-              </button>
-              <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={() => handleAction(selectedSub.id, 'Approved')}>
+              <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Approved')}>
                 ✓ Approve Draft
               </button>
               <button className="btn btn-ghost" onClick={() => setSelectedSub(null)}>Cancel</button>
@@ -258,7 +285,6 @@ export default function ThesisReview() {
         <div className="topbar-actions">
           <button className="btn btn-ghost btn-sm">📥 Export Report</button>
           <button className="btn btn-primary btn-sm" style={{ background: '#0D9488', borderColor: '#0D9488' }} onClick={() => setShowUploadModal(true)}>＋ Upload Thesis</button>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>＋ New Call for Submissions</button>
         </div>
       </div>
 
@@ -266,24 +292,23 @@ export default function ThesisReview() {
         {/* KPI Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Pending', value: '12', sub: '4 from last week', icon: '📚', color: 'blue' },
-            { label: 'In Review', value: '08', sub: 'Completion rate: 92%', icon: '🔍', color: 'purple' },
-            { label: 'Approved (MTD)', value: '24', sub: 'Completion rate: 92%', icon: '✅', color: 'green' },
-            { label: 'Due This Week', value: '03', sub: 'High Priority', icon: '🚨', color: 'red' },
+            { label: 'Total Pending', value: submissions.filter(t => t.status === 'Pending').length, icon: '📚', color: 'blue' },
+            { label: 'Total Approved', value: submissions.filter(t => t.status === 'Approved').length, icon: '✅', color: 'green' },
+            { label: 'Total Rejected', value: submissions.filter(t => t.status === 'Rejected').length, icon: '❌', color: 'red' },
+            { label: 'Total Submissions', value: submissions.length, icon: '🔍', color: 'purple' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
               <div className="stat-info">
-                <div className="stat-value">{s.value}</div>
+                <div className="stat-value">{loading ? '--' : s.value}</div>
                 <div className="stat-label">{s.label}</div>
-                {s.sub && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{s.sub}</div>}
               </div>
             </div>
           ))}
         </div>
 
         {/* Thesis Table */}
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '20px', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', alignItems: 'start' }}>
           <div className="card">
             <div className="card-header">
               <div className="card-title">Submitted Thesis Drafts</div>
@@ -297,66 +322,48 @@ export default function ThesisReview() {
             </div>
 
             <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Scholar Name</th>
-                    <th>Thesis Title</th>
-                    <th>Submission Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map(sub => (
-                    <tr key={sub.id}>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div className="avatar avatar-sm" style={{ background: '#3B82F6' }}>{(sub.scholarName || 'S').charAt(0)}</div>
-                          <div>
-                            <div style={{ fontWeight: 600, fontSize: '13px' }}>{sub.scholarName}</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{sub.dept}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ fontSize: '12.5px', maxWidth: '250px' }}>{sub.title}</td>
-                      <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{sub.date}</td>
-                      <td>
-                        <span className={`badge ${getStatusBadge(sub.status)}`}>{sub.status}</span>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                          <button className="btn btn-secondary btn-sm" onClick={() => setSelectedSub(sub)}>Review</button>
-                          <button className="btn btn-ghost btn-sm" title="Download Draft">📥</button>
-                          <button className="btn btn-ghost btn-sm" title="View Logs">📜</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {filtered.length === 0 && (
+              {loading ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading drafts...</div>
+              ) : filtered.length === 0 ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No thesis drafts submitted yet</div>
+              ) : (
+                <table className="table">
+                  <thead>
                     <tr>
-                      <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                        No thesis submissions found.
-                      </td>
+                      <th>#</th>
+                      <th>Scholar</th>
+                      <th>Thesis Title</th>
+                      <th>Submitted Date</th>
+                      <th>Status</th>
+                      <th>Feedback</th>
+                      <th>Action</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className="card card-body" style={{ background: 'linear-gradient(135deg, #EFF6FF, #DBEAFE)' }}>
-              <div style={{ fontWeight: 800, fontSize: '14px', marginBottom: '8px', color: '#1E40AF' }}>Supervisor Tip</div>
-              <p style={{ fontSize: '12px', color: '#1E3A8A', lineHeight: 1.5, marginBottom: '8px' }}>
-                Reviewing theses within 5 days of submission increases scholar graduation rates by 12% on average.
-              </p>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#3B82F6', cursor: 'pointer' }}>Read academic best practices →</span>
-            </div>
-
-            <div className="card card-body">
-              <div className="card-title" style={{ fontSize: '13px', marginBottom: '8px' }}>Upcoming Defense Committees</div>
-              <button className="btn btn-primary btn-sm" style={{ width: '100%', background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>Manage Committee</button>
+                  </thead>
+                  <tbody>
+                    {filtered.map((sub, i) => (
+                      <tr key={sub.id || sub._id}>
+                        <td>{i + 1}</td>
+                        <td>
+                          <div style={{ fontWeight: 600 }}>{sub.scholar}</div>
+                        </td>
+                        <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
+                          <a href={sub.fileUrl ? `${import.meta.env.VITE_API_URL || ''}${sub.fileUrl}` : '#'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
+                            {sub.title}
+                          </a>
+                        </td>
+                        <td>{sub.submittedAt}</td>
+                        <td><span className={`badge ${getStatusBadge(sub.status)}`}>{sub.status}</span></td>
+                        <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{sub.remarks || '—'}</td>
+                        <td>
+                          <button className="btn btn-primary btn-sm" onClick={() => setSelectedSub(sub)}>
+                            Review
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>

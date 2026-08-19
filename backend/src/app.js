@@ -12,6 +12,9 @@ const submissionRoutes = require('./routes/submissions.routes');
 const meetingRoutes = require('./routes/meetings.routes');
 const minuteRoutes = require('./routes/minutes.routes');
 const reportRoutes = require('./routes/reports.routes');
+const vivaVoceRoutes = require('./routes/vivaVoce.routes');
+const thesisRoutes = require('./routes/thesis.routes');
+const publicationRoutes = require('./routes/publication.routes');
 const { uploadRoot } = require('./services/storageService');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
@@ -38,6 +41,9 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/meetings', meetingRoutes);
 app.use('/api/minutes', minuteRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/viva-voce', vivaVoceRoutes);
+app.use('/api/thesis', thesisRoutes);
+app.use('/api/publication', publicationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

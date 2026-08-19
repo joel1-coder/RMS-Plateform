@@ -165,5 +165,95 @@
       "vivaWindow": "30",
       "maxScholarsPerSupervisor": "6"
     }
+  },
+  {
+    "collection": "viva_voces",
+    "description": "Tracks scheduled viva voce exams, panel details, and outcomes.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true },
+      { "name": "scholar", "type": "string", "required": true },
+      { "name": "scholarId", "type": "ObjectId", "required": true, "ref": "users" },
+      { "name": "thesis", "type": "string", "required": true },
+      { "name": "supervisor", "type": "string", "required": true },
+      { "name": "supervisorId", "type": "ObjectId", "required": true, "ref": "users" },
+      { "name": "dept", "type": "string", "required": true },
+      { "name": "date", "type": "string", "required": true },
+      { "name": "time", "type": "string", "required": true },
+      { "name": "venue", "type": "string", "required": true },
+      { "name": "panel", "type": "string", "required": false },
+      { "name": "status", "type": "string", "required": true, "enum": ["Scheduled", "Completed", "Pending", "Cancelled"] },
+      { "name": "instructions", "type": "string", "required": false }
+    ],
+    "indexes": [ "scholarId", "supervisorId", "status" ],
+    "sample_document": {
+      "_id": "60d5ec49f3323a1a98ec5710",
+      "scholar": "Rahul Sharma",
+      "scholarId": "60d5ec49f3323a1a98ec561a",
+      "thesis": "AI in Healthcare Diagnostics",
+      "supervisor": "Dr. Priya Kumar",
+      "supervisorId": "60d5ec49f3323a1a98ec561f",
+      "dept": "CS",
+      "date": "2024-08-10",
+      "time": "10:00 AM",
+      "venue": "Seminar Hall A",
+      "panel": "Dr. M. Reddy, Prof. R. Iyer",
+      "status": "Scheduled"
+    }
+  },
+  {
+    "collection": "theses",
+    "description": "Thesis drafts and final version files uploaded by scholars for evaluation.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true },
+      { "name": "scholar", "type": "string", "required": true },
+      { "name": "scholarId", "type": "ObjectId", "required": true, "ref": "users" },
+      { "name": "title", "type": "string", "required": true },
+      { "name": "supervisor", "type": "string", "required": true },
+      { "name": "supervisorId", "type": "ObjectId", "required": true, "ref": "users" },
+      { "name": "status", "type": "string", "required": true, "enum": ["Pending", "Approved", "Rejected"] },
+      { "name": "submittedAt", "type": "string", "required": true },
+      { "name": "fileUrl", "type": "string", "required": true },
+      { "name": "remarks", "type": "string", "required": false }
+    ],
+    "indexes": [ "scholarId", "supervisorId", "status" ],
+    "sample_document": {
+      "_id": "60d5ec49f3323a1a98ec5720",
+      "scholar": "Rahul Sharma",
+      "scholarId": "60d5ec49f3323a1a98ec561a",
+      "title": "Final Thesis Draft - AI Healthcare Diagnostics",
+      "supervisor": "Dr. Priya Kumar",
+      "supervisorId": "60d5ec49f3323a1a98ec561f",
+      "status": "Pending",
+      "submittedAt": "2026-08-19",
+      "fileUrl": "/uploads/thesis/t123.pdf"
+    }
+  },
+  {
+    "collection": "publications",
+    "description": "Journals, patents, chapters, and copyrights submitted by scholars.",
+    "fields": [
+      { "name": "_id", "type": "ObjectId", "required": true },
+      { "name": "scholar", "type": "string", "required": true },
+      { "name": "scholarId", "type": "ObjectId", "required": true, "ref": "users" },
+      { "name": "title", "type": "string", "required": true },
+      { "name": "journal", "type": "string", "required": true },
+      { "name": "pubType", "type": "string", "required": true },
+      { "name": "doi", "type": "string", "required": false },
+      { "name": "status", "type": "string", "required": true },
+      { "name": "date", "type": "string", "required": true },
+      { "name": "fileUrl", "type": "string", "required": false }
+    ],
+    "indexes": [ "scholarId", "status" ],
+    "sample_document": {
+      "_id": "60d5ec49f3323a1a98ec5730",
+      "scholar": "Rahul Sharma",
+      "scholarId": "60d5ec49f3323a1a98ec561a",
+      "title": "Deep Learning for Medical Image Classification",
+      "journal": "IEEE Access",
+      "pubType": "Journal Publishing",
+      "doi": "10.1109/ACCESS.2023.123456",
+      "status": "Published",
+      "date": "2023-05-12"
+    }
   }
 ]
