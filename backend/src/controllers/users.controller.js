@@ -26,7 +26,7 @@ const listUsers = asyncHandler(async (req, res) => {
 });
 
 const getMe = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).populate('assignedSupervisorId', 'name email dept role profile');
+  const user = await User.findById(req.user.id).populate('assignedSupervisorId', 'name email dept role profile');
   if (!user) {
     throw new AppError('User not found', 404);
   }
@@ -34,7 +34,7 @@ const getMe = asyncHandler(async (req, res) => {
 });
 
 const updateMe = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user.id);
   if (!user) {
     throw new AppError('User not found', 404);
   }
