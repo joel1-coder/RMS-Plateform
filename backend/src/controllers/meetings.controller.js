@@ -18,17 +18,25 @@ const listMeetings = asyncHandler(async (req, res) => {
 });
 
 const createMeeting = asyncHandler(async (req, res) => {
-  const meeting = await Meeting.create(req.body);
+  const meetingPayload = {
+    ...req.body,
+    supervisor: req.body.supervisor || req.user?.name || ''
+  };
+
+  const meeting = await Meeting.create(meetingPayload);
 
   // Log Audit
   await logAudit({
     user: req.user?.name || 'System',
     action: 'Meeting Scheduled',
-    detail: `Scheduled ${meeting.type} for scholar ${meeting.scholar} on ${meeting.date}`,
+    detail: `Scheduled ${meeting.type} for scholar ${meeting.scholar} on ${meeting.date} at ${meeting.time} (${meeting.venue})`,
     severity: 'Success'
   });
 
-  // Find scholar user to notify
+  const agendaDetail = meeting.agenda ? ` Agenda: ${meeting.agenda}` : '';
+  const venueDetail = meeting.venue || (meeting.mode === 'online' ? 'Online / Virtual' : 'Department Conference Room');
+
+  // 1. Notify the scholar
   const scholarUser = await User.findOne({
     name: { $regex: new RegExp(`^${meeting.scholar}$`, 'i') },
     role: 'scholar'
@@ -37,20 +45,21 @@ const createMeeting = asyncHandler(async (req, res) => {
   if (scholarUser) {
     await createNotification({
       userId: scholarUser._id,
-      title: 'New Meeting Scheduled',
-      message: `A meeting of type "${meeting.type}" has been scheduled for you on ${meeting.date} at ${meeting.time} at ${meeting.venue}.`,
+      title: `New DC Meeting Scheduled: ${meeting.type}`,
+      message: `Your "${meeting.type}" is scheduled on ${meeting.date} at ${meeting.time} (${venueDetail}). Mode: ${meeting.mode || 'In-Person'}.${agendaDetail}`,
       type: 'meeting'
     });
+  }
 
-    // Also notify supervisor if assigned
-    if (scholarUser.assignedSupervisorId) {
-      await createNotification({
-        userId: scholarUser.assignedSupervisorId,
-        title: 'Scholar Meeting Scheduled',
-        message: `A meeting of type "${meeting.type}" has been scheduled for your scholar ${scholarUser.name} on ${meeting.date} at ${meeting.time}.`,
-        type: 'meeting'
-      });
-    }
+  // 2. Notify all Admin users
+  const adminUsers = await User.find({ role: 'admin' }).select('_id');
+  for (const admin of adminUsers) {
+    await createNotification({
+      userId: admin._id,
+      title: `DC Meeting Scheduled: ${meeting.scholar}`,
+      message: `Supervisor ${req.user?.name || meeting.supervisor || 'Supervisor'} scheduled "${meeting.type}" for scholar ${meeting.scholar} on ${meeting.date} at ${meeting.time} (${venueDetail}).${agendaDetail}`,
+      type: 'meeting'
+    });
   }
 
   res.status(201).json(formatMeeting(meeting));

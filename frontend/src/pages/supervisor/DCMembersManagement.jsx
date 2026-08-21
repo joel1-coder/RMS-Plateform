@@ -18,8 +18,6 @@ const INITIAL_MEMBER = () => ({
   recognitionLetter: null,
 })
 
-const DEFAULT_DC_MEMBERS = {}
-
 const genderOptions = ['Male', 'Female', 'Other']
 const categoryOptions = ['Professor', 'Associate Professor', 'Assistant Professor', 'Reader', 'Research Scientist']
 
@@ -28,9 +26,31 @@ export default function DCMembersManagement() {
   const [scholarsList, setScholarsList] = useState([])
   const [selectedScholarReg, setSelectedScholarReg] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [showSuggestions, setShowSuggestions] = useState({}) // { [memberId]: boolean }
+  const [showSuggestions, setShowSuggestions] = useState({})
+  const [promptRestore, setPromptRestore] = useState(null) // { cardId, member }
   const [loading, setLoading] = useState(true)
 
+  // Start with 2 completely clean, blank member cards
+  const [dcMembers, setDcMembers] = useState([INITIAL_MEMBER(), INITIAL_MEMBER()])
+
+  // Clean up legacy hardcoded demo entries on mount
+  useEffect(() => {
+    try {
+      const keys = Object.keys(localStorage)
+      keys.forEach(k => {
+        if (k.startsWith('rms_dc_members_BDU2020410504') || k.startsWith('rms_dc_members_BDU2020410331')) {
+          const val = localStorage.getItem(k)
+          if (val && val.includes('DEIVANAYAGAM')) {
+            localStorage.removeItem(k)
+          }
+        }
+      })
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  // Load scholars for supervisor
   useEffect(() => {
     async function loadScholars() {
       try {
@@ -78,114 +98,88 @@ export default function DCMembersManagement() {
     status: 'PENDING'
   }
 
-  const [dcMembers, setDcMembers] = useState([
-    {
-      id: 1,
-      name: 'DEIVANAYAGAM J G R',
-      idDesignation: '8415',
-      gender: 'Male',
-      category: 'Associate Professor',
-      department: 'DEPARTMENT OF COMPUTER SCIENCE',
-      collegeInstitution: 'BISHOP HEBER COLLEGE (AUTONOMOUS)',
-      pincode: '620017',
-      city: 'Tiruchirappalli',
-      email: 'deiva.cs@heber.ac.in',
-      mobile: '9894033176',
-      recognitionLetter: null,
-    },
-    {
-      id: 2,
-      name: 'HARI GANESH S',
-      idDesignation: '9476',
-      gender: 'Male',
-      category: 'Assistant Professor',
-      department: 'DEPARTMENT OF COMPUTER SCIENCE',
-      collegeInstitution: 'H.H. THE RAJA\'S COLLEGE (AUTONOMOUS)',
-      pincode: '622001',
-      city: 'Pudukkottai',
-      email: 'hariganesh@rajas.edu.in',
-      mobile: '9994058416',
-      recognitionLetter: null,
-    }
-  ])
-
-  // Initialize defaults on mount
-  useEffect(() => {
-    Object.keys(DEFAULT_DC_MEMBERS).forEach(reg => {
-      if (!localStorage.getItem(`rms_dc_members_${reg}`)) {
-        localStorage.setItem(`rms_dc_members_${reg}`, JSON.stringify(DEFAULT_DC_MEMBERS[reg]))
-      }
-    })
-  }, [])
-
   // Sync DC members when selected scholar changes
   useEffect(() => {
+    if (!selectedScholarReg) return
     const stored = localStorage.getItem(`rms_dc_members_${selectedScholarReg}`)
     if (stored) {
-      setDcMembers(JSON.parse(stored))
-    } else {
-      setDcMembers([INITIAL_MEMBER(), INITIAL_MEMBER()])
+      try {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setDcMembers(parsed)
+          return
+        }
+      } catch (e) {
+        console.error(e)
+      }
     }
+    // Default to clean blank cards
+    setDcMembers([INITIAL_MEMBER(), INITIAL_MEMBER()])
   }, [selectedScholarReg])
 
-  // Gather unique pool of all previously stored DC members
-  const getExistingMembersPool = () => {
-    const pool = []
-    const keys = Object.keys(localStorage)
-    const seenNames = new Set()
-    
-    // First load from local storage
-    keys.forEach(key => {
-      if (key.startsWith('rms_dc_members_')) {
-        try {
-          const members = JSON.parse(localStorage.getItem(key))
-          if (Array.isArray(members)) {
-            members.forEach(m => {
-              if (m.name && !seenNames.has(m.name.toLowerCase())) {
-                seenNames.add(m.name.toLowerCase())
-                pool.push(m)
-              }
-            })
-          }
-        } catch (e) {
-          console.error(e)
-        }
+  // Get cached pool of DC members saved by this supervisor
+  const getCachedMembersPool = () => {
+    try {
+      const poolStr = localStorage.getItem('rms_cached_dc_members_pool')
+      if (poolStr) {
+        const pool = JSON.parse(poolStr)
+        if (Array.isArray(pool)) return pool
       }
-    })
-
-    // Fallback to default lists if not already added
-    Object.values(DEFAULT_DC_MEMBERS).forEach(members => {
-      members.forEach(m => {
-        if (m.name && !seenNames.has(m.name.toLowerCase())) {
-          seenNames.add(m.name.toLowerCase())
-          pool.push(m)
-        }
-      })
-    })
-
-    return pool
+    } catch {
+      // ignore
+    }
+    return []
   }
 
-  const existingMembersPool = getExistingMembersPool()
+  const cachedMembersPool = getCachedMembersPool()
 
   const handleMemberChange = (id, field, value) => {
     setDcMembers(prev => prev.map(m => m.id === id ? { ...m, [field]: value } : m))
   }
 
-  const handleSelectExisting = (cardId, selectedMember) => {
+  // Handle typing name: check if matched in cache pool
+  const handleNameChange = (cardId, typedName) => {
+    handleMemberChange(cardId, 'name', typedName)
+    const cleanTyped = typedName.trim().toLowerCase()
+
+    if (!cleanTyped) {
+      if (promptRestore?.cardId === cardId) setPromptRestore(null)
+      return
+    }
+
+    // Find if an exact or strong partial match exists in the cache pool
+    const matched = cachedMembersPool.find(p => p.name.trim().toLowerCase() === cleanTyped)
+    if (matched) {
+      // Check if current card is blank in other fields
+      const currentCard = dcMembers.find(m => m.id === cardId)
+      if (currentCard && !currentCard.department && !currentCard.collegeInstitution) {
+        setPromptRestore({ cardId, member: matched })
+        return
+      }
+    }
+
+    if (promptRestore?.cardId === cardId) {
+      setPromptRestore(null)
+    }
+  }
+
+  // Apply restored cached data to card
+  const applyRestoreData = (cardId, matchedMember) => {
     setDcMembers(prev => prev.map(m => m.id === cardId ? {
       ...m,
-      name: selectedMember.name,
-      idDesignation: selectedMember.idDesignation || '',
-      gender: selectedMember.gender || 'Male',
-      category: selectedMember.category || 'Assistant Professor',
-      department: selectedMember.department || '',
-      collegeInstitution: selectedMember.collegeInstitution || '',
-      pincode: selectedMember.pincode || '',
-      city: selectedMember.city || '',
-      email: selectedMember.email || '',
-      mobile: selectedMember.mobile || '',
+      name: matchedMember.name,
+      idDesignation: matchedMember.idDesignation || '',
+      gender: matchedMember.gender || 'Male',
+      category: matchedMember.category || 'Assistant Professor',
+      department: matchedMember.department || '',
+      collegeInstitution: matchedMember.collegeInstitution || '',
+      pincode: matchedMember.pincode || '',
+      city: matchedMember.city || '',
+      email: matchedMember.email || '',
+      mobile: matchedMember.mobile || '',
     } : m))
+    setPromptRestore(null)
+    toast.success(`Restored previously saved details for ${matchedMember.name}`)
   }
 
   const handleAddMember = () => {
@@ -193,40 +187,67 @@ export default function DCMembersManagement() {
       toast.error('Maximum 6 DC Members allowed per committee')
       return
     }
-    const newMember = {
-      ...INITIAL_MEMBER(),
-      name: '',
-      department: activeScholar.discipline ? `DEPARTMENT OF ${activeScholar.discipline}` : '',
-    }
-    setDcMembers(prev => [...prev, newMember])
-    toast.success(`DC Member ${dcMembers.length + 1} card added`)
+    setDcMembers(prev => [...prev, INITIAL_MEMBER()])
   }
 
   const handleRemoveMember = (id) => {
     if (dcMembers.length <= 2) {
-      toast.error('At least 2 DC Members are required for a Doctoral Committee')
+      toast.error('A minimum of 2 DC Members are mandatory for the committee')
       return
     }
     setDcMembers(prev => prev.filter(m => m.id !== id))
-    toast.success('DC Member removed')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    // Simple validation
+    if (!selectedScholarReg) {
+      toast.error('Please select a scholar first')
+      return
+    }
+
+    // Validate at least 2 members have name, dept, college
     for (let i = 0; i < dcMembers.length; i++) {
       const m = dcMembers[i]
       if (!m.name.trim() || !m.department.trim() || !m.collegeInstitution.trim()) {
-        toast.error(`Please fill in required details for DC Member ${i + 1}`)
+        toast.error(`Please fill in required details (Name, Department, College) for DC Member ${i + 1}`)
         return
       }
     }
 
     setSubmitting(true)
-    await new Promise(r => setTimeout(r, 1000))
+    await new Promise(r => setTimeout(r, 600))
+
+    // 1. Save this scholar's committee
     localStorage.setItem(`rms_dc_members_${selectedScholarReg}`, JSON.stringify(dcMembers))
-    toast.success(`DC Constitution with ${dcMembers.length} members submitted and stored for ${activeScholar.name}!`)
+
+    // 2. Cache each DC member profile into rms_cached_dc_members_pool
+    const existingPool = getCachedMembersPool()
+    const poolMap = new Map()
+    existingPool.forEach(p => {
+      if (p.name) poolMap.set(p.name.trim().toLowerCase(), p)
+    })
+
+    dcMembers.forEach(m => {
+      if (m.name && m.name.trim()) {
+        poolMap.set(m.name.trim().toLowerCase(), {
+          name: m.name.trim(),
+          idDesignation: m.idDesignation || '',
+          gender: m.gender || 'Male',
+          category: m.category || 'Assistant Professor',
+          department: m.department || '',
+          collegeInstitution: m.collegeInstitution || '',
+          pincode: m.pincode || '',
+          city: m.city || '',
+          email: m.email || '',
+          mobile: m.mobile || '',
+        })
+      }
+    })
+
+    const updatedPool = Array.from(poolMap.values())
+    localStorage.setItem('rms_cached_dc_members_pool', JSON.stringify(updatedPool))
+
+    toast.success(`DC Constitution saved & ${dcMembers.length} member profiles cached for ${activeScholar.name}!`)
     setSubmitting(false)
   }
 
@@ -286,12 +307,12 @@ export default function DCMembersManagement() {
           borderRadius: 'var(--radius-md)', padding: '14px 18px', marginBottom: '20px',
         }}>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-            <span style={{ color: '#F59E0B', fontSize: '18px', flexShrink: 0 }}>⚠️</span>
+            <span style={{ color: '#F59E0B', fontSize: '18px', flexShrink: 0 }}>💡</span>
             <div style={{ fontSize: '12.5px', color: '#92400E', lineHeight: 1.6 }}>
-              <strong>Committee Constitution Instructions:</strong><br />
-              • A minimum of 2 external/internal DC Members are required to constitute the Doctoral Committee.<br />
-              • You can dynamically add up to 6 members using the <strong>"➕ Add DC Member"</strong> button.<br />
-              • File attachments are mandatory for members nominated outside Bharathidasan University.
+              <strong>Smart Auto-Cache Instructions:</strong><br />
+              • When you enter and save a DC member's details once, they will be cached.<br />
+              • Whenever you type that member's name for another scholar, you will be prompted to auto-fill their previously saved data.<br />
+              • A minimum of 2 external/internal DC Members are required to constitute the Doctoral Committee.
             </div>
           </div>
         </div>
@@ -300,7 +321,7 @@ export default function DCMembersManagement() {
           {/* Header Action Bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)' }}>
-              Doctoral Committee Members ({dcMembers.length} Members Added)
+              Doctoral Committee Members ({dcMembers.length} Members)
             </div>
             <button
               type="button"
@@ -327,7 +348,7 @@ export default function DCMembersManagement() {
           {/* Members Dynamic Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: dcMembers.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px', marginBottom: '24px' }}>
             {dcMembers.map((member, idx) => {
-              const suggestions = existingMembersPool.filter(p => 
+              const suggestions = cachedMembersPool.filter(p => 
                 p.name.toLowerCase().includes((member.name || '').toLowerCase())
               )
               const hasTyped = member.name.trim().length > 0
@@ -365,6 +386,40 @@ export default function DCMembersManagement() {
                   </div>
 
                   <div className="card-body" style={{ padding: '18px' }}>
+                    {/* Prompt to Restore Previously Cached Data */}
+                    {promptRestore && promptRestore.cardId === member.id && (
+                      <div style={{
+                        background: '#EEF2FF', border: '1.5px solid #6366F1',
+                        borderRadius: 'var(--radius-sm)', padding: '12px 14px', marginBottom: '16px',
+                        display: 'flex', flexDirection: 'column', gap: '8px'
+                      }}>
+                        <div style={{ fontSize: '12.5px', color: '#3730A3', fontWeight: 600 }}>
+                          💡 Would you like to enter the previously stored data for this DC member &ldquo;{promptRestore.member.name}&rdquo;?
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#4B5563' }}>
+                          Dept: {promptRestore.member.department} · Inst: {promptRestore.member.collegeInstitution}
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            style={{ background: '#4F46E5', fontSize: '12px', padding: '4px 12px' }}
+                            onClick={() => applyRestoreData(member.id, promptRestore.member)}
+                          >
+                            ✓ Yes, Restore Data
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            style={{ fontSize: '12px', padding: '4px 12px', background: '#E5E7EB' }}
+                            onClick={() => setPromptRestore(null)}
+                          >
+                            ✕ No, Keep Blank
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                       
                       {/* Name input with custom autocomplete and dropdown quick select */}
@@ -378,12 +433,11 @@ export default function DCMembersManagement() {
                             value={member.name}
                             placeholder="Dr. / Mr. / Mrs. Full Name"
                             onChange={e => {
-                              handleMemberChange(member.id, 'name', e.target.value)
+                              handleNameChange(member.id, e.target.value)
                               setShowSuggestions(prev => ({ ...prev, [member.id]: true }))
                             }}
                             onFocus={() => setShowSuggestions(prev => ({ ...prev, [member.id]: true }))}
                             onBlur={() => {
-                              // Small delay to let onMouseDown register on options
                               setTimeout(() => {
                                 setShowSuggestions(prev => ({ ...prev, [member.id]: false }))
                               }, 250)
@@ -391,24 +445,25 @@ export default function DCMembersManagement() {
                             style={{ width: '100%', padding: '8px 10px', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-sm)', fontSize: '12.5px', background: '#fff', boxSizing: 'border-box' }}
                           />
                           
-                          {/* Quick dropdown choice */}
-                          <select
-                            onChange={(e) => {
-                              const matched = existingMembersPool.find(p => p.name === e.target.value)
-                              if (matched) {
-                                handleSelectExisting(member.id, matched)
-                                toast.success(`Autofilled details for ${matched.name}`)
-                              }
-                            }}
-                            value=""
-                            className="form-control form-select"
-                            style={{ width: '160px', padding: '8px 10px', fontSize: '12.5px', flexShrink: 0 }}
-                          >
-                            <option value="" disabled>Or Quick Select...</option>
-                            {existingMembersPool.map(p => (
-                              <option key={p.name} value={p.name}>{p.name}</option>
-                            ))}
-                          </select>
+                          {/* Quick dropdown choice from cached pool */}
+                          {cachedMembersPool.length > 0 && (
+                            <select
+                              onChange={(e) => {
+                                const matched = cachedMembersPool.find(p => p.name === e.target.value)
+                                if (matched) {
+                                  setPromptRestore({ cardId: member.id, member: matched })
+                                }
+                              }}
+                              value=""
+                              className="form-control form-select"
+                              style={{ width: '160px', padding: '8px 10px', fontSize: '12.5px', flexShrink: 0 }}
+                            >
+                              <option value="" disabled>Or Quick Select...</option>
+                              {cachedMembersPool.map(p => (
+                                <option key={p.name} value={p.name}>{p.name}</option>
+                              ))}
+                            </select>
+                          )}
                         </div>
 
                         {/* Suggestions Dropdown panel */}
@@ -423,8 +478,7 @@ export default function DCMembersManagement() {
                               <div
                                 key={s.name}
                                 onMouseDown={() => {
-                                  handleSelectExisting(member.id, s)
-                                  toast.success(`Autofilled details for ${s.name}`)
+                                  setPromptRestore({ cardId: member.id, member: s })
                                   setShowSuggestions(prev => ({ ...prev, [member.id]: false }))
                                 }}
                                 style={{
@@ -438,7 +492,7 @@ export default function DCMembersManagement() {
                                   <strong style={{ color: '#4F46E5' }}>{s.name}</strong>
                                   <div style={{ fontSize: '11px', color: '#64748B' }}>{s.category} · {s.collegeInstitution}</div>
                                 </div>
-                                <span style={{ fontSize: '10px', color: '#10B981', alignSelf: 'center', fontWeight: 'bold' }}>Select to Autofill</span>
+                                <span style={{ fontSize: '10px', color: '#10B981', alignSelf: 'center', fontWeight: 'bold' }}>Click to prompt autofill</span>
                               </div>
                             ))}
                           </div>

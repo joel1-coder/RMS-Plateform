@@ -107,14 +107,16 @@ const schemas = {
   }),
   createMeeting: Joi.object({
     scholar: Joi.string().required(),
-    type: Joi.string().valid(...meetingTypes).required(),
+    type: Joi.string().required(),
     date: Joi.string().required(),
     time: Joi.string().required(),
     venue: Joi.string().default('TBD'),
+    mode: Joi.string().allow('', null),
+    agenda: Joi.string().allow('', null),
     panel: Joi.string().allow('', null),
     supervisor: Joi.string().allow('', null),
     status: Joi.string().valid(...meetingStatus).default('Scheduled')
-  }),
+  }).unknown(true),
   updateMeeting: Joi.object({
     scholar: Joi.string(),
     type: Joi.string().valid(...meetingTypes),

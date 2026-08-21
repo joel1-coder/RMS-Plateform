@@ -206,3 +206,19 @@
   - Upload modal populates with supervisor's assigned scholars from backend.
 - **DC Members Management (`DCMembersManagement.jsx`) & Schedule Meeting (`ScheduleDCMeeting.jsx`)**:
   - Replaced hardcoded lists with dynamic scholars assigned to the logged-in supervisor.
+
+## [2026-08-22 00:25 IST] — DC Members Auto-Cache Algorithm & Meeting Notifications Integration
+
+### Implemented:
+- **DC Members Management (`DCMembersManagement.jsx`)**:
+  - Removed all hardcoded demo professor data (DEIVANAYAGAM, HARI GANESH, SARAVANAN, etc.).
+  - Default state starts completely blank (`name: ''`, `idDesignation: ''`, `department: ''`, `collegeInstitution: ''`, `city: ''`, `pincode: ''`, `email: ''`, `mobile: ''`).
+  - Added smart auto-caching algorithm: when a supervisor enters and submits DC member details for any scholar, the member profiles are stored in the local cache pool (`rms_cached_dc_members_pool`).
+  - Added interactive prompt: when the supervisor enters/types a name for another scholar that matches a previously cached member, an interactive prompt appears:
+    *"Would you like to enter the previously stored data for this DC member [Member Name]?"*
+    - Clicking **"✓ Yes, Restore Data"** automatically fills in Designation, Gender, Category, Department, College, City, Pin, Email, and Mobile.
+    - Clicking **"✕ No, Keep Blank"** leaves the fields blank.
+- **Schedule DC Meeting (`ScheduleDCMeeting.jsx`) & Notifications**:
+  - Connected meeting scheduling form to `POST /api/meetings`.
+  - Removed demo pre-filled files and replaced system insights with dynamic committee guidelines.
+  - Automatically sends detailed notifications containing Date, Time, Venue, Mode, and Agenda to BOTH the **Scholar** (`userId: scholar._id`) and all **Admins** (`role: 'admin'`).

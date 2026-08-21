@@ -5,12 +5,13 @@ const meetingSchema = new mongoose.Schema(
     scholar: { type: String, required: true, trim: true },
     type: {
       type: String,
-      required: true,
-      enum: ['Viva Voce', 'Synopsis Review', 'Doctoral Committee', 'Progress Review', 'Regular Review', 'Other']
+      required: true
     },
     date: { type: String, required: true },
     time: { type: String, required: true },
     venue: { type: String, required: true, trim: true },
+    mode: { type: String, trim: true, default: 'offline' },
+    agenda: { type: String, trim: true },
     panel: { type: String, trim: true },
     supervisor: { type: String, trim: true },
     status: { type: String, required: true, enum: ['Scheduled', 'Completed', 'Cancelled'], default: 'Scheduled' }
