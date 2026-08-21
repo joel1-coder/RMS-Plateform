@@ -24,8 +24,8 @@ const getAdminDashboardStats = asyncHandler(async (req, res) => {
     Meeting.countDocuments({ type: 'Viva Voce', status: 'Scheduled' }),
     User.distinct('dept'),
     User.find({ role: 'scholar' }, 'dept'),
-    ResearchProject.find({}, 'startDate'),
-    Submission.find({ type: 'thesis' }, 'submittedAt'),
+    ResearchProject.find({}, 'startDate status'),
+    Submission.find({ type: 'thesis' }, 'submittedAt status'),
     Meeting.find({ type: 'Viva Voce' }, 'date')
   ]);
 
@@ -53,7 +53,12 @@ const getAdminDashboardStats = asyncHandler(async (req, res) => {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const mName = monthNames[d.getMonth()];
-    monthlyDataMap[mName] = { month: mName, scholars: 0, thesis: 0, viva: 0 };
+    monthlyDataMap[mName] = { 
+      month: mName, 
+      scholars: 0, thesis: 0, viva: 0,
+      submitted: 0, approved: 0, rejected: 0,
+      active: 0, completed: 0, discontinued: 0 
+    };
   }
 
   // Populate scholars (Research projects)
@@ -64,6 +69,9 @@ const getAdminDashboardStats = asyncHandler(async (req, res) => {
         const mName = monthNames[date.getMonth()];
         if (monthlyDataMap[mName]) {
           monthlyDataMap[mName].scholars += 1;
+          if (p.status === 'Active') monthlyDataMap[mName].active += 1;
+          else if (p.status === 'Completed') monthlyDataMap[mName].completed += 1;
+          else if (p.status === 'Discontinued') monthlyDataMap[mName].discontinued += 1;
         }
       }
     }
@@ -77,6 +85,10 @@ const getAdminDashboardStats = asyncHandler(async (req, res) => {
         const mName = monthNames[date.getMonth()];
         if (monthlyDataMap[mName]) {
           monthlyDataMap[mName].thesis += 1;
+          monthlyDataMap[mName].submitted += 1;
+          const status = s.status || '';
+          if (status.includes('Approved')) monthlyDataMap[mName].approved += 1;
+          if (status.includes('Rejected') || status.includes('Revision')) monthlyDataMap[mName].rejected += 1;
         }
       }
     }

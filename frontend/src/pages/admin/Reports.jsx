@@ -1,27 +1,7 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
-
-const monthlyProgress = [
-  { month: 'Jan', submitted: 4, approved: 3, rejected: 1 },
-  { month: 'Feb', submitted: 6, approved: 5, rejected: 1 },
-  { month: 'Mar', submitted: 5, approved: 4, rejected: 1 },
-  { month: 'Apr', submitted: 8, approved: 7, rejected: 1 },
-  { month: 'May', submitted: 7, approved: 5, rejected: 2 },
-  { month: 'Jun', submitted: 10, approved: 8, rejected: 2 },
-  { month: 'Jul', submitted: 12, approved: 9, rejected: 3 },
-]
-
-const scholarProgress = [
-  { month: 'Jan', active: 85, completed: 12, discontinued: 3 },
-  { month: 'Feb', active: 88, completed: 15, discontinued: 3 },
-  { month: 'Mar', active: 92, completed: 18, discontinued: 4 },
-  { month: 'Apr', active: 96, completed: 22, discontinued: 4 },
-  { month: 'May', active: 98, completed: 25, discontinued: 5 },
-  { month: 'Jun', active: 102, completed: 28, discontinued: 5 },
-  { month: 'Jul', active: 108, completed: 32, discontinued: 6 },
-]
 
 const REPORT_TYPES = ['Scholar Progress', 'Thesis Summary', 'Viva Statistics', 'Department Report', 'Synopsis Report']
 
@@ -51,27 +31,40 @@ export default function Reports() {
   const [scholarSearched, setScholarSearched] = useState(false)
 
   const [research, setResearch] = useState([])
+  const [dashboardData, setDashboardData] = useState({ monthlyData: [] })
   const [loading, setLoading] = useState(true)
 
-  const fetchResearch = async () => {
+  const fetchData = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const response = await apiFetch('/api/research', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      if (!response.ok) throw new Error()
-      const data = await response.json()
-      setResearch(data)
+      const [res1, res2] = await Promise.all([
+        apiFetch('/api/research', { headers: { 'Authorization': `Bearer ${token}` } }),
+        apiFetch('/api/reports/admin-dashboard', { headers: { 'Authorization': `Bearer ${token}` } })
+      ])
+      
+      if (res1.ok) setResearch(await res1.json())
+      if (res2.ok) setDashboardData(await res2.json())
     } catch {
-      toast.error('Failed to load research project analytics')
+      toast.error('Failed to load analytics data')
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchResearch()
+    fetchData()
   }, [])
+
+  const totalReports = research.length;
+  const completedReports = research.filter(r => r.status === 'Completed').length;
+  const completionRate = totalReports ? Math.round((completedReports / totalReports) * 100) : 0;
+  
+  let totalDays = 0;
+  research.forEach(r => totalDays += getDaysElapsed(r.startDate));
+  const avgDurationYrs = totalReports ? (totalDays / totalReports / 365).toFixed(1) : 0;
+  
+  const activeReports = research.filter(r => r.status === 'Active').length;
+  const successRate = totalReports ? Math.round(((activeReports + completedReports) / totalReports) * 100) : 0;
 
   const handleGenerate = () => {
     setGenerated(true)
@@ -118,10 +111,10 @@ export default function Reports() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '20px' }}>
           {[
-            { label: 'Reports Generated', value: '124', icon: '📊', color: 'purple' },
-            { label: 'Completion Rate', value: '87%', icon: '✅', color: 'green' },
-            { label: 'Avg. PhD Duration', value: '4.2 yr', icon: '📅', color: 'blue' },
-            { label: 'Success Rate', value: '92%', icon: '🎓', color: 'orange' },
+            { label: 'Total Projects', value: totalReports.toString(), icon: '📊', color: 'purple' },
+            { label: 'Completion Rate', value: `${completionRate}%`, icon: '✅', color: 'green' },
+            { label: 'Avg. PhD Duration', value: `${avgDurationYrs} yr`, icon: '📅', color: 'blue' },
+            { label: 'Success Rate', value: `${successRate}%`, icon: '🎓', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -271,7 +264,7 @@ export default function Reports() {
             </div>
             <div className="card-body" style={{ height: '220px' }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyProgress}>
+                <BarChart data={dashboardData.monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
@@ -293,7 +286,7 @@ export default function Reports() {
             </div>
             <div className="card-body" style={{ height: '220px' }}>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={scholarProgress}>
+                <AreaChart data={dashboardData.monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />

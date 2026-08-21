@@ -152,3 +152,10 @@
 | DRC | Meeting Minutes | ✅ Complete |
 | DRC | Reports & Analytics | ✅ Complete |
 | DRC | Notifications | ✅ Complete |
+
+## [2026-08-21 22:45 IST] — Admin Reports & Analytics Connection
+
+### Implemented:
+- Enhanced `reports.controller.js` `getAdminDashboardStats` to return detailed counts for thesis statuses (submitted, approved, rejected) and scholar statuses (active, completed, discontinued).
+- Connected `frontend/src/pages/admin/Reports.jsx` to fetch `/api/reports/admin-dashboard` and calculate 4 dynamic top stats (Total Projects, Completion Rate, Avg PhD Duration, Success Rate) from live `research` data.
+- Bound live data to Recharts `BarChart` and `AreaChart` in Reports UI.
