@@ -1,16 +1,83 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-
-const reports = [
-  { id: 1, period: 'Jan – Jun 2022', submittedOn: '2022-06-30', status: 'Approved', remarks: 'Good progress in course work.' },
-  { id: 2, period: 'Jul – Dec 2022', submittedOn: '2022-12-28', status: 'Approved', remarks: 'Literature review completed on schedule.' },
-  { id: 3, period: 'Jan – Jun 2023', submittedOn: '2023-07-01', status: 'Approved', remarks: 'Data collection and initial experiments done.' },
-  { id: 4, period: 'Jul – Dec 2023', submittedOn: '2024-01-02', status: 'Approved', remarks: 'Model development and testing in progress.' },
-  { id: 5, period: 'Jan – Jun 2024', submittedOn: '2024-07-01', status: 'Under Review', remarks: '' },
-]
+import { apiFetch, apiUrl } from '../../utils/api'
 
 export default function ScholarProgress() {
+  const [reportsList, setReportsList] = useState([])
   const [showModal, setShowModal] = useState(false)
+  const [period, setPeriod] = useState('Jul 2024 – Dec 2024')
+  const [workDone, setWorkDone] = useState('')
+  const [planNext, setPlanNext] = useState('')
+  const [publications, setPublications] = useState('')
+  const [file, setFile] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  const fetchReports = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const res = await apiFetch('/api/submissions?type=progress_report', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setReportsList(data)
+    } catch {
+      toast.error('Failed to load progress reports')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchReports()
+  }, [])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!file) {
+      toast.error('Please attach your progress report PDF')
+      return
+    }
+
+    try {
+      setSubmitting(true)
+      const token = localStorage.getItem('rms_token')
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('topic', `Bi-Annual Progress Report (${period})`)
+      formData.append('period', period)
+      formData.append('workDone', workDone)
+      formData.append('planNext', planNext)
+      formData.append('remarks', publications ? `Publications: ${publications}` : '')
+
+      const res = await apiFetch('/api/submissions/progress', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.message || 'Submission failed')
+      }
+
+      toast.success('Progress report submitted successfully!')
+      setShowModal(false)
+      setWorkDone('')
+      setPlanNext('')
+      setPublications('')
+      setFile(null)
+      fetchReports()
+    } catch (err) {
+      toast.error(err.message || 'Failed to submit report')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const approvedCount = reportsList.filter(r => r.status.includes('Approved')).length
+  const underReviewCount = reportsList.filter(r => r.status.includes('Pending') || r.status.includes('Review')).length
 
   return (
     <div className="animate-fade">
@@ -18,38 +85,74 @@ export default function ScholarProgress() {
         <div className="modal-backdrop">
           <div className="modal">
             <div className="modal-header">
-              <span className="modal-title">Submit Progress Report</span>
+              <span className="modal-title">Submit Bi-Annual Progress Report</span>
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label className="form-label">Report Period</label>
-                <select className="form-control form-select">
-                  <option>Jul 2024 – Dec 2024</option>
-                  <option>Jan 2025 – Jun 2025</option>
-                </select>
+            <form onSubmit={handleSubmit}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">Report Period *</label>
+                  <select className="form-control form-select" value={period} onChange={e => setPeriod(e.target.value)}>
+                    <option>Jul 2024 – Dec 2024</option>
+                    <option>Jan 2025 – Jun 2025</option>
+                    <option>Jul 2025 – Dec 2025</option>
+                    <option>Jan 2026 – Jun 2026</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Work Done This Period *</label>
+                  <textarea
+                    className="form-control"
+                    rows={3}
+                    placeholder="Describe your research activities, experiment results, and achievements..."
+                    value={workDone}
+                    onChange={e => setWorkDone(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Plan for Next Period</label>
+                  <textarea
+                    className="form-control"
+                    rows={2}
+                    placeholder="What milestones do you plan to accomplish in the upcoming semester?"
+                    value={planNext}
+                    onChange={e => setPlanNext(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Publications / Conferences Attended</label>
+                  <textarea
+                    className="form-control"
+                    rows={2}
+                    placeholder="List any papers published or conferences attended..."
+                    value={publications}
+                    onChange={e => setPublications(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Attach Signed Report (PDF only) *</label>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="form-control"
+                    onChange={e => setFile(e.target.files[0])}
+                    required
+                  />
+                </div>
               </div>
-              <div className="form-group">
-                <label className="form-label">Work Done This Period</label>
-                <textarea className="form-control" rows={4} placeholder="Describe your research activities, results, and achievements..." />
+              <div className="modal-footer">
+                <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn btn-primary"
+                  style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+                >
+                  {submitting ? 'Submitting...' : '📤 Submit Report'}
+                </button>
               </div>
-              <div className="form-group">
-                <label className="form-label">Plan for Next Period</label>
-                <textarea className="form-control" rows={3} placeholder="What do you plan to accomplish next?" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Publications / Conferences Attended</label>
-                <textarea className="form-control" rows={2} placeholder="List any papers published or conferences attended..." />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Attach Report (PDF)</label>
-                <input type="file" accept=".pdf" className="form-control" />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }} onClick={() => { setShowModal(false); toast.success('Progress report submitted!') }}>📤 Submit Report</button>
-            </div>
+            </form>
           </div>
         </div>
       )}
@@ -69,14 +172,14 @@ export default function ScholarProgress() {
       <div className="page-body">
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Reports',    value: reports.length, icon: '📊', color: 'purple' },
-            { label: 'Approved',         value: reports.filter(r => r.status === 'Approved').length, icon: '✅', color: 'green' },
-            { label: 'Under Review',     value: reports.filter(r => r.status === 'Under Review').length, icon: '🔍', color: 'orange' },
-            { label: 'Next Due',         value: 'Dec 2024', icon: '⏰', color: 'blue' },
+            { label: 'Total Reports', value: reportsList.length, icon: '📊', color: 'purple' },
+            { label: 'Approved', value: approvedCount, icon: '✅', color: 'green' },
+            { label: 'Under Review', value: underReviewCount, icon: '🔍', color: 'orange' },
+            { label: 'Next Due', value: 'Dec 2024', icon: '⏰', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
-              <div className="stat-info"><div className="stat-value">{s.value}</div><div className="stat-label">{s.label}</div></div>
+              <div className="stat-info"><div className="stat-value">{loading ? '--' : s.value}</div><div className="stat-label">{s.label}</div></div>
             </div>
           ))}
         </div>
@@ -97,28 +200,53 @@ export default function ScholarProgress() {
         <div className="card">
           <div className="card-header"><div className="card-title">Report History</div></div>
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="table">
-              <thead>
-                <tr><th>#</th><th>Period</th><th>Submitted On</th><th>Status</th><th>Supervisor Remarks</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                {reports.map((r, i) => (
-                  <tr key={r.id}>
-                    <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
-                    <td style={{ fontWeight: 600 }}>{r.period}</td>
-                    <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{r.submittedOn}</td>
-                    <td><span className={`badge ${r.status === 'Approved' ? 'badge-success' : 'badge-warning'}`}>{r.status}</span></td>
-                    <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: '260px' }}>{r.remarks || 'Awaiting review...'}</td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '5px' }}>
-                        <button className="btn btn-ghost btn-sm">👁️</button>
-                        <button className="btn btn-secondary btn-sm">📥</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>Loading reports...</div>
+            ) : reportsList.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📑</div>
+                <div>No progress reports submitted yet.</div>
+                <div style={{ fontSize: '12px', marginTop: '4px' }}>Click "Submit New Report" above to file your first bi-annual review.</div>
+              </div>
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr><th>#</th><th>Period</th><th>Submitted On</th><th>Status</th><th>Supervisor Remarks</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                  {reportsList.map((r, i) => (
+                    <tr key={r.id || r._id || i}>
+                      <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
+                      <td style={{ fontWeight: 600 }}>{r.period || r.topic}</td>
+                      <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{r.submittedAt?.slice(0, 10)}</td>
+                      <td>
+                        <span className={`badge ${
+                          r.status.includes('Approved') ? 'badge-success' :
+                          r.status.includes('Pending') ? 'badge-warning' : 'badge-info'
+                        }`}>{r.status}</span>
+                      </td>
+                      <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: '260px' }}>{r.remarks || 'Awaiting review...'}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          {r.fileUrl && (
+                            <a
+                              href={apiUrl(r.fileUrl)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="btn btn-secondary btn-sm"
+                              title="Download"
+                              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                            >
+                              📥
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 

@@ -7,6 +7,9 @@ const researchProjectSchema = new mongoose.Schema(
     topic: { type: String, required: true, trim: true },
     supervisor: { type: String, required: true, trim: true },
     supervisorId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+    coSupervisor: { type: String, trim: true, default: '' },
+    domain: { type: String, trim: true, default: '' },
+    objectives: [{ type: String, trim: true }],
     dept: { type: String, required: true, trim: true },
     startDate: { type: String, required: true },
     stage: {

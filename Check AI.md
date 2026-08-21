@@ -159,3 +159,27 @@
 - Enhanced `reports.controller.js` `getAdminDashboardStats` to return detailed counts for thesis statuses (submitted, approved, rejected) and scholar statuses (active, completed, discontinued).
 - Connected `frontend/src/pages/admin/Reports.jsx` to fetch `/api/reports/admin-dashboard` and calculate 4 dynamic top stats (Total Projects, Completion Rate, Avg PhD Duration, Success Rate) from live `research` data.
 - Bound live data to Recharts `BarChart` and `AreaChart` in Reports UI.
+
+## [2026-08-21 23:20 IST] — Scholar Portal Backend Connection & Live Workflow Tracking
+
+### Implemented:
+- **Backend Models & Controllers**:
+  - Expanded `Submission.model.js` with `version`, `period`, `category`, `workDone`, `planNext`, `drcMeetingDate`, and `approvalDate`.
+  - Added `coSupervisor`, `domain`, and `objectives` to `ResearchProject.model.js`.
+  - Created `GET /api/submissions`, `POST /api/submissions/progress`, `POST /api/submissions/document`, and `DELETE /api/submissions/:id`.
+  - Updated `publication.routes.js` and `publication.controller.js` to allow scholars to view, add, edit, and delete their own publications.
+- **Scholar Synopsis (`ScholarSynopsis.jsx`)**:
+  - Added first-time submission guidance when no submission exists in the database.
+  - Implemented dynamic Synopsis Details with scholar name, registration number, supervisor, co-supervisor (`-` if none), DRC dates, and version.
+  - Built real-time 5-stage approval timeline (`Draft Prepared` → `Supervisor Review` → `Submitted` → `DRC Review` → `Approved`).
+  - Added dynamic submission history list with document download links.
+- **My Research (`ScholarResearch.jsx`)**:
+  - Connected to `/api/research` for current scholar project.
+  - Dynamically renders research topic, supervisor, co-supervisor (`-`), domain, and stage-calculated phases.
+- **Scholar Documents (`ScholarDocuments.jsx`)**:
+  - Dynamically aggregates submissions, publications, and thesis files.
+  - Supports drag & drop and manual document uploads.
+- **Scholar Progress Report (`ScholarProgress.jsx`)**:
+  - Connected to backend `/api/submissions?type=progress_report` for bi-annual report tracking.
+- **Scholar Publications (`ScholarPublications.jsx`)**:
+  - Removed mock fallback data to display live database records with full CRUD support.

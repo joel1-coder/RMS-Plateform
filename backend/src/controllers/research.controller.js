@@ -45,6 +45,11 @@ const listResearch = asyncHandler(async (req, res) => {
   const filters = {};
   if (req.query.status) filters.status = req.query.status;
   if (req.query.stage) filters.stage = req.query.stage;
+  if (req.query.scholarId) filters.scholarId = req.query.scholarId;
+
+  if (req.user.role === 'scholar' && !req.query.all) {
+    filters.$or = [{ scholarId: req.user.id }, { scholar: req.user.name }];
+  }
 
   const projects = await ResearchProject.find(filters).sort({ createdAt: -1 });
   res.json(projects.map(formatProject));

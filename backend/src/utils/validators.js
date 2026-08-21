@@ -85,11 +85,21 @@ const schemas = {
     stage: Joi.string().valid(...researchStages).allow('')
   }),
   createSubmission: Joi.object({
-    topic: Joi.string().required()
+    topic: Joi.string().allow('', null),
+    version: Joi.string().allow('', null),
+    remarks: Joi.string().allow('', null),
+    period: Joi.string().allow('', null),
+    category: Joi.string().allow('', null),
+    workDone: Joi.string().allow('', null),
+    planNext: Joi.string().allow('', null),
+    drcMeetingDate: Joi.string().allow('', null),
+    approvalDate: Joi.string().allow('', null)
   }),
   updateSubmissionStatus: Joi.object({
-    status: Joi.string().valid(...submissionStatus).required(),
-    remarks: Joi.string().allow('', null)
+    status: Joi.string().required(),
+    remarks: Joi.string().allow('', null),
+    drcMeetingDate: Joi.string().allow('', null),
+    approvalDate: Joi.string().allow('', null)
   }),
   createMeeting: Joi.object({
     scholar: Joi.string().required(),

@@ -15,6 +15,10 @@ const listPublications = asyncHandler(async (req, res) => {
   if (req.query.status) filters.status = req.query.status;
   if (req.query.scholarId) filters.scholarId = req.query.scholarId;
 
+  if (req.user.role === 'scholar') {
+    filters.scholarId = req.user.id;
+  }
+
   if (req.query.search) {
     const s = new RegExp(req.query.search, 'i');
     filters.$or = [{ scholar: s }, { title: s }, { journal: s }];
@@ -47,7 +51,7 @@ const createPublication = asyncHandler(async (req, res) => {
     pubType: req.body.pubType || req.body.type || 'Journal Publishing',
     doi: req.body.doi || '',
     status: req.body.status || 'Submitted',
-    date: req.body.date || new Date().toISOString().slice(0, 10),
+    date: req.body.date || (req.body.year ? `${req.body.year}-01-01` : new Date().toISOString().slice(0, 10)),
     fileUrl: req.file ? `/uploads/${req.file.filename}` : (req.body.fileUrl || '')
   };
 
@@ -56,19 +60,31 @@ const createPublication = asyncHandler(async (req, res) => {
 });
 
 const updatePublication = asyncHandler(async (req, res) => {
+  const existing = await Publication.findById(req.params.id);
+  if (!existing) throw new AppError('Publication not found', 404);
+
+  if (req.user.role === 'scholar' && existing.scholarId.toString() !== req.user.id) {
+    throw new AppError('Access denied', 403);
+  }
+
   const pub = await Publication.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
   });
 
-  if (!pub) throw new AppError('Publication not found', 404);
   res.json(formatPub(pub));
 });
 
 const deletePublication = asyncHandler(async (req, res) => {
-  const pub = await Publication.findByIdAndDelete(req.params.id);
-  if (!pub) throw new AppError('Publication not found', 404);
-  res.json({ success: true });
+  const existing = await Publication.findById(req.params.id);
+  if (!existing) throw new AppError('Publication not found', 404);
+
+  if (req.user.role === 'scholar' && existing.scholarId.toString() !== req.user.id) {
+    throw new AppError('Access denied', 403);
+  }
+
+  await Publication.findByIdAndDelete(req.params.id);
+  res.json({ success: true, message: 'Publication deleted' });
 });
 
 module.exports = { listPublications, createPublication, updatePublication, deletePublication };

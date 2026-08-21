@@ -1,14 +1,6 @@
-﻿import { apiFetch } from '../../utils/api'
-import { useState } from 'react'
+import { apiFetch } from '../../utils/api'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-
-/* ── Sample data ── */
-const myPubs = [
-  { id: 1, title: 'Deep Learning for Medical Image Classification', venue: 'IEEE Access', year: 2023, type: 'Journal Publishing', indexed: 'SCI', status: 'Published', citations: 12, impactFactor: 3.9, doi: '10.1109/ACCESS.2023.123456' },
-  { id: 2, title: 'AI-Driven Diagnostics: A Comprehensive Survey', venue: 'ICML 2023', year: 2023, type: 'Conference Proceeding', indexed: 'Scopus', status: 'Published', citations: 5, impactFactor: null, doi: '10.5120/ijca2023923001' },
-  { id: 3, title: 'Federated Learning Approaches in Clinical Settings', venue: 'Springer LNCS', year: 2024, type: 'Chapters', indexed: 'Scopus', status: 'Under Review', citations: 0, impactFactor: null, doi: '' },
-  { id: 4, title: 'Explainable AI for Diagnostic Decision Support', venue: 'Expert Systems with Applications', year: 2024, type: 'Journal Publishing', indexed: 'SCI', status: 'Draft', citations: 0, impactFactor: 8.5, doi: '' },
-]
 
 /* ── Publication Types ── */
 const PUB_TYPES = [
