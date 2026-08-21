@@ -1,4 +1,4 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -15,11 +15,22 @@ const STAGE_COLORS = {
   'Completed': '#059669',
 }
 
-function ResearchModal({ onClose, onSave, editData = null }) {
+function ResearchModal({ onClose, onSave, editData = null, scholarsList = [] }) {
   const emptyForm = { scholar: '', topic: '', supervisor: '', dept: 'CS', startDate: new Date().toISOString().slice(0, 10), status: 'Active', progress: 0, stage: 'Course Work' }
   const [form, setForm] = useState(editData ? { ...editData } : emptyForm)
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.name === 'progress' ? Number(e.target.value) : e.target.value })
+
+  const handleScholarChange = e => {
+    const val = e.target.value
+    let newForm = { ...form, scholar: val }
+    const match = scholarsList.find(s => s.name === val)
+    if (match) {
+      if (match.assignedSupervisor) newForm.supervisor = match.assignedSupervisor
+      if (match.dept) newForm.dept = match.dept
+    }
+    setForm(newForm)
+  }
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -43,7 +54,21 @@ function ResearchModal({ onClose, onSave, editData = null }) {
             <div className="grid-2">
               <div className="form-group">
                 <label className="form-label">Scholar Name *</label>
-                <input name="scholar" required className="form-control" placeholder="e.g. Rahul Sharma" value={form.scholar} onChange={handleChange} />
+                <input 
+                  name="scholar" 
+                  required 
+                  className="form-control" 
+                  placeholder="e.g. Rahul Sharma" 
+                  value={form.scholar} 
+                  onChange={handleScholarChange} 
+                  list="scholar-datalist"
+                  autoComplete="off"
+                />
+                <datalist id="scholar-datalist">
+                  {scholarsList.map(s => (
+                    <option key={s.id || s._id} value={s.name}>{s.dept ? `(${s.dept})` : ''}</option>
+                  ))}
+                </datalist>
               </div>
               <div className="form-group">
                 <label className="form-label">Department</label>
@@ -104,6 +129,19 @@ export default function ResearchManagement() {
   const [showModal, setShowModal] = useState(false)
   const [editingProject, setEditingProject] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState([])
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const response = await apiFetch('/api/users', { headers: { 'Authorization': `Bearer ${token}` } })
+      if (response.ok) {
+        setUsers(await response.json())
+      }
+    } catch(err) {
+      console.error('Failed to load users', err)
+    }
+  }
 
   const fetchProjects = async () => {
     try {
@@ -124,6 +162,10 @@ export default function ResearchManagement() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
 
   useEffect(() => {
     fetchProjects()
@@ -200,6 +242,7 @@ export default function ResearchManagement() {
       {(showModal || editingProject) && (
         <ResearchModal
           editData={editingProject}
+          scholarsList={users.filter(u => u.role === 'scholar' && u.status !== 'Inactive')}
           onClose={() => { setShowModal(false); setEditingProject(null) }}
           onSave={handleSave}
         />
