@@ -16,6 +16,21 @@ const listUsers = asyncHandler(async (req, res) => {
     filters.$or = [{ name: s }, { email: s }];
   }
 
+  // Filter by supervisor if requested or if queried by a supervisor (unless all=true is specified)
+  if (req.query.supervisorId || req.query.supervisorName) {
+    const orCond = [];
+    if (req.query.supervisorId) orCond.push({ assignedSupervisorId: req.query.supervisorId });
+    if (req.query.supervisorName) orCond.push({ assignedSupervisor: new RegExp(`^${req.query.supervisorName.trim()}$`, 'i') });
+    if (orCond.length > 0) {
+      filters.$or = orCond;
+    }
+  } else if (req.user?.role === 'supervisor' && req.query.all !== 'true') {
+    filters.$or = [
+      { assignedSupervisorId: req.user.id },
+      { assignedSupervisor: new RegExp(`^${(req.user.name || '').trim()}$`, 'i') }
+    ];
+  }
+
   // Admin gets plainPassword field for the User Management table display
   const isAdmin = req.user?.role === 'admin';
   const query = User.find(filters).sort({ name: 1 });

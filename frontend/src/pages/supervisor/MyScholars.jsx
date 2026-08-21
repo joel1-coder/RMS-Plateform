@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { apiFetch } from '../../utils/api'
 import toast from 'react-hot-toast'
 import ScholarProfileView from './ScholarProfileView'
 
@@ -10,59 +11,77 @@ export default function MyScholars() {
   const [filterDept, setFilterDept] = useState('All')
   const [filterStatus, setFilterStatus] = useState('All')
   const [viewingScholar, setViewingScholar] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchMyScholars = async () => {
+    try {
+      setLoading(true)
+      const token = localStorage.getItem('rms_token')
+      const headers = { 'Authorization': `Bearer ${token}` }
+
+      const [usersRes, researchRes] = await Promise.all([
+        apiFetch('/api/users?role=scholar', { headers }),
+        apiFetch('/api/research', { headers })
+      ])
+
+      let dbUsers = []
+      if (usersRes.ok) {
+        dbUsers = await usersRes.json()
+      }
+
+      let researchProjects = []
+      if (researchRes.ok) {
+        researchProjects = await researchRes.json()
+      }
+
+      // Filter scholars assigned to this logged-in supervisor
+      const myId = user?.id || user?._id
+      const myName = (user?.name || '').toLowerCase().trim()
+
+      const assignedScholars = dbUsers.filter(u =>
+        u.role?.toLowerCase() === 'scholar' &&
+        (
+          (u.assignedSupervisorId && (u.assignedSupervisorId === myId || u.assignedSupervisorId?._id === myId)) ||
+          (u.assignedSupervisor && u.assignedSupervisor.toLowerCase().trim() === myName)
+        )
+      )
+
+      // Join with research projects
+      const enrichedScholars = assignedScholars.map(scholar => {
+        const scholarName = (scholar.name || '').toLowerCase().trim()
+        const project = researchProjects.find(p => (p.scholar || '').toLowerCase().trim() === scholarName)
+        const admissionYear = scholar.joined ? scholar.joined.split('-')[0] : '2024'
+
+        return {
+          id: scholar.id || scholar._id,
+          name: scholar.name,
+          email: scholar.email,
+          dept: scholar.dept || 'Computer Science',
+          regNo: scholar.profile?.regNo || '—',
+          phone: scholar.profile?.phone || '—',
+          topic: project ? project.topic : 'Research Topic Pending Registration',
+          progress: project ? project.progress : 0,
+          status: project
+            ? (project.status === 'Completed' ? 'Completed' : (project.progress >= 60 ? 'On Track' : 'Needs Attention'))
+            : 'Pending',
+          admission: admissionYear,
+          lastReview: project ? project.startDate : 'N/A'
+        }
+      })
+
+      setScholars(enrichedScholars)
+    } catch (err) {
+      console.error('Failed to load scholars', err)
+      toast.error('Failed to load assigned scholars')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    if (!user) return
-
-    // 1. Load users from localStorage (dynamic user management)
-    let dbUsers = []
-    try {
-      const rawUsers = localStorage.getItem('rms_all_users')
-      if (rawUsers) dbUsers = JSON.parse(rawUsers)
-    } catch (e) {
-      console.error('Failed to parse rms_all_users', e)
+    if (user) {
+      fetchMyScholars()
     }
-
-    // 2. Filter scholars assigned to this logged-in supervisor
-    const supervisorName = user.name || ''
-    const assignedScholars = dbUsers.filter(
-      u => u.role?.toLowerCase() === 'scholar' &&
-           u.assignedSupervisor &&
-           u.assignedSupervisor.toLowerCase() === supervisorName.toLowerCase()
-    )
-
-    // 3. Load research projects to enrich scholars with progress/topic
-    let researchProjects = []
-    try {
-      const rawResearch = localStorage.getItem('rms_research')
-      if (rawResearch) researchProjects = JSON.parse(rawResearch)
-    } catch (e) {
-      console.error('Failed to parse rms_research', e)
-    }
-
-    // 4. Join databases
-    const enrichedScholars = assignedScholars.map(scholar => {
-      // Find matching research project by scholar name
-      const project = researchProjects.find(p => p.scholar.toLowerCase() === scholar.name.toLowerCase())
-      
-      const admissionYear = scholar.joined ? scholar.joined.split('-')[0] : '2024'
-      
-      return {
-        id: scholar.id,
-        name: scholar.name,
-        email: scholar.email,
-        dept: scholar.dept || 'Computer Science',
-        topic: project ? project.topic : 'Research Topic Pending Registration',
-        progress: project ? project.progress : 0,
-        status: project 
-          ? (project.status === 'Completed' ? 'Completed' : (project.progress >= 60 ? 'On Track' : 'Needs Attention'))
-          : 'Pending',
-        admission: admissionYear,
-        lastReview: project ? project.startDate : 'N/A'
-      }
-    })
-
-    setScholars(enrichedScholars)
   }, [user])
 
   const filtered = scholars.filter(s => {

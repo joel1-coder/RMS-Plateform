@@ -1,20 +1,51 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '../../context/AuthContext'
+import { apiFetch } from '../../utils/api'
 import toast from 'react-hot-toast'
-
-const scholars = [
-  { id: 'PH2023-088', name: 'Elena Rodriguez', dept: 'Computer Science', status: 'Active Scholar' },
-  { id: 'PH2022-041', name: 'Rahul Sharma', dept: 'Computer Science', status: 'Active Scholar' },
-  { id: 'PH2023-055', name: 'Neha Patel', dept: 'Electronics', status: 'Active Scholar' },
-  { id: 'PH2021-012', name: 'Amit Kumar', dept: 'Mechanical', status: 'Active Scholar' },
-]
 
 const meetingTypes = ['1st DC Meeting', '2nd DC Meeting', '3rd DC Meeting', 'Annual Review', 'Pre-Synopsis', 'Comprehensive Viva']
 const venueOptions = ['Conference Room B, Block-IV, 2nd Floor', 'Online - Google Meet', 'Online - Zoom', 'Seminar Hall A', 'Department Conference Room']
 
 export default function ScheduleDCMeeting() {
-  const [selectedScholar, setSelectedScholar] = useState(scholars[0])
-  const [searchTerm, setSearchTerm] = useState('Elena Rodriguez')
+  const { user } = useAuth()
+  const [scholars, setScholars] = useState([])
+  const [selectedScholar, setSelectedScholar] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
+
+  useEffect(() => {
+    async function loadScholars() {
+      try {
+        const token = localStorage.getItem('rms_token')
+        const res = await apiFetch('/api/users?role=scholar', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (res.ok) {
+          const allScholars = await res.json()
+          const myId = user?.id || user?._id
+          const myName = (user?.name || '').toLowerCase().trim()
+          const myScholars = allScholars.filter(s =>
+            (s.assignedSupervisorId && (s.assignedSupervisorId === myId || s.assignedSupervisorId?._id === myId)) ||
+            (s.assignedSupervisor && s.assignedSupervisor.toLowerCase().trim() === myName)
+          ).map(s => ({
+            id: s.profile?.regNo || s.id || s._id,
+            name: s.name,
+            dept: s.dept || 'Computer Science',
+            status: s.status === 'Active' ? 'Active Scholar' : 'Inactive'
+          }))
+
+          setScholars(myScholars)
+          if (myScholars.length > 0) {
+            setSelectedScholar(myScholars[0])
+            setSearchTerm(myScholars[0].name)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load scholars for scheduling', err)
+      }
+    }
+    if (user) loadScholars()
+  }, [user])
   const [form, setForm] = useState({
     meetingType: '1st DC Meeting',
     date: '',

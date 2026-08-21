@@ -183,3 +183,26 @@
   - Connected to backend `/api/submissions?type=progress_report` for bi-annual report tracking.
 - **Scholar Publications (`ScholarPublications.jsx`)**:
   - Removed mock fallback data to display live database records with full CRUD support.
+
+## [2026-08-22 00:15 IST] — Supervisor Portal Backend Connection & Live Workflow Tracking
+
+### Implemented:
+- **Backend Permissions & Scoping**:
+  - Updated `users.routes.js` and `validators.js` to authorize `supervisor` and `drc` roles on `GET /api/users`.
+  - Scoped `listUsers` and `listSubmissions` so supervisors automatically retrieve only scholars assigned to them.
+  - Allowed supervisors on `POST /api/thesis` to upload drafts on behalf of scholars and review submissions.
+- **Supervisor Dashboard (`SupervisorDashboard.jsx`)**:
+  - Displays dynamic supervisor name (`user.name`), live KPI counts (Active Scholars, Pending Synopsis, Pending Thesis, Publications), and dynamic `Scholar Progress Overview` bar chart.
+  - Displays live pending action items with direct navigation links.
+- **My Scholars (`MyScholars.jsx`)**:
+  - Connected to `/api/users?role=scholar` and `/api/research`.
+  - Automatically lists scholars assigned to this supervisor with research topic, progress percentage, admission year, and status.
+- **Synopsis Review (`SynopsisReview.jsx`)**:
+  - Connected to live `/api/submissions?type=synopsis`.
+  - Implemented supervisor approval workflow: Approving advances status to `'Pending DRC Review'` for DRC review queue; requesting changes sets `'Changes Requested'`.
+  - Added direct synopsis PDF download links.
+- **Thesis Review (`ThesisReview.jsx`)**:
+  - Connected to `/api/thesis` with live status updates (`Approved`, `Changes Requested`, `Rejected`).
+  - Upload modal populates with supervisor's assigned scholars from backend.
+- **DC Members Management (`DCMembersManagement.jsx`) & Schedule Meeting (`ScheduleDCMeeting.jsx`)**:
+  - Replaced hardcoded lists with dynamic scholars assigned to the logged-in supervisor.

@@ -6,6 +6,12 @@ const { publicFileUrl } = require('../services/storageService');
 function formatSubmission(submission) {
   const doc = submission.toObject();
   doc.id = doc._id;
+  if (doc.scholarId && typeof doc.scholarId === 'object') {
+    doc.scholarDept = doc.scholarId.dept || '';
+    doc.scholarRegNo = doc.scholarId.profile?.regNo || '';
+    doc.scholarEmail = doc.scholarId.email || '';
+    doc.scholarId = doc.scholarId._id;
+  }
   delete doc._id;
   delete doc.__v;
   return doc;
@@ -20,9 +26,24 @@ const listSubmissions = asyncHandler(async (req, res) => {
   // Scholars only see their own submissions
   if (req.user.role === 'scholar') {
     filters.scholarId = req.user.id;
+  } else if (req.user.role === 'supervisor') {
+    // Supervisors see submissions from their assigned scholars
+    const supervisorName = (req.user.name || '').trim();
+    const myScholars = await User.find({
+      role: 'scholar',
+      $or: [
+        { assignedSupervisorId: req.user.id },
+        { assignedSupervisor: new RegExp(`^${supervisorName}$`, 'i') }
+      ]
+    }).select('_id');
+    const scholarIds = myScholars.map(s => s._id);
+    filters.scholarId = { $in: scholarIds };
   }
 
-  const submissions = await Submission.find(filters).sort({ createdAt: -1 });
+  const submissions = await Submission.find(filters)
+    .populate('scholarId', 'name dept profile email')
+    .sort({ createdAt: -1 });
+
   res.json(submissions.map(formatSubmission));
 });
 

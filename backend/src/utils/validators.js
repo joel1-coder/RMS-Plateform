@@ -58,8 +58,12 @@ const schemas = {
   }),
   listUsers: Joi.object({
     role: Joi.string().valid(...roles).allow(''),
-    status: Joi.string().valid(...userStatus).allow('')
-  }),
+    status: Joi.string().valid(...userStatus).allow(''),
+    supervisorId: Joi.string().allow(''),
+    supervisorName: Joi.string().allow(''),
+    search: Joi.string().allow(''),
+    all: Joi.string().allow('')
+  }).unknown(true),
   createResearch: Joi.object({
     scholar: Joi.string().required(),
     scholarId: objectId,

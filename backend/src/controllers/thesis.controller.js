@@ -16,9 +16,24 @@ const listTheses = asyncHandler(async (req, res) => {
   if (req.query.scholarId) filters.scholarId = req.query.scholarId;
   if (req.query.supervisorId) filters.supervisorId = req.query.supervisorId;
 
+  if (req.user.role === 'scholar') {
+    filters.scholarId = req.user.id;
+  } else if (req.user.role === 'supervisor') {
+    const supervisorName = (req.user.name || '').trim();
+    filters.$or = [
+      { supervisorId: req.user.id },
+      { supervisor: new RegExp(`^${supervisorName}$`, 'i') }
+    ];
+  }
+
   if (req.query.search) {
     const s = new RegExp(req.query.search, 'i');
-    filters.$or = [{ scholar: s }, { title: s }];
+    if (filters.$or) {
+      filters.$and = [{ $or: filters.$or }, { $or: [{ scholar: s }, { title: s }] }];
+      delete filters.$or;
+    } else {
+      filters.$or = [{ scholar: s }, { title: s }];
+    }
   }
 
   const theses = await Thesis.find(filters).sort({ createdAt: -1 });

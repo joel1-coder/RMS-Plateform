@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from '../../context/AuthContext'
+import { apiFetch } from '../../utils/api'
 import toast from 'react-hot-toast'
 
 const INITIAL_MEMBER = () => ({
@@ -16,71 +18,65 @@ const INITIAL_MEMBER = () => ({
   recognitionLetter: null,
 })
 
-const SCHOLARS_LIST = [
-  { regNo: 'BDU2020410504', name: 'Miss / Mrs. BHUVANESHWARI A', discipline: 'COMPUTER SCIENCE', status: 'APPROVED' },
-  { regNo: 'BDU2020410331', name: 'Miss / Mrs. VIMAL VANI K', discipline: 'COMPUTER SCIENCE', status: 'APPROVED' },
-  { regNo: 'BDU2021050612', name: 'Mr. ANTONY JOHN PRABU J', discipline: 'COMPUTER SCIENCE', status: 'PENDING APPROVAL' },
-  { regNo: 'BDU2019882734', name: 'Miss / Mrs. DHANEDDHAMMA K', discipline: 'ELECTRONICS & COMM.', status: 'APPROVED' },
-]
-
-const DEFAULT_DC_MEMBERS = {
-  'BDU2020410504': [
-    {
-      id: 1,
-      name: 'DEIVANAYAGAM J G R',
-      idDesignation: '8415',
-      gender: 'Male',
-      category: 'Associate Professor',
-      department: 'DEPARTMENT OF COMPUTER SCIENCE',
-      collegeInstitution: 'BISHOP HEBER COLLEGE (AUTONOMOUS)',
-      pincode: '620017',
-      city: 'Tiruchirappalli',
-      email: 'deiva.cs@heber.ac.in',
-      mobile: '9894033176',
-      recognitionLetter: null,
-    },
-    {
-      id: 2,
-      name: 'HARI GANESH S',
-      idDesignation: '9476',
-      gender: 'Male',
-      category: 'Assistant Professor',
-      department: 'DEPARTMENT OF COMPUTER SCIENCE',
-      collegeInstitution: 'H.H. THE RAJA\'S COLLEGE (AUTONOMOUS)',
-      pincode: '622001',
-      city: 'Pudukkottai',
-      email: 'hariganesh@rajas.edu.in',
-      mobile: '9994058416',
-      recognitionLetter: null,
-    }
-  ],
-  'BDU2020410331': [
-    {
-      id: 3,
-      name: 'DR. K. SARAVANAN',
-      idDesignation: '5561',
-      gender: 'Male',
-      category: 'Professor',
-      department: 'DEPARTMENT OF INFORMATION TECHNOLOGY',
-      collegeInstitution: 'NATIONAL INSTITUTE OF TECHNOLOGY',
-      pincode: '620015',
-      city: 'Tiruchirappalli',
-      email: 'saravanan@nit.edu.in',
-      mobile: '9443210987',
-      recognitionLetter: null,
-    }
-  ]
-}
+const DEFAULT_DC_MEMBERS = {}
 
 const genderOptions = ['Male', 'Female', 'Other']
 const categoryOptions = ['Professor', 'Associate Professor', 'Assistant Professor', 'Reader', 'Research Scientist']
 
 export default function DCMembersManagement() {
-  const [selectedScholarReg, setSelectedScholarReg] = useState('BDU2020410504')
+  const { user } = useAuth()
+  const [scholarsList, setScholarsList] = useState([])
+  const [selectedScholarReg, setSelectedScholarReg] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState({}) // { [memberId]: boolean }
+  const [loading, setLoading] = useState(true)
 
-  const activeScholar = SCHOLARS_LIST.find(s => s.regNo === selectedScholarReg) || SCHOLARS_LIST[0]
+  useEffect(() => {
+    async function loadScholars() {
+      try {
+        setLoading(true)
+        const token = localStorage.getItem('rms_token')
+        const res = await apiFetch('/api/users?role=scholar', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (res.ok) {
+          const allScholars = await res.json()
+          const myId = user?.id || user?._id
+          const myName = (user?.name || '').toLowerCase().trim()
+          const myScholars = allScholars.filter(s =>
+            (s.assignedSupervisorId && (s.assignedSupervisorId === myId || s.assignedSupervisorId?._id === myId)) ||
+            (s.assignedSupervisor && s.assignedSupervisor.toLowerCase().trim() === myName)
+          ).map(s => ({
+            id: s.id || s._id,
+            regNo: s.profile?.regNo || s.email?.split('@')[0]?.toUpperCase() || 'SCHOLAR',
+            name: s.name,
+            discipline: s.dept || 'COMPUTER SCIENCE',
+            status: s.status === 'Active' ? 'APPROVED' : 'PENDING'
+          }))
+
+          setScholarsList(myScholars)
+          if (myScholars.length > 0) {
+            setSelectedScholarReg(myScholars[0].regNo)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load scholars for DC management', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (user) {
+      loadScholars()
+    }
+  }, [user])
+
+  const activeScholar = scholarsList.find(s => s.regNo === selectedScholarReg) || scholarsList[0] || {
+    name: 'No Scholar Selected',
+    regNo: '—',
+    discipline: '—',
+    status: 'PENDING'
+  }
 
   const [dcMembers, setDcMembers] = useState([
     {
@@ -267,9 +263,13 @@ export default function DCMembersManagement() {
                   cursor: 'pointer', outline: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
                 }}
               >
-                {SCHOLARS_LIST.map(s => (
-                  <option key={s.regNo} value={s.regNo}>{s.name} [{s.regNo}]</option>
-                ))}
+                {scholarsList.length === 0 ? (
+                  <option value="">-- No Scholars Assigned Yet --</option>
+                ) : (
+                  scholarsList.map(s => (
+                    <option key={s.regNo} value={s.regNo}>{s.name} [{s.regNo}]</option>
+                  ))
+                )}
               </select>
             </div>
           </div>

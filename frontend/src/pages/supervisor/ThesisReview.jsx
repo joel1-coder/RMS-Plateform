@@ -1,4 +1,4 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch, apiUrl } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -6,8 +6,9 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
   const [selectedScholar, setSelectedScholar] = useState('')
   const [title, setTitle] = useState('')
   const [file, setFile] = useState(null)
+  const [uploading, setUploading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!selectedScholar || !title || !file) {
       toast.error('Please select a scholar, enter thesis title, and choose a file.')
@@ -18,12 +19,14 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
       toast.error('Selected scholar not found')
       return
     }
-    
-    onUpload({
+
+    setUploading(true)
+    await onUpload({
       scholarId: scholarObj.id || scholarObj._id,
       title: title,
       file: file
     })
+    setUploading(false)
     onClose()
   }
 
@@ -31,7 +34,7 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
     <div className="modal-backdrop">
       <div className="modal">
         <div className="modal-header">
-          <span className="modal-title">Upload Scholar Thesis</span>
+          <span className="modal-title">Upload Scholar Thesis Draft</span>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <form onSubmit={handleSubmit}>
@@ -46,7 +49,7 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
               >
                 <option value="">-- Choose Scholar --</option>
                 {scholars.map(s => (
-                  <option key={s.id || s._id} value={s.name}>{s.name} ({s.dept})</option>
+                  <option key={s.id || s._id} value={s.name}>{s.name} ({s.dept || 'CS'})</option>
                 ))}
               </select>
             </div>
@@ -101,7 +104,9 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>Upload Thesis</button>
+            <button type="submit" disabled={uploading} className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>
+              {uploading ? 'Uploading...' : 'Upload Thesis'}
+            </button>
           </div>
         </form>
       </div>
@@ -117,21 +122,18 @@ export default function ThesisReview() {
   const [remarks, setRemarks] = useState('')
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [actionLoading, setActionLoading] = useState(false)
 
   const fetchSubmissions = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const storedUser = localStorage.getItem('rms_user')
-      const supervisorObj = storedUser ? JSON.parse(storedUser) : null
-      const supervisorId = supervisorObj?.id || supervisorObj?._id || ''
-
-      const response = await apiFetch(`/api/thesis?supervisorId=${supervisorId}`, {
+      const response = await apiFetch('/api/thesis', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
       const data = await response.json()
       setSubmissions(data)
-    } catch (err) {
+    } catch {
       toast.error('Failed to load thesis submissions')
     } finally {
       setLoading(false)
@@ -141,18 +143,14 @@ export default function ThesisReview() {
   const fetchScholars = async () => {
     try {
       const token = localStorage.getItem('rms_token')
-      const storedUser = localStorage.getItem('rms_user')
-      const supervisorObj = storedUser ? JSON.parse(storedUser) : null
-      const supervisorId = supervisorObj?.id || supervisorObj?._id || ''
-
-      const response = await apiFetch(`/api/users?role=scholar&supervisorId=${supervisorId}`, {
+      const response = await apiFetch('/api/users?role=scholar', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (!response.ok) throw new Error()
       const data = await response.json()
       setScholars(data)
     } catch (err) {
-      console.error('Failed to load supervisor scholars')
+      console.error('Failed to load supervisor scholars', err)
     }
   }
 
@@ -163,6 +161,7 @@ export default function ThesisReview() {
 
   const handleAction = async (id, newStatus) => {
     try {
+      setActionLoading(true)
       const token = localStorage.getItem('rms_token')
       const response = await apiFetch(`/api/thesis/${id}`, {
         method: 'PUT',
@@ -172,7 +171,7 @@ export default function ThesisReview() {
         },
         body: JSON.stringify({
           status: newStatus,
-          remarks: remarks
+          remarks: remarks || `Status set to ${newStatus}`
         })
       })
       if (!response.ok) throw new Error()
@@ -180,8 +179,10 @@ export default function ThesisReview() {
       setSelectedSub(null)
       setRemarks('')
       fetchSubmissions()
-    } catch (err) {
+    } catch {
       toast.error('Failed to submit thesis review decision')
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -203,18 +204,17 @@ export default function ThesisReview() {
       if (!response.ok) throw new Error()
       toast.success('Thesis draft uploaded successfully!')
       fetchSubmissions()
-    } catch (err) {
+    } catch {
       toast.error('Failed to upload thesis draft')
     }
   }
 
   const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Approved': return 'badge-success'
-      case 'Pending': return 'badge-warning'
-      case 'Rejected': return 'badge-danger'
-      default: return 'badge-gray'
-    }
+    if (status === 'Approved') return 'badge-success'
+    if (status === 'Pending') return 'badge-warning'
+    if (status === 'Changes Requested') return 'badge-warning'
+    if (status === 'Rejected') return 'badge-danger'
+    return 'badge-gray'
   }
 
   const filtered = submissions.filter(sub => 
@@ -251,10 +251,23 @@ export default function ThesisReview() {
                   <label className="form-label" style={{ fontWeight: 700 }}>Thesis Title</label>
                   <div style={{ fontSize: '13.5px', color: 'var(--text-primary)', fontWeight: 600 }}>{selectedSub.title}</div>
                 </div>
+                {selectedSub.fileUrl && (
+                  <div>
+                    <a
+                      href={apiUrl(selectedSub.fileUrl)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-outline btn-sm"
+                      style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}
+                    >
+                      📄 Download & Read Thesis PDF
+                    </a>
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
-                <label className="form-label">Review Remarks / Feedback</label>
+                <label className="form-label">Review Remarks / Feedback *</label>
                 <textarea 
                   className="form-control" 
                   rows={4} 
@@ -264,14 +277,32 @@ export default function ThesisReview() {
                 />
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn btn-danger btn-sm" onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Rejected')}>
-                Reject Draft
+            <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button
+                className="btn btn-danger btn-sm"
+                disabled={actionLoading}
+                onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Rejected')}
+              >
+                ✕ Reject Draft
               </button>
-              <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Approved')}>
-                ✓ Approve Draft
-              </button>
-              <button className="btn btn-ghost" onClick={() => setSelectedSub(null)}>Cancel</button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="btn btn-warning btn-sm"
+                  disabled={actionLoading}
+                  onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Changes Requested')}
+                >
+                  📝 Request Changes
+                </button>
+                <button
+                  className="btn btn-primary btn-sm"
+                  style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+                  disabled={actionLoading}
+                  onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Approved')}
+                >
+                  {actionLoading ? 'Saving...' : '✓ Approve Draft'}
+                </button>
+                <button className="btn btn-ghost" onClick={() => setSelectedSub(null)}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>
@@ -281,10 +312,9 @@ export default function ThesisReview() {
       <div className="topbar">
         <div>
           <div className="topbar-title">Thesis Review</div>
-          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Evaluate and provide feedback on final thesis drafts</span>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Evaluate and provide feedback on final thesis drafts from your scholars</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📥 Export Report</button>
           <button className="btn btn-primary btn-sm" style={{ background: '#0D9488', borderColor: '#0D9488' }} onClick={() => setShowUploadModal(true)}>＋ Upload Thesis</button>
         </div>
       </div>
@@ -295,7 +325,7 @@ export default function ThesisReview() {
           {[
             { label: 'Total Pending', value: submissions.filter(t => t.status === 'Pending').length, icon: '📚', color: 'blue' },
             { label: 'Total Approved', value: submissions.filter(t => t.status === 'Approved').length, icon: '✅', color: 'green' },
-            { label: 'Total Rejected', value: submissions.filter(t => t.status === 'Rejected').length, icon: '❌', color: 'red' },
+            { label: 'Changes Requested', value: submissions.filter(t => t.status === 'Changes Requested').length, icon: '⚠️', color: 'orange' },
             { label: 'Total Submissions', value: submissions.length, icon: '🔍', color: 'purple' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
@@ -326,7 +356,10 @@ export default function ThesisReview() {
               {loading ? (
                 <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading drafts...</div>
               ) : filtered.length === 0 ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No thesis drafts submitted yet</div>
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                  <div style={{ fontSize: '32px', marginBottom: '8px' }}>📚</div>
+                  <div>No thesis drafts submitted yet for your scholars.</div>
+                </div>
               ) : (
                 <table className="table">
                   <thead>
@@ -348,9 +381,13 @@ export default function ThesisReview() {
                           <div style={{ fontWeight: 600 }}>{sub.scholar}</div>
                         </td>
                         <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                          <a href={sub.fileUrl ? `${import.meta.env.VITE_API_URL || ''}${sub.fileUrl}` : '#'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
-                            {sub.title}
-                          </a>
+                          {sub.fileUrl ? (
+                            <a href={apiUrl(sub.fileUrl)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
+                              {sub.title}
+                            </a>
+                          ) : (
+                            sub.title
+                          )}
                         </td>
                         <td>{sub.submittedAt}</td>
                         <td><span className={`badge ${getStatusBadge(sub.status)}`}>{sub.status}</span></td>
