@@ -1,4 +1,5 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useAuth } from '../../context/AuthContext'
 
 const progressTimeline = [
   { month: 'Aug 21', progress: 5 },
@@ -29,6 +30,8 @@ const recentActivity = [
 ]
 
 export default function ScholarDashboard() {
+  const { user } = useAuth()
+
   return (
     <div className="animate-fade">
       {/* Topbar */}
@@ -36,7 +39,7 @@ export default function ScholarDashboard() {
         <div>
           <div className="topbar-title">My Dashboard</div>
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-            Welcome back, Rahul! Here's your PhD journey at a glance.
+            Welcome back, {user?.name?.split(' ')[0] || 'Scholar'}! Here's your PhD journey at a glance.
           </span>
         </div>
         <div className="topbar-actions">
@@ -73,9 +76,9 @@ export default function ScholarDashboard() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               {[
-                { label: 'Supervisor', value: 'Dr. Priya Kumar' },
-                { label: 'Department', value: 'Computer Science' },
-                { label: 'Registration', value: 'PhD/2021/CS/042' },
+                { label: 'Supervisor', value: user?.assignedSupervisor || 'Not Assigned' },
+                { label: 'Department', value: user?.dept || 'Not Assigned' },
+                { label: 'Registration', value: user?.registrationNumber || 'Not Assigned' },
                 { label: 'Expected Completion', value: 'Dec 2024' },
               ].map((item, i) => (
                 <div key={i} style={{ background: 'rgba(255,255,255,0.07)', borderRadius: 'var(--radius-md)', padding: '12px 16px', minWidth: '160px' }}>
