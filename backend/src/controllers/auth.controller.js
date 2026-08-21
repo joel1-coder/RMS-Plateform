@@ -32,7 +32,9 @@ const login = asyncHandler(async (req, res) => {
       email: user.email,
       name: user.name,
       role: user.role,
-      dept: user.dept
+      dept: user.dept,
+      isProfileCompleted: user.isProfileCompleted,
+      profile: user.profile
     }
   });
 });

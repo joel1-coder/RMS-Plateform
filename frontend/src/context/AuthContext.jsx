@@ -27,6 +27,14 @@ export function AuthProvider({ children }) {
     localStorage.setItem('rms_user', JSON.stringify(userData))
   }
 
+  const updateUser = (newUserData) => {
+    setUser(prev => {
+      const updated = { ...prev, ...newUserData };
+      localStorage.setItem('rms_user', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const logout = () => {
     setUser(null)
     setIsAuthenticated(false)
@@ -41,7 +49,7 @@ export function AuthProvider({ children }) {
   )
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

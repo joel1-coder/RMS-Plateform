@@ -1,42 +1,95 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
+import { useAuth } from '../../context/AuthContext'
+import { apiFetch } from '../../utils/api'
 
 export default function ScholarProfile() {
+  const { user, updateUser } = useAuth()
   const [editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(true)
+  
   const [profile, setProfile] = useState({
-    name: 'Rahul Sharma',
-    regNo: 'PhD/2021/CS/042',
-    email: 'rahul@rms.edu',
-    phone: '+91 98765 43210',
-    dept: 'Computer Science',
-    batch: '2021',
-    category: 'Full Time',
-    area: 'Artificial Intelligence & Machine Learning',
-    address: '12, Green Avenue, Tech City - 560001',
-    dob: '1995-06-15',
-    gender: 'Male',
-    nationality: 'Indian',
-    aadhaar: 'XXXX-XXXX-4567',
-    qualification: 'M.Tech (CSE) - NIT Trichy, 2019',
-    experience: '2 years industry experience at TCS',
+    name: '', regNo: '', email: '', phone: '', dept: '', batch: '', category: '', 
+    area: '', address: '', dob: '', gender: '', nationality: '', aadhaar: '', 
+    qualification: '', experience: '',
   })
   const [form, setForm] = useState(profile)
+  
+  const [supervisorDetails, setSupervisorDetails] = useState({
+    name: 'Not Assigned', designation: '—', dept: '—', email: '—', specialization: '—'
+  })
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
-  const handleSave = () => {
-    setProfile(form)
-    setEditing(false)
-    toast.success('Profile updated successfully!')
+  useEffect(() => {
+    fetchProfile()
+  }, [])
+
+  const fetchProfile = async () => {
+    try {
+      const res = await apiFetch('/api/users/me', { 
+        headers: { Authorization: `Bearer ${localStorage.getItem('rms_token')}` } 
+      })
+      if (res.ok) {
+        const data = await res.json()
+        const p = data.profile || {}
+        const newProfile = {
+          name: data.name || '',
+          email: data.email || '',
+          dept: data.dept || '',
+          regNo: p.regNo || '',
+          phone: p.phone || '',
+          batch: p.batch || '',
+          category: p.category || '',
+          area: p.area || '',
+          address: p.address || '',
+          dob: p.dob || '',
+          gender: p.gender || '',
+          nationality: p.nationality || '',
+          aadhaar: p.aadhaar || '',
+          qualification: p.qualification || '',
+          experience: p.experience || '',
+        }
+        setProfile(newProfile)
+        setForm(newProfile)
+
+        if (data.assignedSupervisorId) {
+          const sup = data.assignedSupervisorId
+          setSupervisorDetails({
+            name: sup.name,
+            designation: 'Supervisor', 
+            dept: sup.dept,
+            email: sup.email,
+            specialization: sup.profile?.specialization || 'Not specified',
+          })
+        }
+      }
+    } catch (err) {
+      toast.error('Failed to load profile')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const supervisorDetails = {
-    name: 'Dr. Priya Kumar',
-    designation: 'Associate Professor',
-    dept: 'Computer Science',
-    email: 'priya@rms.edu',
-    phone: '+91 98765 11111',
-    specialization: 'AI, Machine Learning, NLP',
-    scholars: 8,
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
+  
+  const handleSave = async () => {
+    try {
+      const res = await apiFetch('/api/users/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('rms_token')}`
+        },
+        body: JSON.stringify(form)
+      })
+      if (!res.ok) throw new Error('Update failed')
+      
+      setProfile(form)
+      setEditing(false)
+      updateUser({ isProfileCompleted: true, name: form.name })
+      toast.success('Profile updated successfully!')
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
   const Field = ({ label, name, type = 'text', readOnly = false }) => (
@@ -49,6 +102,12 @@ export default function ScholarProfile() {
           {profile[name] || '—'}
         </div>
       )}
+    </div>
+  )
+
+  if (loading) return (
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'60vh' }}>
+      <div className="spinner" style={{ borderColor:'rgba(16,185,129,0.3)', borderTopColor:'#10B981' }} />
     </div>
   )
 
@@ -83,7 +142,7 @@ export default function ScholarProfile() {
                 fontSize: '34px', fontWeight: 800, color: '#fff',
                 boxShadow: '0 8px 24px rgba(16,185,129,0.35)',
               }}>
-                {profile.name.charAt(0)}
+                {profile.name ? profile.name.charAt(0).toUpperCase() : 'U'}
               </div>
               <div style={{ fontWeight: 800, fontSize: '17px', marginBottom: '4px' }}>{profile.name}</div>
               <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '12px' }}>{profile.regNo}</div>
@@ -145,7 +204,7 @@ export default function ScholarProfile() {
                   <Field label="Date of Birth" name="dob" type="date" />
                   <Field label="Gender" name="gender" />
                   <Field label="Nationality" name="nationality" />
-                  <Field label="Email Address" name="email" type="email" />
+                  <Field label="Email Address" name="email" type="email" readOnly />
                   <Field label="Phone Number" name="phone" />
                   <Field label="Aadhaar No." name="aadhaar" />
                   <div className="form-group" style={{ gridColumn: '1/-1' }}>

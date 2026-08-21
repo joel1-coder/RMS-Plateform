@@ -87,7 +87,21 @@ export default function LoginPage() {
       // Update Context
       login(data.user)
       toast.success(`Welcome back, ${data.user.name.split(' ').pop()}!`)
-      navigate(`/${selectedRole.toLowerCase()}`)
+      
+      if (selectedRole.toLowerCase() === 'scholar' && !data.user.isProfileCompleted) {
+        toast.custom((t) => (
+          <div style={{ background: '#3B82F6', color: '#fff', padding: '12px 20px', borderRadius: '8px', display: 'flex', gap: '10px', alignItems: 'center', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)' }}>
+            <span style={{ fontSize: '20px' }}>👋</span>
+            <div>
+              <div style={{ fontWeight: 600 }}>Welcome to RMS!</div>
+              <div style={{ fontSize: '13px', opacity: 0.9 }}>Please fill in your details in My Profile first.</div>
+            </div>
+          </div>
+        ), { duration: 5000 });
+        navigate('/scholar/profile')
+      } else {
+        navigate(`/${selectedRole.toLowerCase()}`)
+      }
     } catch (err) {
       toast.error(err.message)
     } finally {

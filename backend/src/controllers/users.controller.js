@@ -25,6 +25,51 @@ const listUsers = asyncHandler(async (req, res) => {
   res.json(users.map(u => u.toPublicJSON({ includePassword: isAdmin })));
 });
 
+const getMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).populate('assignedSupervisorId', 'name email dept role profile');
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  res.json(user.toPublicJSON());
+});
+
+const updateMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  // Allow updating specific fields
+  const allowedFields = ['name', 'phone', 'dob', 'gender', 'nationality', 'aadhaar', 'address', 'qualification', 'experience', 'regNo', 'batch', 'category', 'area'];
+  
+  // Initialize profile if undefined
+  if (!user.profile) user.profile = {};
+
+  allowedFields.forEach(field => {
+    if (req.body[field] !== undefined) {
+      if (['name'].includes(field)) {
+        user[field] = req.body[field];
+      } else {
+        user.profile[field] = req.body[field];
+      }
+    }
+  });
+
+  user.isProfileCompleted = true;
+  await user.save();
+
+  await logAudit({
+    user: user.name,
+    action: 'Profile Updated',
+    detail: 'User updated their profile',
+    severity: 'Info'
+  });
+
+  // Populate supervisor for the return payload
+  await user.populate('assignedSupervisorId', 'name email dept role profile');
+  res.json(user.toPublicJSON());
+});
+
 const createUser = asyncHandler(async (req, res) => {
   const email = req.body.email?.toLowerCase();
   const exists = await User.exists({ email });
@@ -187,5 +232,7 @@ module.exports = {
   updateUser,
   deleteUser,
   assignSupervisor,
-  unassignSupervisor
+  unassignSupervisor,
+  getMe,
+  updateMe
 };

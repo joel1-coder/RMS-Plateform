@@ -16,7 +16,22 @@ const userSchema = new mongoose.Schema(
     status: { type: String, required: true, enum: ['Active', 'Inactive'], default: 'Active' },
     joined: { type: String, required: true },
     assignedSupervisor: { type: String, trim: true },
-    assignedSupervisorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    assignedSupervisorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    isProfileCompleted: { type: Boolean, default: false },
+    profile: {
+      regNo: { type: String, trim: true },
+      phone: { type: String, trim: true },
+      batch: { type: String, trim: true },
+      category: { type: String, trim: true },
+      area: { type: String, trim: true },
+      address: { type: String, trim: true },
+      dob: { type: String, trim: true },
+      gender: { type: String, trim: true },
+      nationality: { type: String, trim: true },
+      aadhaar: { type: String, trim: true },
+      qualification: { type: String, trim: true },
+      experience: { type: String, trim: true }
+    }
   },
   { timestamps: true }
 );
