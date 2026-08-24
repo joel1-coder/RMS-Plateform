@@ -17,6 +17,8 @@ import VivaVoce from './pages/admin/VivaVoce'
 import ResearchManagement from './pages/admin/ResearchManagement'
 import DRCManagement from './pages/admin/DRCManagement'
 import AssignScholar from './pages/admin/AssignScholar'
+import AcceptingRegistration from './pages/admin/AcceptingRegistration'
+import ScholarManagement from './pages/admin/ScholarManagement'
 
 // Pages - Scholar
 import ScholarLayout from './layouts/ScholarLayout'
@@ -117,6 +119,8 @@ function AppRoutes() {
         <Route path="research" element={<ResearchManagement />} />
         <Route path="drc" element={<DRCManagement />} />
         <Route path="assign" element={<AssignScholar />} />
+        <Route path="accepting-registration" element={<AcceptingRegistration />} />
+        <Route path="scholar-management" element={<ScholarManagement />} />
       </Route>
 
       {/* Scholar Routes */}

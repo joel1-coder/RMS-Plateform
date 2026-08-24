@@ -1,7 +1,9 @@
 const TestAccount = require('../models/TestAccount.model');
 const User = require('../models/User.model');
+const RegistrationSubmission = require('../models/RegistrationSubmission.model');
 const { AppError, asyncHandler } = require('../middlewares/errorHandler');
 const { signToken } = require('./auth.controller');
+const { sendTestCredentials } = require('../services/emailService');
 
 /**
  * POST /api/test-accounts/login
@@ -28,7 +30,7 @@ const testLogin = asyncHandler(async (req, res) => {
     throw new AppError('This test account has expired. Please contact the Admin.', 401);
   }
 
-  // Plain-text password comparison (intentionally simple for test accounts)
+  // Plain-text password comparison
   if (account.testPassword !== testPassword.trim()) {
     throw new AppError('Incorrect test password', 401);
   }
@@ -51,6 +53,7 @@ const testLogin = asyncHandler(async (req, res) => {
       assignedSupervisor: scholar.assignedSupervisor,
       assignedSupervisorId: scholar.assignedSupervisorId,
       isTestAccount: true,
+      testAccountId: account._id,
       testLabel: account.label,
     },
   });
@@ -70,10 +73,14 @@ const listTestAccounts = asyncHandler(async (req, res) => {
 
 /**
  * POST /api/test-accounts
- * Admin only — create a new test account.
+ * Admin only — create a new test account and auto-email credentials.
  */
 const createTestAccount = asyncHandler(async (req, res) => {
   const { testId, testPassword, scholarId, label, expiresAt } = req.body;
+
+  if (!expiresAt) {
+    throw new AppError('Expiry date is required for all test accounts', 400);
+  }
 
   // Verify scholar exists
   const scholar = await User.findById(scholarId);
@@ -86,11 +93,26 @@ const createTestAccount = asyncHandler(async (req, res) => {
     testPassword: testPassword.trim(),
     scholarId,
     label: label || '',
-    expiresAt: expiresAt || null,
+    expiresAt,
     createdBy: req.user.id,
   });
 
-  res.status(201).json({ message: 'Test account created', data: account });
+  // Auto-send credentials to the scholar's email (non-blocking)
+  sendTestCredentials({
+    to: scholar.email,
+    name: scholar.name,
+    testId: account.testId,
+    testPassword: account.testPassword,
+    expiresAt: account.expiresAt,
+    label: account.label,
+  }).catch(err => {
+    console.error('[TestAccount] Email send failed:', err.message);
+  });
+
+  res.status(201).json({
+    message: `Test account created. Credentials auto-sent to ${scholar.email}`,
+    data: account,
+  });
 });
 
 /**
@@ -117,4 +139,95 @@ const deleteTestAccount = asyncHandler(async (req, res) => {
   res.json({ message: 'Test account deleted' });
 });
 
-module.exports = { testLogin, listTestAccounts, createTestAccount, revokeTestAccount, deleteTestAccount };
+/* ─── Registration Submissions ─────────────────────────────────── */
+
+/**
+ * POST /api/test-accounts/submit-registration
+ * Scholar (test account) — submit their filled registration form.
+ */
+const submitRegistration = asyncHandler(async (req, res) => {
+  const { testAccountId, formData } = req.body;
+  const scholarId = req.user.id;
+
+  // Upsert: one submission per scholar
+  const existing = await RegistrationSubmission.findOne({ scholarId });
+  if (existing) {
+    existing.formData = formData;
+    existing.status = 'Pending';
+    existing.testAccountId = testAccountId;
+    await existing.save();
+    return res.json({ message: 'Registration updated successfully', data: existing });
+  }
+
+  const submission = await RegistrationSubmission.create({
+    scholarId,
+    testAccountId,
+    formData,
+    status: 'Pending',
+  });
+
+  res.status(201).json({ message: 'Registration submitted successfully', data: submission });
+});
+
+/**
+ * GET /api/test-accounts/registrations
+ * Admin only — list all pending/submitted registrations.
+ */
+const listRegistrations = asyncHandler(async (req, res) => {
+  const submissions = await RegistrationSubmission.find()
+    .populate('scholarId', 'name email dept assignedSupervisor')
+    .sort({ createdAt: -1 });
+  res.json({ data: submissions });
+});
+
+/**
+ * PATCH /api/test-accounts/registrations/:id/approve
+ * Admin only — approve a registration submission.
+ */
+const approveRegistration = asyncHandler(async (req, res) => {
+  const submission = await RegistrationSubmission.findByIdAndUpdate(
+    req.params.id,
+    { status: 'Approved', approvedAt: new Date(), approvedBy: req.user.id },
+    { new: true }
+  ).populate('scholarId', 'name email dept');
+  if (!submission) throw new AppError('Submission not found', 404);
+  res.json({ message: 'Registration approved', data: submission });
+});
+
+/**
+ * PATCH /api/test-accounts/registrations/:id/reject
+ * Admin only — reject a registration submission.
+ */
+const rejectRegistration = asyncHandler(async (req, res) => {
+  const { reason } = req.body;
+  const submission = await RegistrationSubmission.findByIdAndUpdate(
+    req.params.id,
+    { status: 'Rejected', rejectionReason: reason || '', approvedAt: new Date() },
+    { new: true }
+  ).populate('scholarId', 'name email dept');
+  if (!submission) throw new AppError('Submission not found', 404);
+  res.json({ message: 'Registration rejected', data: submission });
+});
+
+/**
+ * GET /api/test-accounts/my-registration
+ * Scholar (authenticated) — get their own registration submission.
+ */
+const getMyRegistration = asyncHandler(async (req, res) => {
+  const scholarId = req.user.id;
+  const submission = await RegistrationSubmission.findOne({ scholarId });
+  res.json({ data: submission || null });
+});
+
+module.exports = {
+  testLogin,
+  listTestAccounts,
+  createTestAccount,
+  revokeTestAccount,
+  deleteTestAccount,
+  submitRegistration,
+  listRegistrations,
+  approveRegistration,
+  rejectRegistration,
+  getMyRegistration,
+};

@@ -5,6 +5,8 @@ import toast from 'react-hot-toast'
 const NAV_ITEMS = [
   { to: '/admin', label: 'Dashboard', icon: '🏠', exact: true, section: 'OVERVIEW' },
   { to: '/admin/users', label: 'User Management', icon: '👥', section: 'MANAGEMENT' },
+  { to: '/admin/accepting-registration', label: 'Accepting Registration', icon: '📥', section: 'MANAGEMENT' },
+  { to: '/admin/scholar-management', label: 'Scholar Management', icon: '🎓', section: 'MANAGEMENT' },
   { to: '/admin/research', label: 'Research', icon: '🔬', section: 'MANAGEMENT' },
   { to: '/admin/viva', label: 'Viva Voce', icon: '🎓', section: 'MANAGEMENT' },
   { to: '/admin/assign', label: 'Assign Scholar', icon: '🧑‍🎓', section: 'MANAGEMENT' },

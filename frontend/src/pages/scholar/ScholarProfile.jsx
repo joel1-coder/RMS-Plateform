@@ -14,6 +14,7 @@ export default function ScholarProfile() {
     qualification: '', experience: '',
   })
   const [form, setForm] = useState(profile)
+  const [submission, setSubmission] = useState(null)
   
   const [supervisorDetails, setSupervisorDetails] = useState({
     name: 'Not Assigned', designation: '—', dept: '—', email: '—', specialization: '—'
@@ -21,7 +22,22 @@ export default function ScholarProfile() {
 
   useEffect(() => {
     fetchProfile()
+    if (user?.isTestAccount) {
+      fetchSubmissionStatus()
+    }
   }, [])
+
+  const fetchSubmissionStatus = async () => {
+    try {
+      const res = await apiFetch('/api/test-accounts/my-registration', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('rms_token')}` }
+      })
+      if (res.ok) {
+        const d = await res.json()
+        setSubmission(d.data)
+      }
+    } catch {}
+  }
 
   const fetchProfile = async () => {
     try {
@@ -92,6 +108,28 @@ export default function ScholarProfile() {
     }
   }
 
+  const handleSubmitRegistration = async () => {
+    try {
+      const res = await apiFetch('/api/test-accounts/submit-registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('rms_token')}`
+        },
+        body: JSON.stringify({
+          testAccountId: user.testAccountId,
+          formData: form
+        })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Submission failed')
+      toast.success('Registration details submitted to Admin!')
+      fetchSubmissionStatus()
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }
+
   const Field = ({ label, name, type = 'text', readOnly = false }) => (
     <div className="form-group">
       <label className="form-label">{label}</label>
@@ -118,7 +156,17 @@ export default function ScholarProfile() {
           <div className="topbar-title">My Profile</div>
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Manage your personal and academic details</span>
         </div>
-        <div className="topbar-actions">
+        <div className="topbar-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {user?.isTestAccount && (
+            <button 
+              className="btn btn-primary btn-sm" 
+              style={{ background: 'linear-gradient(90deg,#1e3a5f,#2563EB)' }} 
+              onClick={handleSubmitRegistration}
+              disabled={submission?.status === 'Pending' || submission?.status === 'Approved'}
+            >
+              🚀 {submission?.status === 'Pending' ? 'Submission Pending' : submission?.status === 'Approved' ? 'Approved' : 'Submit Registration to Admin'}
+            </button>
+          )}
           {editing ? (
             <>
               <button className="btn btn-ghost btn-sm" onClick={() => { setEditing(false); setForm(profile) }}>✕ Cancel</button>
@@ -131,6 +179,31 @@ export default function ScholarProfile() {
       </div>
 
       <div className="page-body">
+        {user?.isTestAccount && (
+          <div style={{
+            background: submission?.status === 'Approved' ? '#DEF7EC' : submission?.status === 'Pending' ? '#EBF5FF' : submission?.status === 'Rejected' ? '#FDE8E8' : '#FEF3C7',
+            border: `1px solid ${submission?.status === 'Approved' ? '#BCF0DA' : submission?.status === 'Pending' ? '#C3DDFD' : submission?.status === 'Rejected' ? '#F8B4B4' : '#FCD34D'}`,
+            color: submission?.status === 'Approved' ? '#03543F' : submission?.status === 'Pending' ? '#1E429F' : submission?.status === 'Rejected' ? '#9B1C1C' : '#92400E',
+            borderRadius: '12px', padding: '16px 20px', marginBottom: '20px',
+            display: 'flex', gap: '12px', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            width: '100%'
+          }}>
+            <span style={{ fontSize: '20px' }}>
+              {submission?.status === 'Approved' ? '🎉' : submission?.status === 'Pending' ? '⏳' : submission?.status === 'Rejected' ? '❌' : '🧪'}
+            </span>
+            <div>
+              <div style={{ fontWeight: 700 }}>
+                {submission?.status === 'Approved' ? 'Registration Approved!' : submission?.status === 'Pending' ? 'Registration Pending Review' : submission?.status === 'Rejected' ? 'Registration Rejected' : 'Test Login Mode'}
+              </div>
+              <div style={{ fontSize: '13px', marginTop: '2px', opacity: 0.9 }}>
+                {submission?.status === 'Approved' && 'Your registration details have been verified and approved by the Administrator.'}
+                {submission?.status === 'Pending' && 'Your details are with the Administrator for approval. You can view the status here.'}
+                {submission?.status === 'Rejected' && `Rejection Reason: ${submission.rejectionReason || 'No reason provided'}. Please correct your details and re-submit.`}
+                {!submission && 'Please complete all fields in your profile and click "Submit Registration to Admin" to proceed.'}
+              </div>
+            </div>
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '20px', alignItems: 'start' }}>
           {/* Profile Card */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

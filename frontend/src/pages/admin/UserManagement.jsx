@@ -126,8 +126,8 @@ function TestAccountsPanel({ scholars }) {
 
   const handleCreate = async (e) => {
     e.preventDefault()
-    if (!form.testId || !form.testPassword || !form.scholarId) {
-      toast.error('Test ID, Password, and Scholar are required')
+    if (!form.testId || !form.testPassword || !form.scholarId || !form.expiresAt) {
+      toast.error('Test ID, Password, Scholar, and Expiry Date are required')
       return
     }
     setCreating(true)
@@ -136,7 +136,7 @@ function TestAccountsPanel({ scholars }) {
       const res = await apiFetch('/api/test-accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ ...form, expiresAt: form.expiresAt || null }),
+        body: JSON.stringify({ ...form }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Failed to create')
@@ -222,9 +222,9 @@ function TestAccountsPanel({ scholars }) {
                 value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} />
             </div>
             <div className="form-group">
-              <label className="form-label">Expires On (optional)</label>
+              <label className="form-label">Expires On *</label>
               <input type="date" className="form-control"
-                value={form.expiresAt} onChange={e => setForm({ ...form, expiresAt: e.target.value })} />
+                value={form.expiresAt} onChange={e => setForm({ ...form, expiresAt: e.target.value })} required />
             </div>
           </div>
           <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
