@@ -1,4 +1,4 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
@@ -103,6 +103,204 @@ function UserModal({ onClose, onSave, userToEdit = null }) {
   )
 }
 
+/* ─── Test Accounts Sub-Component ────────────────────────────────── */
+function TestAccountsPanel({ scholars }) {
+  const [accounts, setAccounts] = useState([])
+  const [loadingAcc, setLoadingAcc] = useState(true)
+  const [showCreate, setShowCreate] = useState(false)
+  const [form, setForm] = useState({ testId: '', testPassword: '', scholarId: '', label: '', expiresAt: '' })
+  const [creating, setCreating] = useState(false)
+
+  const fetchAccounts = async () => {
+    setLoadingAcc(true)
+    try {
+      const token = localStorage.getItem('rms_token')
+      const res = await apiFetch('/api/test-accounts', { headers: { 'Authorization': `Bearer ${token}` } })
+      const data = await res.json()
+      setAccounts(data.data || [])
+    } catch { toast.error('Failed to load test accounts') }
+    finally { setLoadingAcc(false) }
+  }
+
+  useEffect(() => { fetchAccounts() }, [])
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    if (!form.testId || !form.testPassword || !form.scholarId) {
+      toast.error('Test ID, Password, and Scholar are required')
+      return
+    }
+    setCreating(true)
+    try {
+      const token = localStorage.getItem('rms_token')
+      const res = await apiFetch('/api/test-accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ ...form, expiresAt: form.expiresAt || null }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Failed to create')
+      toast.success('Test account created!')
+      setShowCreate(false)
+      setForm({ testId: '', testPassword: '', scholarId: '', label: '', expiresAt: '' })
+      fetchAccounts()
+    } catch (err) { toast.error(err.message) }
+    finally { setCreating(false) }
+  }
+
+  const handleRevoke = async (id) => {
+    const token = localStorage.getItem('rms_token')
+    try {
+      const res = await apiFetch(`/api/test-accounts/${id}/revoke`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } })
+      if (!res.ok) throw new Error('Failed to revoke')
+      toast.success('Test account revoked')
+      fetchAccounts()
+    } catch { toast.error('Failed to revoke') }
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this test account permanently?')) return
+    const token = localStorage.getItem('rms_token')
+    try {
+      const res = await apiFetch(`/api/test-accounts/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+      if (!res.ok) throw new Error('Failed to delete')
+      toast.success('Test account deleted')
+      fetchAccounts()
+    } catch { toast.error('Failed to delete') }
+  }
+
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: '15px' }}>Test Accounts for Scholar Registration</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '3px' }}>
+            Issue temporary test credentials so evaluators can log in as a scholar without a full account
+          </div>
+        </div>
+        <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#1e3a5f,#2563EB)' }}
+          onClick={() => setShowCreate(!showCreate)} id="create-test-account-btn">
+          {showCreate ? '✕ Cancel' : '＋ Create Test Account'}
+        </button>
+      </div>
+
+      {/* Create Form */}
+      {showCreate && (
+        <form onSubmit={handleCreate} style={{
+          background: '#F0F7FF', border: '1.5px solid #BFDBFE',
+          borderRadius: '12px', padding: '20px 24px', marginBottom: '20px',
+        }}>
+          <div style={{ fontWeight: 600, marginBottom: '14px', color: '#1e3a5f', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>🧪</span> New Test Account
+          </div>
+          <div className="grid-2" style={{ gap: '14px' }}>
+            <div className="form-group">
+              <label className="form-label">Test User ID *</label>
+              <input className="form-control" placeholder="e.g. TEST-001"
+                value={form.testId} onChange={e => setForm({ ...form, testId: e.target.value.toUpperCase() })}
+                style={{ fontFamily: 'monospace', textTransform: 'uppercase' }} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Test Password *</label>
+              <input className="form-control" placeholder="Set a password"
+                value={form.testPassword} onChange={e => setForm({ ...form, testPassword: e.target.value })} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Linked Scholar *</label>
+              <select className="form-control form-select"
+                value={form.scholarId} onChange={e => setForm({ ...form, scholarId: e.target.value })} required>
+                <option value="">-- Select Scholar --</option>
+                {scholars.map(s => (
+                  <option key={s.id || s._id} value={s.id || s._id}>{s.name} ({s.dept})</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Label (optional)</label>
+              <input className="form-control" placeholder="e.g. Board Evaluation Jan 2025"
+                value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Expires On (optional)</label>
+              <input type="date" className="form-control"
+                value={form.expiresAt} onChange={e => setForm({ ...form, expiresAt: e.target.value })} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#1e3a5f,#2563EB)' }} disabled={creating}>
+              {creating ? 'Creating...' : '✓ Create Account'}
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={() => setShowCreate(false)}>Cancel</button>
+          </div>
+        </form>
+      )}
+
+      {/* Table */}
+      {loadingAcc ? (
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Loading test accounts...</div>
+      ) : accounts.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '48px 20px' }}>
+          <div style={{ fontSize: '40px', marginBottom: '12px' }}>🧪</div>
+          <div style={{ fontWeight: 600, marginBottom: '6px' }}>No Test Accounts Yet</div>
+          <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Click "Create Test Account" above to issue the first one.</div>
+        </div>
+      ) : (
+        <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Test ID</th>
+                <th>Password</th>
+                <th>Linked Scholar</th>
+                <th>Label</th>
+                <th>Expires</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {accounts.map((acc, i) => (
+                <tr key={acc._id}>
+                  <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
+                  <td><code style={{ background: '#EFF6FF', padding: '2px 8px', borderRadius: '6px', color: '#1D4ED8', fontWeight: 700 }}>{acc.testId}</code></td>
+                  <td><code style={{ fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-secondary)' }}>{acc.testPassword}</code></td>
+                  <td>
+                    <div style={{ fontWeight: 600, fontSize: '13px' }}>{acc.scholarId?.name || '—'}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{acc.scholarId?.dept}</div>
+                  </td>
+                  <td style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{acc.label || '—'}</td>
+                  <td style={{ fontSize: '12px', color: acc.expiresAt && new Date(acc.expiresAt) < new Date() ? '#EF4444' : 'var(--text-secondary)' }}>
+                    {acc.expiresAt ? new Date(acc.expiresAt).toLocaleDateString('en-IN') : 'Never'}
+                  </td>
+                  <td>
+                    <span className={`badge ${acc.status === 'Active' ? 'badge-success' : 'badge-gray'}`}>{acc.status}</span>
+                  </td>
+                  <td style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                    {new Date(acc.createdAt).toLocaleDateString('en-IN')}
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {acc.status === 'Active' && (
+                        <button className="btn btn-ghost btn-sm" style={{ color: '#F59E0B' }}
+                          onClick={() => handleRevoke(acc._id)} title="Revoke">⛔</button>
+                      )}
+                      <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }}
+                        onClick={() => handleDelete(acc._id)} title="Delete">🗑️</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function UserManagement() {
   const [users, setUsers] = useState([])
   const [search, setSearch] = useState('')
@@ -111,6 +309,7 @@ export default function UserManagement() {
   const [showModal, setShowModal] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('users')
 
   const abortRef = useRef(null)
 
@@ -268,13 +467,40 @@ export default function UserManagement() {
           </span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #6C63FF, #4F46E5)' }} onClick={() => setShowModal(true)} id="add-user-btn">
-            ＋ Add User
-          </button>
+          {activeTab === 'users' && (
+            <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #6C63FF, #4F46E5)' }} onClick={() => setShowModal(true)} id="add-user-btn">
+              ＋ Add User
+            </button>
+          )}
         </div>
       </div>
 
       <div className="page-body">
+        {/* Tab Switcher */}
+        <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', background: '#F3F4F6', borderRadius: '10px', padding: '4px', width: 'fit-content' }}>
+          {[
+            { key: 'users', label: '👥 All Users' },
+            { key: 'test', label: '🧪 Test Accounts' },
+          ].map(tab => (
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+              style={{
+                padding: '8px 18px', border: 'none', borderRadius: '8px', cursor: 'pointer',
+                fontWeight: 600, fontSize: '13px', transition: 'all 0.2s',
+                background: activeTab === tab.key ? '#fff' : 'transparent',
+                color: activeTab === tab.key ? 'var(--primary)' : 'var(--text-secondary)',
+                boxShadow: activeTab === tab.key ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
+              }}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'test' ? (
+          <div className="card" style={{ padding: '24px' }}>
+            <TestAccountsPanel scholars={users.filter(u => u.role?.toLowerCase() === 'scholar')} />
+          </div>
+        ) : (
+        <>
         {/* Summary Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
@@ -409,6 +635,8 @@ export default function UserManagement() {
             <button className="page-btn active">1</button>
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   )
