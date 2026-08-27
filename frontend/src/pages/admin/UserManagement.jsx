@@ -1,6 +1,7 @@
 import { apiFetch } from '../../utils/api'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
+import AppIcon from '../../components/AppIcon'
 
 const ROLES = ['All', 'Admin', 'Supervisor', 'Scholar', 'HOD', 'DRC', 'Librarian']
 const STATUSES = ['All', 'Active', 'Inactive']
@@ -241,7 +242,7 @@ function TestAccountsPanel({ scholars }) {
         <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Loading test accounts...</div>
       ) : accounts.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '48px 20px' }}>
-          <div style={{ fontSize: '40px', marginBottom: '12px' }}></div>
+          <div style={{ marginBottom: '12px', color: '#174EA6' }}><AppIcon name="users" size={40} /></div>
           <div style={{ fontWeight: 600, marginBottom: '6px' }}>No Test Accounts Yet</div>
           <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Click "Create Test Account" above to issue the first one.</div>
         </div>
@@ -285,10 +286,10 @@ function TestAccountsPanel({ scholars }) {
                     <div style={{ display: 'flex', gap: '6px' }}>
                       {acc.status === 'Active' && (
                         <button className="btn btn-ghost btn-sm" style={{ color: '#C89B1E' }}
-                          onClick={() => handleRevoke(acc._id)} title="Revoke"></button>
+                          onClick={() => handleRevoke(acc._id)} title="Revoke"><AppIcon name="x" size={16} /></button>
                       )}
                       <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }}
-                        onClick={() => handleDelete(acc._id)} title="Delete"></button>
+                        onClick={() => handleDelete(acc._id)} title="Delete"><AppIcon name="trash" size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -613,13 +614,13 @@ export default function UserManagement() {
                             className="btn btn-secondary btn-sm" 
                             onClick={() => setEditingUser(user)}
                             title="Edit"
-                          ></button>
+                          ><AppIcon name="edit" size={16} /></button>
                           <button
                             className="btn btn-ghost btn-sm"
                             style={{ color: '#B4232A' }}
                             onClick={() => handleDelete(user.id || user._id)}
                             title="Delete"
-                          ></button>
+                          ><AppIcon name="trash" size={16} /></button>
                         </div>
                       </td>
                     </tr>

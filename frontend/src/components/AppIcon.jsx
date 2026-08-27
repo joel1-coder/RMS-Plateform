@@ -66,6 +66,7 @@ const icons = {
   users: Users,
   x: X,
   dashboard: LayoutDashboard,
+  trash: Trash2,
 }
 
 export default function AppIcon({ name = 'file', size = 18, strokeWidth = 2, className = '', ...props }) {
