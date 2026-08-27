@@ -51,8 +51,8 @@ export default function AuditLog() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Track all system actions and events</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm" onClick={() => toast.success('CSV export generated successfully')}>📥 Export CSV</button>
-          <button className="btn btn-primary btn-sm" onClick={() => fetchLogs(filterSeverity, search)}>🔄 Refresh</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => toast.success('CSV export generated successfully')}> Export CSV</button>
+          <button className="btn btn-primary btn-sm" onClick={() => fetchLogs(filterSeverity, search)}> Refresh</button>
         </div>
       </div>
 
@@ -60,10 +60,10 @@ export default function AuditLog() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Events', value: logs.length, icon: '📋', color: 'purple' },
-            { label: 'Critical Events', value: logs.filter(l => l.severity === 'Critical').length, icon: '🚨', color: 'red' },
-            { label: 'Warnings', value: logs.filter(l => l.severity === 'Warning').length, icon: '⚠️', color: 'orange' },
-            { label: 'Success Actions', value: logs.filter(l => l.severity === 'Success').length, icon: '✅', color: 'green' },
+            { label: 'Total Events', value: logs.length, icon: '', color: 'blue' },
+            { label: 'Critical Events', value: logs.filter(l => l.severity === 'Critical').length, icon: '', color: 'red' },
+            { label: 'Warnings', value: logs.filter(l => l.severity === 'Warning').length, icon: '', color: 'orange' },
+            { label: 'Success Actions', value: logs.filter(l => l.severity === 'Success').length, icon: '', color: 'green' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -78,7 +78,7 @@ export default function AuditLog() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search logs..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <select className="form-control form-select" style={{ width: '150px' }} value={filterSeverity} onChange={e => setFilterSeverity(e.target.value)}>
@@ -111,7 +111,7 @@ export default function AuditLog() {
                       <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div className="avatar avatar-sm" style={{ background: '#6C63FF' }}>{log.user?.charAt(0) || 'S'}</div>
+                          <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{log.user?.charAt(0) || 'S'}</div>
                           <span style={{ fontWeight: 600, fontSize: '13px' }}>{log.user}</span>
                         </div>
                       </td>

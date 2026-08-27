@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 
 // Pages - Auth
 import LoginPage from './pages/LoginPage'
+import ScholarRegistration from './pages/ScholarRegistration'
+import LandingPage from './pages/LandingPage'
 
 // Pages - Admin
 import AdminLayout from './layouts/AdminLayout'
@@ -100,8 +102,11 @@ function AppRoutes() {
       <Route path="/" element={
         isAuthenticated && user?.role && ['admin', 'scholar', 'supervisor', 'hod', 'drc'].includes(user.role.toLowerCase()) 
           ? <Navigate to={`/${user.role.toLowerCase()}`} replace /> 
-          : <Navigate to="/login" replace />
+          : <LandingPage />
       } />
+
+      {/* Standalone Registration for Test Login users - no scholar layout */}
+      <Route path="/register" element={<ScholarRegistration />} />
 
       {/* Admin Routes */}
       <Route path="/admin" element={
@@ -194,6 +199,7 @@ function AppRoutes() {
         <Route index element={<DRCDashboard />} />
         <Route path="scholars" element={<DRCViewScholars />} />
         <Route path="synopsis" element={<DRCSynopsisApproval />} />
+        <Route path="committee" element={<CommitteeManagement />} />
         <Route path="meetings" element={<DRCMeetingManagement />} />
         <Route path="minutes" element={<MeetingMinutes />} />
         <Route path="reports" element={<DRCReports />} />
@@ -223,8 +229,8 @@ export default function App() {
               fontSize: '13.5px',
               fontWeight: '500',
             },
-            success: { iconTheme: { primary: '#10B981', secondary: '#fff' } },
-            error: { iconTheme: { primary: '#EF4444', secondary: '#fff' } },
+            success: { iconTheme: { primary: '#1E7D45', secondary: '#fff' } },
+            error: { iconTheme: { primary: '#B4232A', secondary: '#fff' } },
           }}
         />
       </AuthProvider>

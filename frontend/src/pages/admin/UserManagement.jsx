@@ -49,7 +49,7 @@ function UserModal({ onClose, onSave, userToEdit = null }) {
       <div className="modal">
         <div className="modal-header">
           <span className="modal-title">{userToEdit ? 'Edit User Details' : 'Add New User'}</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -93,7 +93,7 @@ function UserModal({ onClose, onSave, userToEdit = null }) {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #6C63FF, #4F46E5)' }}>
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #174EA6, #0A2A66)' }}>
               {userToEdit ? 'Save Changes' : 'Add User'}
             </button>
           </div>
@@ -103,7 +103,7 @@ function UserModal({ onClose, onSave, userToEdit = null }) {
   )
 }
 
-/* ─── Test Accounts Sub-Component ────────────────────────────────── */
+/* --- Test Accounts Sub-Component ---------------------------------- */
 function TestAccountsPanel({ scholars }) {
   const [accounts, setAccounts] = useState([])
   const [loadingAcc, setLoadingAcc] = useState(true)
@@ -179,20 +179,20 @@ function TestAccountsPanel({ scholars }) {
             Issue temporary test credentials so evaluators can log in as a scholar without a full account
           </div>
         </div>
-        <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#1e3a5f,#2563EB)' }}
+        <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#1e3a5f,#174EA6)' }}
           onClick={() => setShowCreate(!showCreate)} id="create-test-account-btn">
-          {showCreate ? '✕ Cancel' : '＋ Create Test Account'}
+          {showCreate ? ' Cancel' : '+ Create Test Account'}
         </button>
       </div>
 
       {/* Create Form */}
       {showCreate && (
         <form onSubmit={handleCreate} style={{
-          background: '#F0F7FF', border: '1.5px solid #BFDBFE',
+          background: '#F0F7FF', border: '1.5px solid #B9C9EA',
           borderRadius: '12px', padding: '20px 24px', marginBottom: '20px',
         }}>
           <div style={{ fontWeight: 600, marginBottom: '14px', color: '#1e3a5f', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>🧪</span> New Test Account
+            <span></span> New Test Account
           </div>
           <div className="grid-2" style={{ gap: '14px' }}>
             <div className="form-group">
@@ -228,8 +228,8 @@ function TestAccountsPanel({ scholars }) {
             </div>
           </div>
           <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#1e3a5f,#2563EB)' }} disabled={creating}>
-              {creating ? 'Creating...' : '✓ Create Account'}
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#1e3a5f,#174EA6)' }} disabled={creating}>
+              {creating ? 'Creating...' : ' Create Account'}
             </button>
             <button type="button" className="btn btn-ghost" onClick={() => setShowCreate(false)}>Cancel</button>
           </div>
@@ -241,7 +241,7 @@ function TestAccountsPanel({ scholars }) {
         <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Loading test accounts...</div>
       ) : accounts.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '48px 20px' }}>
-          <div style={{ fontSize: '40px', marginBottom: '12px' }}>🧪</div>
+          <div style={{ fontSize: '40px', marginBottom: '12px' }}></div>
           <div style={{ fontWeight: 600, marginBottom: '6px' }}>No Test Accounts Yet</div>
           <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Click "Create Test Account" above to issue the first one.</div>
         </div>
@@ -265,14 +265,14 @@ function TestAccountsPanel({ scholars }) {
               {accounts.map((acc, i) => (
                 <tr key={acc._id}>
                   <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
-                  <td><code style={{ background: '#EFF6FF', padding: '2px 8px', borderRadius: '6px', color: '#1D4ED8', fontWeight: 700 }}>{acc.testId}</code></td>
+                  <td><code style={{ background: '#F3F7FF', padding: '2px 8px', borderRadius: '6px', color: '#0A2A66', fontWeight: 700 }}>{acc.testId}</code></td>
                   <td><code style={{ fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-secondary)' }}>{acc.testPassword}</code></td>
                   <td>
-                    <div style={{ fontWeight: 600, fontSize: '13px' }}>{acc.scholarId?.name || '—'}</div>
+                    <div style={{ fontWeight: 600, fontSize: '13px' }}>{acc.scholarId?.name || '-'}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{acc.scholarId?.dept}</div>
                   </td>
-                  <td style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{acc.label || '—'}</td>
-                  <td style={{ fontSize: '12px', color: acc.expiresAt && new Date(acc.expiresAt) < new Date() ? '#EF4444' : 'var(--text-secondary)' }}>
+                  <td style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{acc.label || '-'}</td>
+                  <td style={{ fontSize: '12px', color: acc.expiresAt && new Date(acc.expiresAt) < new Date() ? '#B4232A' : 'var(--text-secondary)' }}>
                     {acc.expiresAt ? new Date(acc.expiresAt).toLocaleDateString('en-IN') : 'Never'}
                   </td>
                   <td>
@@ -284,11 +284,11 @@ function TestAccountsPanel({ scholars }) {
                   <td>
                     <div style={{ display: 'flex', gap: '6px' }}>
                       {acc.status === 'Active' && (
-                        <button className="btn btn-ghost btn-sm" style={{ color: '#F59E0B' }}
-                          onClick={() => handleRevoke(acc._id)} title="Revoke">⛔</button>
+                        <button className="btn btn-ghost btn-sm" style={{ color: '#C89B1E' }}
+                          onClick={() => handleRevoke(acc._id)} title="Revoke"></button>
                       )}
-                      <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }}
-                        onClick={() => handleDelete(acc._id)} title="Delete">🗑️</button>
+                      <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }}
+                        onClick={() => handleDelete(acc._id)} title="Delete"></button>
                     </div>
                   </td>
                 </tr>
@@ -468,8 +468,8 @@ export default function UserManagement() {
         </div>
         <div className="topbar-actions">
           {activeTab === 'users' && (
-            <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #6C63FF, #4F46E5)' }} onClick={() => setShowModal(true)} id="add-user-btn">
-              ＋ Add User
+            <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #174EA6, #0A2A66)' }} onClick={() => setShowModal(true)} id="add-user-btn">
+              + Add User
             </button>
           )}
         </div>
@@ -479,8 +479,8 @@ export default function UserManagement() {
         {/* Tab Switcher */}
         <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', background: '#F3F4F6', borderRadius: '10px', padding: '4px', width: 'fit-content' }}>
           {[
-            { key: 'users', label: '👥 All Users' },
-            { key: 'test', label: '🧪 Test Accounts' },
+            { key: 'users', label: ' All Users' },
+            { key: 'test', label: ' Test Accounts' },
           ].map(tab => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
               style={{
@@ -504,10 +504,10 @@ export default function UserManagement() {
         {/* Summary Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Users', value: users.length, icon: '👥', color: 'purple' },
-            { label: 'Active', value: users.filter(u => u.status === 'Active').length, icon: '✅', color: 'green' },
-            { label: 'Scholars', value: users.filter(u => u.role?.toLowerCase() === 'scholar').length, icon: '🎓', color: 'blue' },
-            { label: 'Supervisors', value: users.filter(u => u.role?.toLowerCase() === 'supervisor').length, icon: '👨‍🏫', color: 'orange' },
+            { label: 'Total Users', value: users.length, icon: '', color: 'blue' },
+            { label: 'Active', value: users.filter(u => u.status === 'Active').length, icon: '', color: 'green' },
+            { label: 'Scholars', value: users.filter(u => u.role?.toLowerCase() === 'scholar').length, icon: '', color: 'blue' },
+            { label: 'Supervisors', value: users.filter(u => u.role?.toLowerCase() === 'supervisor').length, icon: '', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -523,7 +523,7 @@ export default function UserManagement() {
           {/* Filter Bar */}
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input
                 className="form-control"
                 placeholder="Search by name, email..."
@@ -584,15 +584,15 @@ export default function UserManagement() {
                       <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div className="avatar avatar-sm" style={{ background: `hsl(${((user.id || user._id).toString().charCodeAt(0) * 60) % 360}, 60%, 55%)` }}>
+                          <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>
                             {user.name.charAt(0)}
                           </div>
                           <span style={{ fontWeight: 600 }}>{user.name}</span>
                         </div>
                       </td>
                       <td style={{ color: 'var(--text-secondary)' }}>{user.email}</td>
-                      <td style={{ color: 'var(--text-muted)', fontFamily: 'monospace', fontSize: '12px' }}>{user.plainPassword || '—'}</td>
-                      <td><span className={`badge ${ROLE_COLORS[user.role?.toLowerCase()] || 'badge-gray'}`}>{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '—'}</span></td>
+                      <td style={{ color: 'var(--text-muted)', fontFamily: 'monospace', fontSize: '12px' }}>{user.plainPassword || '-'}</td>
+                      <td><span className={`badge ${ROLE_COLORS[user.role?.toLowerCase()] || 'badge-gray'}`}>{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '-'}</span></td>
                       <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{user.dept}</td>
                       <td style={{ color: 'var(--text-secondary)', fontSize: '12.5px' }}>{user.joined}</td>
                       <td>
@@ -607,19 +607,19 @@ export default function UserManagement() {
                             onClick={() => handleToggleStatus(user)}
                             title={user.status === 'Active' ? 'Deactivate' : 'Activate'}
                           >
-                            {user.status === 'Active' ? '⏸' : '▶'}
+                            {user.status === 'Active' ? 'Pause' : 'Activate'}
                           </button>
                           <button 
                             className="btn btn-secondary btn-sm" 
                             onClick={() => setEditingUser(user)}
                             title="Edit"
-                          >✏️</button>
+                          ></button>
                           <button
                             className="btn btn-ghost btn-sm"
-                            style={{ color: '#EF4444' }}
+                            style={{ color: '#B4232A' }}
                             onClick={() => handleDelete(user.id || user._id)}
                             title="Delete"
-                          >🗑️</button>
+                          ></button>
                         </div>
                       </td>
                     </tr>

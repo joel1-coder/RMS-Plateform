@@ -47,10 +47,10 @@ export default function AddCoSupervisor() {
         padding: '7px 14px', background: '#F1F5F9', border: '1.5px solid var(--border)',
         borderRadius: 'var(--radius-sm)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: 'var(--text-secondary)',
       }}>
-        📎 Select
+        Select
         <input type="file" style={{ display: 'none' }} onChange={e => handleChange(fileKey, e.target.files[0])} />
       </label>
-      {form[fileKey] && <span style={{ marginLeft: '8px', fontSize: '11px', color: '#10B981' }}>✓ {form[fileKey].name}</span>}
+      {form[fileKey] && <span style={{ marginLeft: '8px', fontSize: '11px', color: '#1E7D45' }}>Selected: {form[fileKey].name}</span>}
     </div>
   )
 
@@ -69,11 +69,11 @@ export default function AddCoSupervisor() {
       <div className="page-body">
         {/* Scholar Banner */}
         <div style={{
-          background: 'linear-gradient(90deg, #059669, #10B981)',
+          background: 'linear-gradient(90deg, #1E7D45, #166A3A)',
           borderRadius: 'var(--radius-md)', padding: '12px 20px', marginBottom: '20px',
           display: 'flex', alignItems: 'center', gap: '10px',
         }}>
-          <span style={{ fontSize: '14px' }}>➕</span>
+          <span style={{ fontSize: '14px' }} />
           <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#fff' }}>Add Co-Supervisor - Miss / Mrs. VANI K [BDU2020410331]</span>
         </div>
 
@@ -86,8 +86,8 @@ export default function AddCoSupervisor() {
                   <input type="checkbox" checked={form.printProforma} onChange={e => handleChange('printProforma', e.target.checked)} />
                   Print Proforma
                 </label>
-                <button type="button" style={{ padding: '6px 14px', background: 'linear-gradient(90deg,#6C63FF,#4F46E5)', color: '#fff', border: 'none', borderRadius: 'var(--radius-sm)', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
-                  🖨️ Proforma
+                <button type="button" style={{ padding: '6px 14px', background: 'linear-gradient(90deg,#174EA6,#0A2A66)', color: '#fff', border: 'none', borderRadius: 'var(--radius-sm)', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                  Proforma
                 </button>
                 <button type="button" className="btn btn-ghost btn-sm">Get signature from the authority</button>
               </div>
@@ -160,18 +160,18 @@ export default function AddCoSupervisor() {
             <button type="button" className="btn btn-ghost">CANCEL</button>
             <button type="submit" disabled={submitting}
               style={{
-                padding: '10px 28px', background: 'linear-gradient(90deg,#059669,#10B981)', color: '#fff',
+                padding: '10px 28px', background: 'linear-gradient(90deg,#1E7D45,#166A3A)', color: '#fff',
                 border: 'none', borderRadius: 'var(--radius-md)', fontWeight: 700, fontSize: '13.5px',
                 cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1,
-                boxShadow: '0 4px 12px rgba(5,150,105,0.4)',
+                boxShadow: '0 4px 12px rgba(30,125,69,0.3)',
               }}>
-              {submitting ? '⏳ Saving...' : '✅ SAVE NOMINATION'}
+              {submitting ? 'Saving...' : 'SAVE NOMINATION'}
             </button>
           </div>
         </form>
 
         <div style={{ marginTop: '20px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
-          © 2024 Research Section Management
+          2024 Research Section Management
         </div>
       </div>
     </div>

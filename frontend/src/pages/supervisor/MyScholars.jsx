@@ -57,8 +57,8 @@ export default function MyScholars() {
           name: scholar.name,
           email: scholar.email,
           dept: scholar.dept || 'Computer Science',
-          regNo: scholar.profile?.regNo || '—',
-          phone: scholar.profile?.phone || '—',
+          regNo: scholar.profile?.regNo || '-',
+          phone: scholar.profile?.phone || '-',
           topic: project ? project.topic : 'Research Topic Pending Registration',
           progress: project ? project.progress : 0,
           status: project
@@ -126,21 +126,21 @@ export default function MyScholars() {
         {/* Summary Info Row */}
         <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
           <div className="card" style={{ flex: 1, padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '28px' }}>🎓</span>
+            <span style={{ fontSize: '28px' }}></span>
             <div>
               <div style={{ fontSize: '24px', fontWeight: 800 }}>{scholars.length}</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Total Supervised Scholars</div>
             </div>
           </div>
           <div className="card" style={{ flex: 1, padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '28px' }}>🟢</span>
+            <span style={{ fontSize: '28px' }}></span>
             <div>
               <div style={{ fontSize: '24px', fontWeight: 800 }}>{scholars.filter(s => s.status === 'On Track' || s.status === 'Completed').length}</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Active & On Track / Completed</div>
             </div>
           </div>
           <div className="card" style={{ flex: 1, padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '28px' }}>⚠️</span>
+            <span style={{ fontSize: '28px' }}></span>
             <div>
               <div style={{ fontSize: '24px', fontWeight: 800 }}>{scholars.filter(s => s.status === 'Needs Attention' || s.status === 'Pending').length}</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Pending Topic / Action Needed</div>
@@ -151,7 +151,7 @@ export default function MyScholars() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input 
                 className="form-control" 
                 placeholder="Filter by name, ID or topic..." 
@@ -206,12 +206,12 @@ export default function MyScholars() {
                   <tr key={s.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div className="avatar avatar-sm" style={{ background: `hsl(${(s.id * 73) % 360}, 60%, 55%)` }}>
+                        <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>
                           {s.name.charAt(0)}
                         </div>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{s.name}</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID: {s.id} · Adm: {s.admission}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID: {s.id} - Adm: {s.admission}</div>
                         </div>
                       </div>
                     </td>
@@ -220,7 +220,7 @@ export default function MyScholars() {
                     <td>
                       <div className="progress-bar-wrap">
                         <div className="progress-bar" style={{ width: '80px' }}>
-                          <div className="progress-fill" style={{ width: `${s.progress}%`, background: s.progress >= 85 ? '#10B981' : s.progress >= 50 ? '#6C63FF' : '#EF4444' }} />
+                          <div className="progress-fill" style={{ width: `${s.progress}%`, background: s.progress >= 85 ? '#1E7D45' : s.progress >= 50 ? '#174EA6' : '#B4232A' }} />
                         </div>
                         <span style={{ fontSize: '12px', fontWeight: 700, minWidth: '32px' }}>{s.progress}%</span>
                       </div>

@@ -55,16 +55,16 @@ export default function CourseworkDetailsManagement() {
       <div className="page-body">
         {/* Breadcrumb */}
         <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '8px' }}>
-          ✓ Coursework Mark Entry
+          Coursework Mark Entry
         </div>
 
         {/* Scholar Header */}
         <div style={{
-          background: 'linear-gradient(90deg, #4F46E5, #6C63FF)',
+          background: 'linear-gradient(90deg, #0A2A66, #174EA6)',
           borderRadius: 'var(--radius-md)', padding: '12px 20px', marginBottom: '20px',
         }}>
           <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#fff' }}>
-            🔍 View / Add Coursework Details - {scholarDetails.regNo}
+            View / Add Coursework Details - {scholarDetails.regNo}
           </div>
         </div>
 
@@ -81,7 +81,7 @@ export default function CourseworkDetailsManagement() {
                 onClick={handleAddRow}
                 style={{
                   padding: '7px 14px',
-                  background: 'linear-gradient(90deg, #4F46E5, #6C63FF)',
+                  background: 'linear-gradient(90deg, #0A2A66, #174EA6)',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 'var(--radius-md)',
@@ -93,7 +93,7 @@ export default function CourseworkDetailsManagement() {
                   gap: '6px',
                 }}
               >
-                ➕ Add Subject Row
+                Add Subject Row
               </button>
             </div>
 
@@ -169,16 +169,16 @@ export default function CourseworkDetailsManagement() {
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           {m.eScript ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#ECFDF5', border: '1px solid #A7F3D0', padding: '4px 8px', borderRadius: '4px', maxWidth: '140px' }}>
-                              <span style={{ fontSize: '11px', color: '#065F46', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={m.eScript}>
-                                📄 {m.eScript}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#E7F4EC', border: '1px solid #B6D9C4', padding: '4px 8px', borderRadius: '4px', maxWidth: '140px' }}>
+                              <span style={{ fontSize: '11px', color: '#166A3A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={m.eScript}>
+                                {m.eScript}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleMarkChange(i, 'eScript', '')}
-                                style={{ background: 'none', border: 'none', color: '#10B981', cursor: 'pointer', fontSize: '12px', padding: 0 }}
+                                style={{ background: 'none', border: 'none', color: '#1E7D45', cursor: 'pointer', fontSize: '12px', padding: 0 }}
                               >
-                                ✕
+                                Remove
                               </button>
                             </div>
                           ) : (
@@ -191,7 +191,7 @@ export default function CourseworkDetailsManagement() {
                                   display: 'inline-flex', alignItems: 'center', gap: '4px'
                                 }}
                               >
-                                📤 Upload
+                                Upload
                               </label>
                               <input
                                 id={`escript-file-${i}`}
@@ -218,12 +218,12 @@ export default function CourseworkDetailsManagement() {
                         />
                       </td>
                       <td>
-                        <span style={{ fontSize: '11.5px', color: '#6C63FF', fontStyle: 'italic', fontWeight: 700 }}>
+                        <span style={{ fontSize: '11.5px', color: '#174EA6', fontStyle: 'italic', fontWeight: 700 }}>
                           {(() => {
                             const hasMarks = m.internal !== '' || m.external !== '';
                             if (!hasMarks) return m.result;
                             const total = (Number(m.internal) || 0) + (Number(m.external) || 0);
-                            return total >= 50 ? '✅ PASS' : '❌ FAIL';
+                            return total >= 50 ? 'PASS' : 'FAIL';
                           })()}
                         </span>
                       </td>
@@ -234,16 +234,16 @@ export default function CourseworkDetailsManagement() {
                           title="Remove Subject Row"
                           style={{
                             padding: '4px 8px',
-                            background: '#FEE2E2',
-                            color: '#EF4444',
-                            border: '1px solid #FCA5A5',
+                            background: '#F9E6E8',
+                            color: '#B4232A',
+                            border: '1px solid #F0B9BD',
                             borderRadius: 'var(--radius-sm)',
                             cursor: 'pointer',
                             fontSize: '12px',
                             fontWeight: 700,
                           }}
                         >
-                          🗑️
+                          Delete
                         </button>
                       </td>
                     </tr>
@@ -260,12 +260,12 @@ export default function CourseworkDetailsManagement() {
             onClick={handleSave}
             disabled={saving}
             style={{
-              padding: '10px 28px', background: 'linear-gradient(90deg,#4F46E5,#6C63FF)', color: '#fff',
+              padding: '10px 28px', background: 'linear-gradient(90deg,#0A2A66,#174EA6)', color: '#fff',
               border: 'none', borderRadius: 'var(--radius-md)', fontWeight: 700, fontSize: '13.5px',
               cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1,
-              boxShadow: '0 4px 12px rgba(79,70,229,0.4)',
+              boxShadow: '0 4px 12px rgba(23,78,166,0.28)',
             }}>
-            {saving ? '⏳ Saving...' : '💾 Save Details'}
+            {saving ? 'Saving...' : 'Save Details'}
           </button>
         </div>
       </div>

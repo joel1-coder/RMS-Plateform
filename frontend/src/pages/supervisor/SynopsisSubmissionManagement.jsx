@@ -35,17 +35,17 @@ export default function SynopsisSubmissionManagement() {
       <div className="page-body">
         {/* Active Banner */}
         <div style={{
-          background: 'linear-gradient(90deg, #059669, #10B981)',
+          background: 'linear-gradient(90deg, #1E7D45, #166A3A)',
           borderRadius: 'var(--radius-md)', padding: '12px 20px', marginBottom: '20px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '14px' }}>📋</span>
+            <span style={{ fontSize: '14px' }} />
             <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#fff' }}>Synopsis Submission</span>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>∨</button>
-            <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✕</button>
+            <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>v</button>
+            <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>Close</button>
           </div>
         </div>
 
@@ -71,10 +71,10 @@ export default function SynopsisSubmissionManagement() {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Registration No. ⇅</th>
-                  <th>Name ⇅</th>
-                  <th>Synopsis ⇅</th>
-                  <th>Valid till ⇅</th>
+                  <th>Registration No.</th>
+                  <th>Name</th>
+                  <th>Synopsis</th>
+                  <th>Valid till</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -90,7 +90,7 @@ export default function SynopsisSubmissionManagement() {
                     <td>{i + 1}</td>
                     <td style={{ fontWeight: 600 }}>{r.regNo}</td>
                     <td>{r.name}</td>
-                    <td style={{ fontSize: '12px', color: '#059669', textDecoration: 'underline', cursor: 'pointer' }}>📄 {r.synopsis}</td>
+                    <td style={{ fontSize: '12px', color: '#166A3A', textDecoration: 'underline', cursor: 'pointer' }}>{r.synopsis}</td>
                     <td><span className="badge badge-success" style={{ fontSize: '11px' }}>{r.validTill}</span></td>
                     <td>
                       <button className="btn btn-secondary btn-sm" onClick={() => toast.success(`Viewing Synopsis for ${r.name}`)}>

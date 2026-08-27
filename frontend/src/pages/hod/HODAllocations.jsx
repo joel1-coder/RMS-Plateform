@@ -2,16 +2,16 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 const unassignedScholars = [
-  { id: 'REG-2023-091', name: 'Alex Mercer', area: 'Quantum Computing', tags: ['MACHINE LEARNING', 'EMBEDDED SYSTEMS'], topic: 'Optimization of Superconducting Qubits using AI', color: '#8B5CF6' },
-  { id: 'REG-2023-014', name: 'Elena Rodriguez', area: 'Quantum Computing', tags: ['QUANTUM COMPUTING'], topic: 'Find-Short Protocols for Quantum Data', color: '#3B82F6' },
-  { id: 'REG-2022-077', name: 'Chen Wei', area: 'Cybersecurity', tags: ['CYBERSECURITY', 'BLOCKCHAIN'], topic: 'Distributed Speciality System in Wei', color: '#EF4444' },
-  { id: 'REG-2023-119', name: 'Jordan Smith', area: 'Data Science', tags: ['NLP', 'AI/ML'], topic: 'Transformer Models for Real-time Translation', color: '#10B981' },
+  { id: 'REG-2023-091', name: 'Alex Mercer', area: 'Quantum Computing', tags: ['MACHINE LEARNING', 'EMBEDDED SYSTEMS'], topic: 'Optimization of Superconducting Qubits using AI', color: '#174EA6' },
+  { id: 'REG-2023-014', name: 'Elena Rodriguez', area: 'Quantum Computing', tags: ['QUANTUM COMPUTING'], topic: 'Find-Short Protocols for Quantum Data', color: '#174EA6' },
+  { id: 'REG-2022-077', name: 'Chen Wei', area: 'Cybersecurity', tags: ['CYBERSECURITY', 'BLOCKCHAIN'], topic: 'Distributed Speciality System in Wei', color: '#B4232A' },
+  { id: 'REG-2023-119', name: 'Jordan Smith', area: 'Data Science', tags: ['NLP', 'AI/ML'], topic: 'Transformer Models for Real-time Translation', color: '#1E7D45' },
 ]
 
 const facultyPool = [
-  { id: 'FAC-001', name: 'Dr. Sarah Jenkins', dept: 'Senior Scientist · Computer Science', available: true, tags: ['MACHINE LEARNING', 'EMBEDDED SYSTEMS'], scholars: 4, maxScholars: 8, color: '#3B82F6' },
-  { id: 'FAC-002', name: 'Prof. Liam Vance', dept: 'Lead Researcher · 1 Quarter', available: false, tags: ['QUANTUM COMPUTING'], scholars: 7, maxScholars: 8, color: '#8B5CF6' },
-  { id: 'FAC-003', name: 'Dr. Maria Santos', dept: 'Asst. Professor · Information Technology', available: true, tags: ['risk', 'blockchain'], scholars: 2, maxScholars: 5, color: '#10B981' },
+  { id: 'FAC-001', name: 'Dr. Sarah Jenkins', dept: 'Senior Scientist - Computer Science', available: true, tags: ['MACHINE LEARNING', 'EMBEDDED SYSTEMS'], scholars: 4, maxScholars: 8, color: '#174EA6' },
+  { id: 'FAC-002', name: 'Prof. Liam Vance', dept: 'Lead Researcher - 1 Quarter', available: false, tags: ['QUANTUM COMPUTING'], scholars: 7, maxScholars: 8, color: '#174EA6' },
+  { id: 'FAC-003', name: 'Dr. Maria Santos', dept: 'Asst. Professor - Information Technology', available: true, tags: ['risk', 'blockchain'], scholars: 2, maxScholars: 5, color: '#1E7D45' },
 ]
 
 export default function HODAllocations() {
@@ -39,20 +39,20 @@ export default function HODAllocations() {
           <div className="modal" style={{ maxWidth: '440px' }}>
             <div className="modal-header">
               <span className="modal-title">Confirm Allocation</span>
-              <button className="modal-close" onClick={() => setShowConfirmModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowConfirmModal(false)}></button>
             </div>
             <div className="modal-body">
               <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
                 You are about to assign the following scholar to a supervisor:
               </p>
               <div style={{ display: 'grid', gap: '10px' }}>
-                <div style={{ padding: '12px', background: '#EFF6FF', borderRadius: 'var(--radius-md)', border: '1px solid #BFDBFE' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#1D4ED8', marginBottom: '4px' }}>SCHOLAR</div>
+                <div style={{ padding: '12px', background: '#F3F7FF', borderRadius: 'var(--radius-md)', border: '1px solid #B9C9EA' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#0A2A66', marginBottom: '4px' }}>SCHOLAR</div>
                   <div style={{ fontWeight: 700 }}>{selectedScholar.name}</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{selectedScholar.topic}</div>
                 </div>
-                <div style={{ padding: '12px', background: '#F0FDF4', borderRadius: 'var(--radius-md)', border: '1px solid #BBF7D0' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#15803D', marginBottom: '4px' }}>FACULTY</div>
+                <div style={{ padding: '12px', background: '#E7F4EC', borderRadius: 'var(--radius-md)', border: '1px solid #B8DFC6' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#166A3A', marginBottom: '4px' }}>FACULTY</div>
                   <div style={{ fontWeight: 700 }}>{selectedFaculty.name}</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{selectedFaculty.dept}</div>
                 </div>
@@ -60,7 +60,7 @@ export default function HODAllocations() {
             </div>
             <div className="modal-footer">
               <button className="btn btn-ghost" onClick={() => setShowConfirmModal(false)}>Cancel</button>
-              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#3B82F6,#1D4ED8)' }} onClick={handleConfirm}>✓ Confirm Allocation</button>
+              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} onClick={handleConfirm}> Confirm Allocation</button>
             </div>
           </div>
         </div>
@@ -76,10 +76,10 @@ export default function HODAllocations() {
           <input className="form-control" style={{ width: '220px', fontSize: '12.5px' }} placeholder="Search scholars or supervisors..." />
           <button 
             className="btn btn-primary btn-sm" 
-            style={{ background: 'linear-gradient(90deg,#3B82F6,#1D4ED8)' }}
+            style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}
             onClick={() => selectedScholar && selectedFaculty ? setShowConfirmModal(true) : toast.error('Select a scholar and faculty member first')}
           >
-            ✓ Confirm Allocation
+             Confirm Allocation
           </button>
         </div>
       </div>
@@ -90,7 +90,7 @@ export default function HODAllocations() {
           <div className="card">
             <div className="card-header">
               <div className="card-title">Unassigned Scholars</div>
-              <span style={{ background: '#FEF3C7', color: '#D97706', fontSize: '12px', fontWeight: 700, padding: '3px 10px', borderRadius: '99px' }}>
+              <span style={{ background: '#FFF6D8', color: '#936C00', fontSize: '12px', fontWeight: 700, padding: '3px 10px', borderRadius: '99px' }}>
                 {scholars.length} Pending
               </span>
             </div>
@@ -127,7 +127,7 @@ export default function HODAllocations() {
                   </div>
                 ))}
                 {scholars.length === 0 && (
-                  <div className="empty-state"><div className="empty-icon">🎉</div><h3>All scholars assigned!</h3><p>No pending allocations.</p></div>
+                  <div className="empty-state"><div className="empty-icon"></div><h3>All scholars assigned!</h3><p>No pending allocations.</p></div>
                 )}
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function HODAllocations() {
           <div className="card">
             <div className="card-header">
               <div className="card-title">Faculty Pool</div>
-              <span style={{ background: '#D1FAE5', color: '#065F46', fontSize: '12px', fontWeight: 700, padding: '3px 10px', borderRadius: '99px' }}>
+              <span style={{ background: '#E7F4EC', color: '#166A3A', fontSize: '12px', fontWeight: 700, padding: '3px 10px', borderRadius: '99px' }}>
                 {faculty.filter(f => f.available).length} Available
               </span>
             </div>
@@ -178,7 +178,7 @@ export default function HODAllocations() {
                             <span>{f.scholars} / {f.maxScholars} Scholars</span>
                           </div>
                           <div className="progress-bar">
-                            <div className="progress-fill" style={{ width: `${pct}%`, background: pct >= 90 ? '#EF4444' : pct >= 70 ? '#F59E0B' : '#10B981' }} />
+                            <div className="progress-fill" style={{ width: `${pct}%`, background: pct >= 90 ? '#B4232A' : pct >= 70 ? '#C89B1E' : '#1E7D45' }} />
                           </div>
                         </div>
                       </div>

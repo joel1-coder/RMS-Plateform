@@ -1,4 +1,4 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -48,7 +48,7 @@ function AssignMeetingModal({ onClose, onSave, editData = null }) {
       <div className="modal">
         <div className="modal-header">
           <span className="modal-title">{editData ? 'Edit Meeting Details' : 'Assign New Meeting'}</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -89,7 +89,7 @@ function AssignMeetingModal({ onClose, onSave, editData = null }) {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #6C63FF, #4F46E5)' }}>
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #174EA6, #0A2A66)' }}>
               {editData ? 'Save Changes' : 'Assign Meeting'}
             </button>
           </div>
@@ -195,8 +195,8 @@ export default function MeetingManagement() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Assign and schedule meetings for scholars (Viva Voce, DRC, etc.)</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #6C63FF, #4F46E5)' }} onClick={() => setShowModal(true)}>
-            ＋ Assign Meeting
+          <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #174EA6, #0A2A66)' }} onClick={() => setShowModal(true)}>
+            + Assign Meeting
           </button>
         </div>
       </div>
@@ -204,11 +204,11 @@ export default function MeetingManagement() {
       <div className="page-body">
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
           {[
-            { label: 'Total Meetings', value: meetings.length, icon: '📅', color: 'purple' },
-            { label: 'Upcoming', value: meetings.filter(m => m.status === 'Scheduled').length, icon: '⏰', color: 'orange' },
-            { label: 'Completed', value: meetings.filter(m => m.status === 'Completed').length, icon: '✅', color: 'green' },
-            { label: 'Viva Voce', value: meetings.filter(m => m.type === 'Viva Voce').length, icon: '🎓', color: 'blue' },
-            { label: 'Synopsis Review', value: meetings.filter(m => m.type === 'Synopsis Review').length, icon: '📋', color: 'indigo' },
+            { label: 'Total Meetings', value: meetings.length, icon: '', color: 'blue' },
+            { label: 'Upcoming', value: meetings.filter(m => m.status === 'Scheduled').length, icon: '', color: 'orange' },
+            { label: 'Completed', value: meetings.filter(m => m.status === 'Completed').length, icon: '', color: 'green' },
+            { label: 'Viva Voce', value: meetings.filter(m => m.type === 'Viva Voce').length, icon: '', color: 'blue' },
+            { label: 'Synopsis Review', value: meetings.filter(m => m.type === 'Synopsis Review').length, icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -223,7 +223,7 @@ export default function MeetingManagement() {
         <div className="card" style={{ marginTop: '20px' }}>
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search scholar or type..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <select className="form-control form-select" style={{ width: '180px' }} value={filterType} onChange={e => setFilterType(e.target.value)}>
@@ -262,7 +262,7 @@ export default function MeetingManagement() {
                         <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{m.time}</div>
                       </td>
                       <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{m.venue}</td>
-                      <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{m.panel || '—'}</td>
+                      <td style={{ fontSize: '12px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{m.panel || '-'}</td>
                       <td>
                         <span className={`badge ${m.status === 'Completed' ? 'badge-success' : m.status === 'Cancelled' ? 'badge-danger' : 'badge-warning'}`}>
                           {m.status}
@@ -270,8 +270,8 @@ export default function MeetingManagement() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '4px' }}>
-                          <button className="btn btn-secondary btn-sm" title="Edit" onClick={() => setEditingMeeting(m)}>✏️</button>
-                          <button className="btn btn-ghost btn-sm" title="Delete" style={{ color: '#EF4444' }} onClick={() => handleDelete(m.id || m._id)}>🗑️</button>
+                          <button className="btn btn-secondary btn-sm" title="Edit" onClick={() => setEditingMeeting(m)}></button>
+                          <button className="btn btn-ghost btn-sm" title="Delete" style={{ color: '#B4232A' }} onClick={() => handleDelete(m.id || m._id)}></button>
                         </div>
                       </td>
                     </tr>

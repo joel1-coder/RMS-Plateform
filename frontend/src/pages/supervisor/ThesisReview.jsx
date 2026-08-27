@@ -35,7 +35,7 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
       <div className="modal">
         <div className="modal-header">
           <span className="modal-title">Upload Scholar Thesis Draft</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -75,13 +75,13 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
                   padding: '24px', textAlign: 'center', cursor: 'pointer',
                   background: '#FAFAFA', transition: 'all 0.2s'
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = '#4F46E5'}
+                onMouseEnter={e => e.currentTarget.style.borderColor = '#0A2A66'}
                 onMouseLeave={e => e.currentTarget.style.borderColor = '#CBD5E1'}
               >
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📄</div>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
                 {file ? (
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: '13px', color: '#10B981' }}>Selected: {file.name}</div>
+                    <div style={{ fontWeight: 600, fontSize: '13px', color: '#1E7D45' }}>Selected: {file.name}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Click to change file</div>
                   </div>
                 ) : (
@@ -104,7 +104,7 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" disabled={uploading} className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>
+            <button type="submit" disabled={uploading} className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}>
               {uploading ? 'Uploading...' : 'Upload Thesis'}
             </button>
           </div>
@@ -239,7 +239,7 @@ export default function ThesisReview() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Review Thesis Draft</span>
-              <button className="modal-close" onClick={() => setSelectedSub(null)}>✕</button>
+              <button className="modal-close" onClick={() => setSelectedSub(null)}></button>
             </div>
             <div className="modal-body">
               <div style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
@@ -260,7 +260,7 @@ export default function ThesisReview() {
                       className="btn btn-outline btn-sm"
                       style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}
                     >
-                      📄 Download & Read Thesis PDF
+                       Download & Read Thesis PDF
                     </a>
                   </div>
                 )}
@@ -283,7 +283,7 @@ export default function ThesisReview() {
                 disabled={actionLoading}
                 onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Rejected')}
               >
-                ✕ Reject Draft
+                 Reject Draft
               </button>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
@@ -291,15 +291,15 @@ export default function ThesisReview() {
                   disabled={actionLoading}
                   onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Changes Requested')}
                 >
-                  📝 Request Changes
+                   Request Changes
                 </button>
                 <button
                   className="btn btn-primary btn-sm"
-                  style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+                  style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
                   disabled={actionLoading}
                   onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Approved')}
                 >
-                  {actionLoading ? 'Saving...' : '✓ Approve Draft'}
+                  {actionLoading ? 'Saving...' : ' Approve Draft'}
                 </button>
                 <button className="btn btn-ghost" onClick={() => setSelectedSub(null)}>Cancel</button>
               </div>
@@ -315,7 +315,7 @@ export default function ThesisReview() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Evaluate and provide feedback on final thesis drafts from your scholars</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: '#0D9488', borderColor: '#0D9488' }} onClick={() => setShowUploadModal(true)}>＋ Upload Thesis</button>
+          <button className="btn btn-primary btn-sm" style={{ background: '#174EA6', borderColor: '#174EA6' }} onClick={() => setShowUploadModal(true)}>+ Upload Thesis</button>
         </div>
       </div>
 
@@ -323,10 +323,10 @@ export default function ThesisReview() {
         {/* KPI Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Pending', value: submissions.filter(t => t.status === 'Pending').length, icon: '📚', color: 'blue' },
-            { label: 'Total Approved', value: submissions.filter(t => t.status === 'Approved').length, icon: '✅', color: 'green' },
-            { label: 'Changes Requested', value: submissions.filter(t => t.status === 'Changes Requested').length, icon: '⚠️', color: 'orange' },
-            { label: 'Total Submissions', value: submissions.length, icon: '🔍', color: 'purple' },
+            { label: 'Total Pending', value: submissions.filter(t => t.status === 'Pending').length, icon: '', color: 'blue' },
+            { label: 'Total Approved', value: submissions.filter(t => t.status === 'Approved').length, icon: '', color: 'green' },
+            { label: 'Changes Requested', value: submissions.filter(t => t.status === 'Changes Requested').length, icon: '', color: 'orange' },
+            { label: 'Total Submissions', value: submissions.length, icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -357,7 +357,7 @@ export default function ThesisReview() {
                 <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading drafts...</div>
               ) : filtered.length === 0 ? (
                 <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '8px' }}>📚</div>
+                  <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
                   <div>No thesis drafts submitted yet for your scholars.</div>
                 </div>
               ) : (
@@ -391,7 +391,7 @@ export default function ThesisReview() {
                         </td>
                         <td>{sub.submittedAt}</td>
                         <td><span className={`badge ${getStatusBadge(sub.status)}`}>{sub.status}</span></td>
-                        <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{sub.remarks || '—'}</td>
+                        <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{sub.remarks || '-'}</td>
                         <td>
                           <button className="btn btn-primary btn-sm" onClick={() => setSelectedSub(sub)}>
                             Review

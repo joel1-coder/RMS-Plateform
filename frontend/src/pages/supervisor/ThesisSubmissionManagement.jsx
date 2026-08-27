@@ -36,16 +36,16 @@ export default function ThesisSubmissionManagement() {
       <div className="page-body">
         {/* Blue Banner */}
         <div style={{
-          background: 'linear-gradient(90deg, #3B82F6, #2563EB)',
+          background: 'linear-gradient(90deg, #174EA6, #0A2A66)',
           borderRadius: 'var(--radius-md)', padding: '12px 20px', marginBottom: '20px',
           display: 'flex', alignItems: 'center', gap: '10px',
           cursor: 'pointer',
         }}>
-          <span style={{ fontSize: '14px' }}>📚</span>
+          <span style={{ fontSize: '14px' }} />
           <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#fff' }}>Thesis Submission List</span>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-            <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>∨</button>
-            <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✕</button>
+            <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>v</button>
+            <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>Close</button>
           </div>
         </div>
 
@@ -72,11 +72,11 @@ export default function ThesisSubmissionManagement() {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Register No. ⇅</th>
-                  <th>Name ⇅</th>
-                  <th>Discipline ⇅</th>
-                  <th>Thesis ⇅</th>
-                  <th>Revision ⇅</th>
+                  <th>Register No.</th>
+                  <th>Name</th>
+                  <th>Discipline</th>
+                  <th>Thesis</th>
+                  <th>Revision</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -92,8 +92,8 @@ export default function ThesisSubmissionManagement() {
                     <td>{i + 1}</td>
                     <td style={{ fontWeight: 600 }}>{r.regNo}</td>
                     <td>{r.name}</td>
-                    <td><span style={{ fontSize: '12px', color: '#4338CA', fontWeight: 600 }}>{r.discipline}</span></td>
-                    <td style={{ fontSize: '12px', color: '#2563EB', textDecoration: 'underline', cursor: 'pointer' }}>📄 {r.thesis}</td>
+                    <td><span style={{ fontSize: '12px', color: '#174EA6', fontWeight: 600 }}>{r.discipline}</span></td>
+                    <td style={{ fontSize: '12px', color: '#174EA6', textDecoration: 'underline', cursor: 'pointer' }}>{r.thesis}</td>
                     <td><span className="badge badge-warning" style={{ fontSize: '11px' }}>{r.revision}</span></td>
                     <td>
                       <button className="btn btn-primary btn-sm" onClick={() => toast.success(`Opening Thesis for ${r.name}`)}>
@@ -113,7 +113,7 @@ export default function ThesisSubmissionManagement() {
         </div>
 
         <div style={{ marginTop: '20px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
-          © 2024 Research Section Management
+          2024 Research Section Management
         </div>
       </div>
     </div>

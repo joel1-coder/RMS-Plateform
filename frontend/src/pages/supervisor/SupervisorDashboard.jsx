@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { apiFetch } from '../../utils/api'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
-const PROGRESS_COLOR = pct => pct >= 80 ? '#10B981' : pct >= 50 ? '#6C63FF' : '#EF4444'
+const PROGRESS_COLOR = pct => pct >= 80 ? '#1E7D45' : pct >= 50 ? '#174EA6' : '#B4232A'
 
 export default function SupervisorDashboard() {
   const { user } = useAuth()
@@ -90,7 +90,7 @@ export default function SupervisorDashboard() {
   const dynamicMilestones = []
   synopses.filter(s => s.status.includes('Pending') || s.status.includes('Supervisor')).forEach(s => {
     dynamicMilestones.push({
-      task: `Synopsis Review – ${s.scholarName}`,
+      task: `Synopsis Review - ${s.scholarName}`,
       date: s.submittedAt ? s.submittedAt.slice(0, 10) : 'Recent',
       type: 'synopsis',
       urgent: true,
@@ -99,7 +99,7 @@ export default function SupervisorDashboard() {
   })
   theses.filter(t => t.status === 'Pending').forEach(t => {
     dynamicMilestones.push({
-      task: `Thesis Draft Review – ${t.scholar}`,
+      task: `Thesis Draft Review - ${t.scholar}`,
       date: t.submittedAt || 'Recent',
       type: 'thesis',
       urgent: true,
@@ -123,10 +123,10 @@ export default function SupervisorDashboard() {
         {/* KPI Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Active Scholars', value: loading ? '--' : scholars.length, sub: 'Assigned to you', icon: '👥', color: 'blue', badge: null },
-            { label: 'Pending Synopsis', value: loading ? '--' : pendingSynCount, sub: pendingSynCount > 0 ? 'Requires Action' : 'Up to date', icon: '📋', color: 'red', badge: pendingSynCount > 0 ? 'urgent' : null },
-            { label: 'Pending Thesis', value: loading ? '--' : pendingThCount, sub: pendingThCount > 0 ? 'Requires Action' : 'Up to date', icon: '📚', color: 'red', badge: pendingThCount > 0 ? 'urgent' : null },
-            { label: 'Publications', value: loading ? '--' : publications.length, sub: 'Scholar publications', icon: '📰', color: 'green', badge: null },
+            { label: 'Active Scholars', value: loading ? '--' : scholars.length, sub: 'Assigned to you', icon: '', color: 'blue', badge: null },
+            { label: 'Pending Synopsis', value: loading ? '--' : pendingSynCount, sub: pendingSynCount > 0 ? 'Requires Action' : 'Up to date', icon: '', color: 'red', badge: pendingSynCount > 0 ? 'urgent' : null },
+            { label: 'Pending Thesis', value: loading ? '--' : pendingThCount, sub: pendingThCount > 0 ? 'Requires Action' : 'Up to date', icon: '', color: 'red', badge: pendingThCount > 0 ? 'urgent' : null },
+            { label: 'Publications', value: loading ? '--' : publications.length, sub: 'Scholar publications', icon: '', color: 'green', badge: null },
           ].map((s, i) => (
             <div className="stat-card" key={i} style={{ position: 'relative' }}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -134,7 +134,7 @@ export default function SupervisorDashboard() {
                 <div className="stat-value">{s.value}</div>
                 <div className="stat-label">{s.label}</div>
                 <div style={{ fontSize: '11px', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  {s.badge === 'urgent' && <span style={{ background: '#FEE2E2', color: '#EF4444', fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '99px' }}>Requires Action</span>}
+                  {s.badge === 'urgent' && <span style={{ background: '#F9E6E8', color: '#B4232A', fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '99px' }}>Requires Action</span>}
                   {!s.badge && <span style={{ color: 'var(--text-muted)' }}>{s.sub}</span>}
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function SupervisorDashboard() {
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading scholar progress...</div>
               ) : chartData.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                  <div style={{ fontSize: '28px', marginBottom: '6px' }}>👥</div>
+                  <div style={{ fontSize: '28px', marginBottom: '6px' }}></div>
                   <div>No scholars assigned to your supervision yet.</div>
                   <div style={{ fontSize: '12px', marginTop: '4px' }}>Assigned scholars by HOD/Admin will appear here automatically.</div>
                 </div>
@@ -187,17 +187,17 @@ export default function SupervisorDashboard() {
             <div className="card-body" style={{ padding: '4px 0' }}>
               {dynamicMilestones.length === 0 ? (
                 <div style={{ padding: '24px 20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
-                  🎉 No pending synopsis or thesis reviews. All up to date!
+                   No pending synopsis or thesis reviews. All up to date!
                 </div>
               ) : (
                 dynamicMilestones.slice(0, 5).map((m, i) => (
                   <div key={i} style={{ padding: '10px 20px', borderBottom: i < dynamicMilestones.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: 'var(--radius-sm)', flexShrink: 0,
-                      background: m.type === 'synopsis' ? '#EDE9FE' : '#DBEAFE',
+                      background: m.type === 'synopsis' ? '#E8EEF8' : '#E8EEF8',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px',
                     }}>
-                      {m.type === 'synopsis' ? '📋' : '📚'}
+                      {m.type === 'synopsis' ? '' : ''}
                     </div>
                     <div style={{ flex: 1 }}>
                       <Link to={m.link} style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text-primary)', textDecoration: 'none', lineHeight: 1.4 }}>
@@ -205,7 +205,7 @@ export default function SupervisorDashboard() {
                       </Link>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{m.date}</div>
                     </div>
-                    {m.urgent && <span style={{ background: '#FEE2E2', color: '#EF4444', fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px', flexShrink: 0, marginTop: '3px' }}>ACTION</span>}
+                    {m.urgent && <span style={{ background: '#F9E6E8', color: '#B4232A', fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px', flexShrink: 0, marginTop: '3px' }}>ACTION</span>}
                   </div>
                 ))
               )}
@@ -214,13 +214,13 @@ export default function SupervisorDashboard() {
             <div style={{ padding: '14px 20px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Quick Actions</div>
               <Link to="/supervisor/synopsis" className="btn btn-ghost btn-sm" style={{ justifyContent: 'flex-start', gap: '8px', width: '100%', textAlign: 'left', fontSize: '12.5px', textDecoration: 'none' }}>
-                📋 Review Synopsis
+                 Review Synopsis
               </Link>
               <Link to="/supervisor/thesis" className="btn btn-ghost btn-sm" style={{ justifyContent: 'flex-start', gap: '8px', width: '100%', textAlign: 'left', fontSize: '12.5px', textDecoration: 'none' }}>
-                📚 Review Thesis
+                 Review Thesis
               </Link>
               <Link to="/supervisor/schedule-dc-meeting" className="btn btn-ghost btn-sm" style={{ justifyContent: 'flex-start', gap: '8px', width: '100%', textAlign: 'left', fontSize: '12.5px', textDecoration: 'none' }}>
-                📅 Schedule DC Meeting
+                 Schedule DC Meeting
               </Link>
             </div>
           </div>
@@ -233,7 +233,7 @@ export default function SupervisorDashboard() {
               <div className="card-title">Recent Publications</div>
               <div className="card-subtitle">Publications by your supervised scholars</div>
             </div>
-            <Link to="/supervisor/publications" className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)', textDecoration: 'none' }}>View All</Link>
+            <Link to="/supervisor/publications" className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)', textDecoration: 'none' }}>View All</Link>
           </div>
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
             {publications.length === 0 ? (
@@ -252,12 +252,12 @@ export default function SupervisorDashboard() {
                     <tr key={p.id || p._id || i}>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div className="avatar avatar-sm" style={{ background: `hsl(${i * 70},60%,55%)` }}>{(p.scholarName || p.author || 'S').charAt(0)}</div>
+                          <div className="avatar avatar-sm" style={{ background: ['#174EA6', '#1E7D45', '#C89B1E', '#B4232A'][i % 4] }}>{(p.scholarName || p.author || 'S').charAt(0)}</div>
                           <span style={{ fontWeight: 600, fontSize: '13px' }}>{p.scholarName || p.author || 'Scholar'}</span>
                         </div>
                       </td>
                       <td style={{ maxWidth: '240px', fontSize: '12.5px' }}>{p.title}</td>
-                      <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{p.journal || p.venue || '—'}</td>
+                      <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{p.journal || p.venue || '-'}</td>
                       <td>
                         <span className="badge badge-info" style={{ fontSize: '10px' }}>{p.pubType || 'Journal'}</span>
                       </td>

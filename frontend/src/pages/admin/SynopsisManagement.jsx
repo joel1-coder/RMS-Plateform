@@ -34,7 +34,7 @@ export default function SynopsisManagement() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Synopsis Details</span>
-              <button className="modal-close" onClick={() => setViewItem(null)}>✕</button>
+              <button className="modal-close" onClick={() => setViewItem(null)}></button>
             </div>
             <div className="modal-body">
               <div style={{ display: 'grid', gap: '12px' }}>
@@ -52,8 +52,8 @@ export default function SynopsisManagement() {
             </div>
             <div className="modal-footer">
               {viewItem.status === 'Under Review' && <>
-                <button className="btn btn-success btn-sm" onClick={() => { changeStatus(viewItem.id, 'Approved'); setViewItem(null) }}>✓ Approve</button>
-                <button className="btn btn-danger btn-sm" onClick={() => { changeStatus(viewItem.id, 'Revision Required'); setViewItem(null) }}>↩ Request Revision</button>
+                <button className="btn btn-success btn-sm" onClick={() => { changeStatus(viewItem.id, 'Approved'); setViewItem(null) }}> Approve</button>
+                <button className="btn btn-danger btn-sm" onClick={() => { changeStatus(viewItem.id, 'Revision Required'); setViewItem(null) }}> Request Revision</button>
               </>}
               <button className="btn btn-ghost" onClick={() => setViewItem(null)}>Close</button>
             </div>
@@ -67,17 +67,17 @@ export default function SynopsisManagement() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Track and review research synopsis submissions</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📥 Export</button>
+          <button className="btn btn-ghost btn-sm"> Export</button>
         </div>
       </div>
 
       <div className="page-body">
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
           {[
-            { label: 'Total', value: synopses.length, icon: '📋', color: 'purple' },
-            { label: 'Approved', value: synopses.filter(s => s.status === 'Approved').length, icon: '✅', color: 'green' },
-            { label: 'Under Review', value: synopses.filter(s => s.status === 'Under Review').length, icon: '🔍', color: 'orange' },
-            { label: 'Pending DRC', value: synopses.filter(s => s.status === 'Pending DRC').length, icon: '⏳', color: 'blue' },
+            { label: 'Total', value: synopses.length, icon: '', color: 'blue' },
+            { label: 'Approved', value: synopses.filter(s => s.status === 'Approved').length, icon: '', color: 'green' },
+            { label: 'Under Review', value: synopses.filter(s => s.status === 'Under Review').length, icon: '', color: 'orange' },
+            { label: 'Pending DRC', value: synopses.filter(s => s.status === 'Pending DRC').length, icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -92,7 +92,7 @@ export default function SynopsisManagement() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search synopsis..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <select className="form-control form-select" style={{ width: '170px' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
@@ -121,7 +121,7 @@ export default function SynopsisManagement() {
                     <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="avatar avatar-sm" style={{ background: '#10B981' }}>{syn.scholar.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: '#1E7D45' }}>{syn.scholar.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '13px' }}>{syn.scholar}</div>
                           <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{syn.dept}</div>
@@ -135,12 +135,12 @@ export default function SynopsisManagement() {
                     <td><span className={`badge ${STATUS_COLORS[syn.status]}`}>{syn.status}</span></td>
                     <td>
                       <div style={{ display: 'flex', gap: '5px' }}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => setViewItem(syn)}>👁️</button>
+                        <button className="btn btn-secondary btn-sm" onClick={() => setViewItem(syn)}></button>
                         {syn.status === 'Under Review' && <>
-                          <button className="btn btn-success btn-sm" onClick={() => changeStatus(syn.id, 'Approved')}>✓</button>
-                          <button className="btn btn-danger btn-sm" onClick={() => changeStatus(syn.id, 'Revision Required')}>↩</button>
+                          <button className="btn btn-success btn-sm" onClick={() => changeStatus(syn.id, 'Approved')}></button>
+                          <button className="btn btn-danger btn-sm" onClick={() => changeStatus(syn.id, 'Revision Required')}></button>
                         </>}
-                        <button className="btn btn-ghost btn-sm">📄</button>
+                        <button className="btn btn-ghost btn-sm"></button>
                       </div>
                     </td>
                   </tr>

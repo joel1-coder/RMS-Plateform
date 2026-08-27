@@ -1,4 +1,4 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
@@ -63,7 +63,7 @@ function ScheduleModal({ onClose, onSave, scholars, editData = null }) {
       <div className="modal">
         <div className="modal-header">
           <span className="modal-title">{editData ? 'Edit Viva Voce details' : 'Schedule Viva Voce'}</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -119,7 +119,7 @@ function ScheduleModal({ onClose, onSave, scholars, editData = null }) {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary">📅 {editData ? 'Save Changes' : 'Schedule Viva'}</button>
+            <button type="submit" className="btn btn-primary"> {editData ? 'Save Changes' : 'Schedule Viva'}</button>
           </div>
         </form>
       </div>
@@ -282,17 +282,17 @@ export default function VivaVoce() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Schedule and track viva voce examinations</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>📅 Schedule Viva</button>
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}> Schedule Viva</button>
         </div>
       </div>
 
       <div className="page-body">
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Scheduled', value: vivas.length, icon: '📅', color: 'purple' },
-            { label: 'Upcoming', value: vivas.filter(v => v.status === 'Scheduled').length, icon: '⏰', color: 'blue' },
-            { label: 'Completed', value: vivas.filter(v => v.status === 'Completed').length, icon: '✅', color: 'green' },
-            { label: 'Pending Setup', value: vivas.filter(v => v.status === 'Pending').length, icon: '⏳', color: 'orange' },
+            { label: 'Total Scheduled', value: vivas.length, icon: '', color: 'blue' },
+            { label: 'Upcoming', value: vivas.filter(v => v.status === 'Scheduled').length, icon: '', color: 'blue' },
+            { label: 'Completed', value: vivas.filter(v => v.status === 'Completed').length, icon: '', color: 'green' },
+            { label: 'Pending Setup', value: vivas.filter(v => v.status === 'Pending').length, icon: '', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -307,7 +307,7 @@ export default function VivaVoce() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search scholar or department..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <select className="form-control form-select" style={{ width: '160px' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
@@ -341,7 +341,7 @@ export default function VivaVoce() {
                       <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div className="avatar avatar-sm" style={{ background: '#6C63FF' }}>{viva.scholar?.charAt(0)}</div>
+                          <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{viva.scholar?.charAt(0)}</div>
                           <div>
                             <div style={{ fontWeight: 600, fontSize: '13px' }}>{viva.scholar}</div>
                             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{viva.dept}</div>
@@ -363,10 +363,10 @@ export default function VivaVoce() {
                       <td>
                         <div style={{ display: 'flex', gap: '4px' }}>
                           {viva.status === 'Scheduled' && (
-                            <button className="btn btn-ghost btn-sm" style={{ color: '#10B981' }} onClick={() => handleToggleStatus(viva, 'Completed')} title="Mark Completed">✓</button>
+                            <button className="btn btn-ghost btn-sm" style={{ color: '#1E7D45' }} onClick={() => handleToggleStatus(viva, 'Completed')} title="Mark Completed"></button>
                           )}
-                          <button className="btn btn-secondary btn-sm" onClick={() => setEditingViva(viva)} title="Edit">✏️</button>
-                          <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }} onClick={() => handleDelete(viva.id || viva._id)} title="Delete">🗑️</button>
+                          <button className="btn btn-secondary btn-sm" onClick={() => setEditingViva(viva)} title="Edit"></button>
+                          <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }} onClick={() => handleDelete(viva.id || viva._id)} title="Delete"></button>
                         </div>
                       </td>
                     </tr>

@@ -38,18 +38,18 @@ export default function ThesisManagement() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Review and manage thesis submissions</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📥 Export</button>
+          <button className="btn btn-ghost btn-sm"> Export</button>
         </div>
       </div>
 
       <div className="page-body">
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
           {[
-            { label: 'Total', value: theses.length, icon: '📚', color: 'purple' },
-            { label: 'Submitted', value: theses.filter(t => t.status === 'Submitted').length, icon: '📤', color: 'blue' },
-            { label: 'Under Review', value: theses.filter(t => t.status === 'Under Review').length, icon: '🔍', color: 'orange' },
-            { label: 'Approved', value: theses.filter(t => t.status === 'Approved').length, icon: '✅', color: 'green' },
-            { label: 'Revision Needed', value: theses.filter(t => t.status === 'Revision Required').length, icon: '✏️', color: 'red' },
+            { label: 'Total', value: theses.length, icon: '', color: 'blue' },
+            { label: 'Submitted', value: theses.filter(t => t.status === 'Submitted').length, icon: '', color: 'blue' },
+            { label: 'Under Review', value: theses.filter(t => t.status === 'Under Review').length, icon: '', color: 'orange' },
+            { label: 'Approved', value: theses.filter(t => t.status === 'Approved').length, icon: '', color: 'green' },
+            { label: 'Revision Needed', value: theses.filter(t => t.status === 'Revision Required').length, icon: '', color: 'red' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -64,7 +64,7 @@ export default function ThesisManagement() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search scholar or thesis..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <select className="form-control form-select" style={{ width: '170px' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
@@ -97,7 +97,7 @@ export default function ThesisManagement() {
                     <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="avatar avatar-sm" style={{ background: '#6C63FF' }}>{thesis.scholar.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{thesis.scholar.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '13px' }}>{thesis.scholar}</div>
                           <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{thesis.dept}</div>
@@ -112,12 +112,12 @@ export default function ThesisManagement() {
                     <td><span className={`badge ${STATUS_COLORS[thesis.status]}`}>{thesis.status}</span></td>
                     <td>
                       <div style={{ display: 'flex', gap: '5px' }}>
-                        <button className="btn btn-secondary btn-sm" title="View">👁️</button>
+                        <button className="btn btn-secondary btn-sm" title="View"></button>
                         {thesis.status === 'Under Review' && <>
-                          <button className="btn btn-success btn-sm" onClick={() => changeStatus(thesis.id, 'Approved')} title="Approve">✓</button>
-                          <button className="btn btn-danger btn-sm" onClick={() => changeStatus(thesis.id, 'Revision Required')} title="Request Revision">↩</button>
+                          <button className="btn btn-success btn-sm" onClick={() => changeStatus(thesis.id, 'Approved')} title="Approve"></button>
+                          <button className="btn btn-danger btn-sm" onClick={() => changeStatus(thesis.id, 'Revision Required')} title="Request Revision"></button>
                         </>}
-                        <button className="btn btn-ghost btn-sm">📄</button>
+                        <button className="btn btn-ghost btn-sm"></button>
                       </div>
                     </td>
                   </tr>

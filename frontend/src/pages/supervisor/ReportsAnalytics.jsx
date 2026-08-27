@@ -1,9 +1,9 @@
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 
 const progressDist = [
-  { name: 'On Track (60%)', value: 25, color: '#3B82F6' },
-  { name: 'Excellent (25%)', value: 11, color: '#F59E0B' },
-  { name: 'Needs Attention (15%)', value: 6, color: '#EF4444' },
+  { name: 'On Track (60%)', value: 25, color: '#174EA6' },
+  { name: 'Excellent (25%)', value: 11, color: '#C89B1E' },
+  { name: 'Needs Attention (15%)', value: 6, color: '#B4232A' },
 ]
 
 const completionRates = [
@@ -28,8 +28,8 @@ export default function ReportsAnalytics() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Analyze scholar performance and institutional research metrics</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📄 Export as PDF</button>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>📊 Export as Excel</button>
+          <button className="btn btn-ghost btn-sm"> Export as PDF</button>
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}> Export as Excel</button>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ export default function ReportsAnalytics() {
                   <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fontWeight: 600 }} width={120} />
                   <Tooltip formatter={v => [`${v}%`, 'Completion Rate']} />
-                  <Bar dataKey="rate" fill="#3B82F6" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="rate" fill="#174EA6" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -123,7 +123,7 @@ export default function ReportsAnalytics() {
                   <tr key={idx}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="avatar avatar-sm" style={{ background: '#4F46E5' }}>{s.name.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: '#0A2A66' }}>{s.name.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '13px' }}>{s.name}</div>
                           <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.id}</div>
@@ -137,7 +137,7 @@ export default function ReportsAnalytics() {
                     <td>
                       <div className="progress-bar-wrap">
                         <div className="progress-bar" style={{ width: '70px' }}>
-                          <div className="progress-fill" style={{ width: `${s.progress}%`, background: s.progress >= 75 ? '#10B981' : s.progress >= 40 ? '#3B82F6' : '#EF4444' }} />
+                          <div className="progress-fill" style={{ width: `${s.progress}%`, background: s.progress >= 75 ? '#1E7D45' : s.progress >= 40 ? '#174EA6' : '#B4232A' }} />
                         </div>
                         <span style={{ fontSize: '11.5px', fontWeight: 700 }}>{s.progress}%</span>
                       </div>

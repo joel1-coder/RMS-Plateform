@@ -92,7 +92,7 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
       <div className="modal">
         <div className="modal-header">
           <span className="modal-title">Meeting Schedule</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -135,12 +135,12 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
                           borderBottom: '1px solid var(--border)',
                           transition: 'background 0.15s'
                         }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#F0FDF4'}
+                        onMouseEnter={e => e.currentTarget.style.background = '#E7F4EC'}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
                         <span style={{
                           width: '28px', height: '28px', borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #0D9488, #10B981)',
+                          background: 'linear-gradient(135deg, #174EA6, #1E7D45)',
                           color: '#fff', display: 'flex', alignItems: 'center',
                           justifyContent: 'center', fontWeight: 700, fontSize: '12px', flexShrink: 0
                         }}>{s.name.charAt(0)}</span>
@@ -189,7 +189,7 @@ function DRCMeetingModal({ onClose, onSave, editData = null }) {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary" style={{ background: '#0D9488', borderColor: '#0D9488' }}>
+            <button type="submit" className="btn btn-primary" style={{ background: '#174EA6', borderColor: '#174EA6' }}>
               {editData ? 'Save Changes' : 'Schedule Meeting'}
             </button>
           </div>
@@ -268,8 +268,8 @@ export default function DRCMeetingManagement() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Coordinate and list scheduled Doctoral Research Committee reviews</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: '#0D9488', borderColor: '#0D9488' }} onClick={() => setShowModal(true)}>
-            ＋ Meeting Schedule
+          <button className="btn btn-primary btn-sm" style={{ background: '#174EA6', borderColor: '#174EA6' }} onClick={() => setShowModal(true)}>
+            + Meeting Schedule
           </button>
         </div>
       </div>
@@ -278,7 +278,7 @@ export default function DRCMeetingManagement() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search candidate or title..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
           </div>
@@ -302,7 +302,7 @@ export default function DRCMeetingManagement() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <span style={{
                           width: '32px', height: '32px', borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #0D9488, #0F766E)',
+                          background: 'linear-gradient(135deg, #174EA6, #0A2A66)',
                           color: '#fff', display: 'flex', alignItems: 'center',
                           justifyContent: 'center', fontWeight: 700, fontSize: '13px'
                         }}>{(m.scholar || 'S').charAt(0)}</span>
@@ -314,7 +314,7 @@ export default function DRCMeetingManagement() {
                     <td>
                       <div style={{ fontSize: '13px', fontWeight: 600 }}>{m.date}</div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{m.time}</div>
-                      <div style={{ fontSize: '11px', color: '#0D9488', marginTop: '2px', fontWeight: 600 }}>📍 {m.venue || 'TBD'}</div>
+                      <div style={{ fontSize: '11px', color: '#174EA6', marginTop: '2px', fontWeight: 600 }}> {m.venue || 'TBD'}</div>
                     </td>
 
                     {/* 3. Regards Title */}
@@ -333,7 +333,7 @@ export default function DRCMeetingManagement() {
                     <td>
                       <div style={{ display: 'flex', gap: '4px' }}>
                         <button className="btn btn-ghost btn-sm" onClick={() => setEditingMeeting(m)}>Edit</button>
-                        <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }} onClick={() => handleDelete(m.id)}>Delete</button>
+                        <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }} onClick={() => handleDelete(m.id)}>Delete</button>
                       </div>
                     </td>
                   </tr>

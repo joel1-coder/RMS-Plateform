@@ -52,7 +52,7 @@ export default function CommitteeManagement() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Establish New DRC Committee</span>
-              <button className="modal-close" onClick={() => setShowAddModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowAddModal(false)}></button>
             </div>
             <div className="modal-body">
               <div className="form-group">
@@ -89,7 +89,7 @@ export default function CommitteeManagement() {
             </div>
             <div className="modal-footer">
               <button className="btn btn-ghost" onClick={() => setShowAddModal(false)}>Cancel</button>
-              <button className="btn btn-primary" style={{ background: '#0D9488' }} onClick={handleAdd}>Establish Committee</button>
+              <button className="btn btn-primary" style={{ background: '#174EA6' }} onClick={handleAdd}>Establish Committee</button>
             </div>
           </div>
         </div>
@@ -102,8 +102,8 @@ export default function CommitteeManagement() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Establish, edit and assign members to departmental research evaluation boards.</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: '#0D9488' }} onClick={() => setShowAddModal(true)}>
-            ＋ Establish Committee
+          <button className="btn btn-primary btn-sm" style={{ background: '#174EA6' }} onClick={() => setShowAddModal(true)}>
+            + Establish Committee
           </button>
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function CommitteeManagement() {
                   <tr key={c.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '20px' }}>👥</span>
+                        <span style={{ fontSize: '20px' }}></span>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{c.name}</div>
                           <span style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>ID: {c.id}</span>
@@ -154,7 +154,7 @@ export default function CommitteeManagement() {
                         <button className="btn btn-secondary btn-sm" style={{ fontSize: '11px', padding: '3px 8px' }} onClick={() => toggleStatus(c.id)}>
                           Toggle Status
                         </button>
-                        <button className="btn btn-ghost btn-sm" title="Edit Members">✏️</button>
+                        <button className="btn btn-ghost btn-sm" title="Edit Members"></button>
                       </div>
                     </td>
                   </tr>

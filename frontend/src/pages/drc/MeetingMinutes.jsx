@@ -35,7 +35,7 @@ export default function MeetingMinutes() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Record DRC Meeting Minutes</span>
-              <button className="modal-close" onClick={() => setShowAddModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowAddModal(false)}></button>
             </div>
             <div className="modal-body">
               <div className="form-group">
@@ -60,7 +60,7 @@ export default function MeetingMinutes() {
             </div>
             <div className="modal-footer">
               <button className="btn btn-ghost" onClick={() => setShowAddModal(false)}>Cancel</button>
-              <button className="btn btn-primary" style={{ background: '#0D9488' }} onClick={handleAdd}>Save Minutes</button>
+              <button className="btn btn-primary" style={{ background: '#174EA6' }} onClick={handleAdd}>Save Minutes</button>
             </div>
           </div>
         </div>
@@ -73,8 +73,8 @@ export default function MeetingMinutes() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Record, review, and digitally sign minutes of DRC research review meetings.</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: '#0D9488' }} onClick={() => setShowAddModal(true)}>
-            ＋ Record Minutes
+          <button className="btn btn-primary btn-sm" style={{ background: '#174EA6' }} onClick={() => setShowAddModal(true)}>
+            + Record Minutes
           </button>
         </div>
       </div>
@@ -98,10 +98,10 @@ export default function MeetingMinutes() {
                   <tr key={m.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '20px' }}>📝</span>
+                        <span style={{ fontSize: '20px' }}></span>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{m.committee}</div>
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>📅 {m.meetingDate}</span>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}> {m.meetingDate}</span>
                         </div>
                       </div>
                     </td>
@@ -115,10 +115,10 @@ export default function MeetingMinutes() {
                       <div style={{ display: 'flex', gap: '4px' }}>
                         {m.status === 'Draft' ? (
                           <button className="btn btn-secondary btn-sm" style={{ fontSize: '11px', padding: '3px 8px' }} onClick={() => finalizeMinutes(m.id)}>
-                            ✓ Finalize
+                             Finalize
                           </button>
                         ) : (
-                          <button className="btn btn-ghost btn-sm" title="View final signed MoM">📄 Signed</button>
+                          <button className="btn btn-ghost btn-sm" title="View final signed MoM"> Signed</button>
                         )}
                       </div>
                     </td>

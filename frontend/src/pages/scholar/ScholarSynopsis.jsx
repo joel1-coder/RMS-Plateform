@@ -120,7 +120,7 @@ export default function ScholarSynopsis() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">{submissions.length > 0 ? 'Submit Revised Synopsis' : 'Submit Research Synopsis'}</span>
-              <button className="modal-close" onClick={() => setShowUpload(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowUpload(false)}></button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
@@ -152,14 +152,14 @@ export default function ScholarSynopsis() {
                       padding: '28px',
                       textAlign: 'center',
                       cursor: 'pointer',
-                      background: file ? '#F0FDF4' : 'transparent',
+                      background: file ? '#E7F4EC' : 'transparent',
                       transition: 'border-color 0.2s'
                     }}
                     onDragOver={e => e.preventDefault()}
                     onClick={() => document.getElementById('syn-file').click()}
                   >
-                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>{file ? '📄' : '📤'}</div>
-                    <div style={{ fontSize: '13px', color: file ? '#059669' : 'var(--text-secondary)', fontWeight: file ? 600 : 400 }}>
+                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>{file ? '' : ''}</div>
+                    <div style={{ fontSize: '13px', color: file ? '#166A3A' : 'var(--text-secondary)', fontWeight: file ? 600 : 400 }}>
                       {file ? file.name : 'Click to upload or drag & drop'}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>PDF, max 15MB</div>
@@ -189,9 +189,9 @@ export default function ScholarSynopsis() {
                   type="submit"
                   disabled={submitting}
                   className="btn btn-primary"
-                  style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+                  style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
                 >
-                  {submitting ? 'Submitting...' : '📤 Submit Synopsis'}
+                  {submitting ? 'Submitting...' : ' Submit Synopsis'}
                 </button>
               </div>
             </form>
@@ -208,10 +208,10 @@ export default function ScholarSynopsis() {
         <div className="topbar-actions">
           <button
             className="btn btn-primary btn-sm"
-            style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+            style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
             onClick={() => setShowUpload(true)}
           >
-            📤 {submissions.length > 0 ? 'Submit New Version' : 'Submit Synopsis'}
+             {submissions.length > 0 ? 'Submit New Version' : 'Submit Synopsis'}
           </button>
         </div>
       </div>
@@ -222,14 +222,14 @@ export default function ScholarSynopsis() {
           <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading synopsis status...</div>
         ) : !latest ? (
           <div style={{
-            background: 'linear-gradient(135deg, #1E293B, #0F172A)',
+            background: 'linear-gradient(135deg, #0A2A66, #061B44)',
             border: '1.5px dashed rgba(255,255,255,0.2)',
             borderRadius: 'var(--radius-xl)', padding: '28px 32px', color: '#fff', marginBottom: '24px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(16,185,129,0.2)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px' }}>
-                📋
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(30,125,69,0.18)', color: '#1E7D45', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px' }}>
+                
               </div>
               <div>
                 <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '3px' }}>Synopsis Status</div>
@@ -241,19 +241,19 @@ export default function ScholarSynopsis() {
             </div>
             <button
               className="btn btn-primary"
-              style={{ background: 'linear-gradient(90deg,#10B981,#059669)', border: 'none', boxShadow: '0 4px 14px rgba(16,185,129,0.4)' }}
+              style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)', border: 'none', boxShadow: '0 4px 14px rgba(30,125,69,0.3)' }}
               onClick={() => setShowUpload(true)}
             >
-              📤 Submit Synopsis Now
+               Submit Synopsis Now
             </button>
           </div>
         ) : isDone ? (
           <div style={{
-            background: 'linear-gradient(135deg, #065F46, #047857)',
+            background: 'linear-gradient(135deg, #1E7D45, #166A3A)',
             borderRadius: 'var(--radius-xl)', padding: '28px 32px', color: '#fff', marginBottom: '24px',
             display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap'
           }}>
-            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', flexShrink: 0 }}>✅</div>
+            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', flexShrink: 0 }}></div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '4px' }}>Synopsis Status</div>
               <div style={{ fontSize: '22px', fontWeight: 800, marginBottom: '4px' }}>Approved by DRC</div>
@@ -269,18 +269,18 @@ export default function ScholarSynopsis() {
                 className="btn"
                 style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 'var(--radius-md)', textDecoration: 'none' }}
               >
-                📄 Download Approved Copy
+                 Download Approved Copy
               </a>
             )}
           </div>
         ) : (
           <div style={{
-            background: latest.status.includes('Revision') ? 'linear-gradient(135deg, #991B1B, #B91C1C)' : 'linear-gradient(135deg, #1E3A5F, #1E293B)',
+            background: latest.status.includes('Revision') ? 'linear-gradient(135deg, #9F1E24, #B4232A)' : 'linear-gradient(135deg, #0A2A66, #061B44)',
             borderRadius: 'var(--radius-xl)', padding: '24px 30px', color: '#fff', marginBottom: '24px',
             display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap'
           }}>
             <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', flexShrink: 0 }}>
-              {latest.status.includes('Revision') ? '⚠️' : '⏳'}
+              {latest.status.includes('Revision') ? '' : ''}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '3px' }}>Current Synopsis Status</div>
@@ -297,7 +297,7 @@ export default function ScholarSynopsis() {
                 className="btn"
                 style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', textDecoration: 'none' }}
               >
-                📄 View Submitted File
+                 View Submitted File
               </a>
             )}
           </div>
@@ -317,17 +317,17 @@ export default function ScholarSynopsis() {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '80px' }}>
                       <div style={{
                         width: 36, height: 36, borderRadius: '50%',
-                        background: isStepCompleted || isDone ? '#10B981' : isStepActive ? '#F59E0B' : 'var(--border)',
+                        background: isStepCompleted || isDone ? '#1E7D45' : isStepActive ? '#C89B1E' : 'var(--border)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#fff', fontSize: '14px', fontWeight: 700,
-                        border: isStepActive ? '3px solid #D97706' : 'none',
+                        border: isStepActive ? '3px solid #936C00' : 'none',
                         boxShadow: isStepActive ? '0 0 0 4px rgba(245,158,11,0.2)' : 'none',
                       }}>
-                        {isStepCompleted || isDone ? '✓' : i + 1}
+                        {isStepCompleted || isDone ? '' : i + 1}
                       </div>
                       <div style={{
                         fontSize: '11px',
-                        color: isStepCompleted || isDone ? '#059669' : isStepActive ? '#D97706' : 'var(--text-muted)',
+                        color: isStepCompleted || isDone ? '#166A3A' : isStepActive ? '#936C00' : 'var(--text-muted)',
                         fontWeight: isStepActive || isStepCompleted || isDone ? 700 : 400,
                         marginTop: '6px',
                         textAlign: 'center',
@@ -339,7 +339,7 @@ export default function ScholarSynopsis() {
                     {i < TIMELINE_STEPS.length - 1 && (
                       <div style={{
                         flex: 1, height: '2px',
-                        background: (isStepCompleted || isDone) && i < currentStep ? '#10B981' : 'var(--border)',
+                        background: (isStepCompleted || isDone) && i < currentStep ? '#1E7D45' : 'var(--border)',
                         margin: '0 4px', marginBottom: '18px', transition: 'background 0.5s'
                       }} />
                     )}
@@ -381,7 +381,7 @@ export default function ScholarSynopsis() {
                 <div style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>Loading history...</div>
               ) : submissions.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-muted)' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '8px' }}>📂</div>
+                  <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
                   <div style={{ fontWeight: 600 }}>No submissions yet</div>
                   <div style={{ fontSize: '12px', marginTop: '4px' }}>Click "Submit Synopsis" above to upload your version 1.0.</div>
                 </div>
@@ -390,7 +390,7 @@ export default function ScholarSynopsis() {
                   <div key={h.id || h._id} style={{
                     padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
                     marginBottom: '12px',
-                    background: (h.status === 'Approved by DRC' || h.status === 'Approved') ? '#F0FDF4' : h.status.includes('Revision') ? '#FEF2F2' : '#FFFBEB'
+                    background: (h.status === 'Approved by DRC' || h.status === 'Approved') ? '#E7F4EC' : h.status.includes('Revision') ? '#F9E6E8' : '#FFF6D8'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                       <span style={{ fontWeight: 700, fontSize: '14px' }}>{h.version || `v${submissions.length - i}.0`}</span>
@@ -414,7 +414,7 @@ export default function ScholarSynopsis() {
                         className="btn btn-ghost btn-sm"
                         style={{ marginTop: '8px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       >
-                        📄 Download Document
+                         Download Document
                       </a>
                     )}
                   </div>

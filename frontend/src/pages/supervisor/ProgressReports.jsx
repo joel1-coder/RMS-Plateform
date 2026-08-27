@@ -37,7 +37,7 @@ export default function ProgressReports() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Assess bi-annual progress reports submitted by scholars</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📥 Export CSV</button>
+          <button className="btn btn-ghost btn-sm"> Export CSV</button>
         </div>
       </div>
 
@@ -62,7 +62,7 @@ export default function ProgressReports() {
                 <option value="365">This Year</option>
               </select>
             </div>
-            <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>Apply Filters</button>
+            <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}>Apply Filters</button>
           </div>
         </div>
 
@@ -70,7 +70,7 @@ export default function ProgressReports() {
         <div className="card">
           <div className="card-header" style={{ padding: '12px 20px' }}>
             <span className="card-title">Recent Submissions</span>
-            <span style={{ fontSize: '11px', background: '#EDE9FE', color: '#6C63FF', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontWeight: 700 }}>
+            <span style={{ fontSize: '11px', background: '#E8EEF8', color: '#174EA6', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontWeight: 700 }}>
               {filtered.filter(r => r.status === 'Pending').length} Active Reports
             </span>
           </div>
@@ -92,7 +92,7 @@ export default function ProgressReports() {
                   <tr key={r.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="avatar avatar-sm" style={{ background: '#10B981' }}>{r.name.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: '#1E7D45' }}>{r.name.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '13px' }}>{r.name}</div>
                           <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{r.role}</div>
@@ -103,7 +103,7 @@ export default function ProgressReports() {
                     <td>
                       <div className="progress-bar-wrap">
                         <div className="progress-bar" style={{ width: '60px' }}>
-                          <div className="progress-fill" style={{ width: `${r.progress}%`, background: r.progress >= 75 ? '#10B981' : r.progress >= 50 ? '#6C63FF' : '#EF4444' }} />
+                          <div className="progress-fill" style={{ width: `${r.progress}%`, background: r.progress >= 75 ? '#1E7D45' : r.progress >= 50 ? '#174EA6' : '#B4232A' }} />
                         </div>
                         <span style={{ fontSize: '11.5px', fontWeight: 700 }}>{r.progress}%</span>
                       </div>

@@ -5,7 +5,7 @@ import { Plus, Trash2, Pencil, Save, X, Search, Download, ChevronLeft, ChevronRi
 // CONCEPT: "constants outside the component"
 // Things that never change while the app is running (dropdown choices, column
 // definitions) are kept outside the component function. This way React does
-// not recreate them on every re-render — it's a small performance habit.
+// not recreate them on every re-render - it's a small performance habit.
 // ---------------------------------------------------------------------------
 const DEPARTMENTS = [
   "Computer Science",
@@ -22,7 +22,7 @@ const REVIEW_STATUS = ["Pending", "In Review", "Approved", "Revision Needed"];
 const COMPLETION_STATUS = ["Ongoing", "Submitted", "Viva Completed", "Awarded"];
 
 // Every column the register needs. Keeping this as one list means the header
-// row and every data row can be built by looping over the SAME array —
+// row and every data row can be built by looping over the SAME array -
 // so header and body can never drift out of sync.
 const COLUMNS = [
   { key: "sno", label: "S.No", width: 60, type: "text", sticky: "left" },
@@ -118,7 +118,7 @@ export default function ScholarManagement() {
   // CONCEPT: "state"
   // useState gives a component memory. `data` holds every row of the
   // register. Whenever we call setData(...), React re-renders the table
-  // with the new array — that's the whole trick behind "live" UI.
+  // with the new array - that's the whole trick behind "live" UI.
   // ---------------------------------------------------------------------
   const [data, setData] = useState(INITIAL_DATA);
 
@@ -136,7 +136,7 @@ export default function ScholarManagement() {
   // Instead of storing a separate "filteredData" in useState, we CALCULATE
   // it from `data` and `search` every render. useMemo just avoids redoing
   // that calculation unless data/search actually changed. This keeps the
-  // filtered list always correct — there's no way for it to go stale.
+  // filtered list always correct - there's no way for it to go stale.
   // -----------------------------------------------------------------------
   const filteredData = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -357,7 +357,7 @@ export default function ScholarManagement() {
                           <EditableField col={col} value={activeRow[col.key]} onChange={updateDraft} />
                         ) : (
                           <span style={{ color: col.key === "sno" ? "#6b7280" : "#111827" }}>
-                            {activeRow[col.key] || "—"}
+                            {activeRow[col.key] || "-"}
                           </span>
                         )}
                       </td>
@@ -438,7 +438,7 @@ function EditableField({ col, value, onChange }) {
   if (col.type === "select") {
     return (
       <select value={value || ""} onChange={(e) => onChange(col.key, e.target.value)} style={baseStyle}>
-        <option value="">—</option>
+        <option value="">-</option>
         {col.options.map((opt) => (
           <option key={opt} value={opt}>
             {opt}

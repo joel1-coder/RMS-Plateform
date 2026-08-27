@@ -406,7 +406,7 @@ export default function ScholarProfileView({ scholar, onBack }) {
                   setIsEditing(true);
                 }
               }} 
-              style={{ background: isEditing ? '#10B981' : '#2563eb', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+              style={{ background: isEditing ? '#1E7D45' : '#174EA6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
             >
               {isEditing ? 'SAVE DETAILS' : 'UPDATE DETAILS'}
             </button>
@@ -416,7 +416,7 @@ export default function ScholarProfileView({ scholar, onBack }) {
         {/* Action Buttons */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '40px' }}>
           <button style={{ 
-            background: '#2563eb', color: '#fff', border: 'none', 
+            background: '#174EA6', color: '#fff', border: 'none', 
             padding: '12px 24px', borderRadius: '6px', fontSize: '14px', 
             fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' 
           }}>
@@ -432,7 +432,7 @@ export default function ScholarProfileView({ scholar, onBack }) {
               }
             }}
             style={{ 
-              background: isEditing ? '#10B981' : '#4F46E5', color: '#fff', border: 'none', 
+              background: isEditing ? '#1E7D45' : '#0A2A66', color: '#fff', border: 'none', 
               padding: '12px 24px', borderRadius: '6px', fontSize: '14px', 
               fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' 
             }}

@@ -44,7 +44,7 @@ function ScheduleMeetingModal({ onClose, onSave, editData = null, scholarOptions
       <div className="modal">
         <div className="modal-header">
           <span className="modal-title">{editData ? 'Edit Scheduled Meeting' : 'Schedule New Meeting'}</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -95,7 +95,7 @@ function ScheduleMeetingModal({ onClose, onSave, editData = null, scholarOptions
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}>
               {editData ? 'Save Changes' : 'Schedule Meeting'}
             </button>
           </div>
@@ -231,10 +231,10 @@ export default function MeetingsManagement() {
         <div className="topbar-actions">
           <button 
             className="btn btn-primary btn-sm" 
-            style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} 
+            style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} 
             onClick={() => setShowModal(true)}
           >
-            ＋ Schedule New Meeting
+            + Schedule New Meeting
           </button>
         </div>
       </div>
@@ -243,10 +243,10 @@ export default function MeetingsManagement() {
         {/* KPI Mini Grid */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'My Total Meetings', value: `${myMeetings.length} Scheduled`, icon: '📅', color: 'blue' },
-            { label: 'Upcoming Reviews', value: `${myMeetings.filter(m => m.status === 'Scheduled').length} Upcoming`, icon: '⏰', color: 'orange' },
-            { label: 'Completed', value: `${myMeetings.filter(m => m.status === 'Completed').length} Done`, icon: '✅', color: 'green' },
-            { label: 'Supervised Scholars', value: `${myScholars.length} Candidates`, icon: '👥', color: 'purple' },
+            { label: 'My Total Meetings', value: `${myMeetings.length} Scheduled`, icon: '', color: 'blue' },
+            { label: 'Upcoming Reviews', value: `${myMeetings.filter(m => m.status === 'Scheduled').length} Upcoming`, icon: '', color: 'orange' },
+            { label: 'Completed', value: `${myMeetings.filter(m => m.status === 'Completed').length} Done`, icon: '', color: 'green' },
+            { label: 'Supervised Scholars', value: `${myScholars.length} Candidates`, icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i} style={{ padding: '12px 16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -287,7 +287,7 @@ export default function MeetingsManagement() {
                 return (
                   <div key={idx} style={{ 
                     height: '58px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', 
-                    padding: '4px', textAlign: 'left', background: meeting ? '#EEF2FF' : 'transparent',
+                    padding: '4px', textAlign: 'left', background: meeting ? '#E8EEF8' : 'transparent',
                     display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
                   }}>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)' }}>{dateNum}</span>
@@ -295,7 +295,7 @@ export default function MeetingsManagement() {
                       <span 
                         title={`${meeting.scholar}: ${meeting.type}`}
                         style={{ 
-                          fontSize: '8.5px', background: meeting.status === 'Completed' ? '#10B981' : '#6C63FF', color: '#fff', 
+                          fontSize: '8.5px', background: meeting.status === 'Completed' ? '#1E7D45' : '#174EA6', color: '#fff', 
                           padding: '2px 4px', borderRadius: '4px', fontWeight: 700,
                           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', cursor: 'pointer'
                         }}
@@ -314,7 +314,7 @@ export default function MeetingsManagement() {
             <div className="card">
               <div className="card-header" style={{ padding: '12px 16px' }}>
                 <span className="card-title" style={{ fontSize: '13px' }}>My Scheduled Meetings</span>
-                <span style={{ fontSize: '11.5px', color: '#6C63FF', fontWeight: 700 }}>Active</span>
+                <span style={{ fontSize: '11.5px', color: '#174EA6', fontWeight: 700 }}>Active</span>
               </div>
               <div style={{ padding: '0 16px 12px' }}>
                 {myMeetings.map(meeting => (
@@ -323,7 +323,7 @@ export default function MeetingsManagement() {
                     display: 'flex', gap: '10px', alignItems: 'flex-start' 
                   }}>
                     <div style={{
-                      width: 36, height: 36, borderRadius: '50%', background: '#EDE9FE', color: '#4F46E5',
+                      width: 36, height: 36, borderRadius: '50%', background: '#E8EEF8', color: '#0A2A66',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0, fontWeight: 700
                     }}>
                       {meeting.scholar ? meeting.scholar.charAt(0) : 'S'}
@@ -335,17 +335,17 @@ export default function MeetingsManagement() {
                           {meeting.status}
                         </span>
                       </div>
-                      <div style={{ fontSize: '11px', color: '#6C63FF', fontWeight: 600 }}>{meeting.type}</div>
+                      <div style={{ fontSize: '11px', color: '#174EA6', fontWeight: 600 }}>{meeting.type}</div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{meeting.panel || meeting.venue}</div>
                       
                       <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px', display: 'flex', gap: '12px' }}>
-                        <span>📅 {meeting.date}</span>
-                        <span>⏰ {meeting.time}</span>
+                        <span> {meeting.date}</span>
+                        <span> {meeting.time}</span>
                       </div>
                       
                       <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
                         <button className="btn btn-outline btn-sm" style={{ padding: '2px 8px', fontSize: '11px' }} onClick={() => setEditingMeeting(meeting)}>Edit</button>
-                        <button className="btn btn-ghost btn-sm" style={{ padding: '2px 8px', fontSize: '11px', color: '#EF4444' }} onClick={() => handleDelete(meeting.id)}>Cancel</button>
+                        <button className="btn btn-ghost btn-sm" style={{ padding: '2px 8px', fontSize: '11px', color: '#B4232A' }} onClick={() => handleDelete(meeting.id)}>Cancel</button>
                       </div>
                     </div>
                   </div>
@@ -360,13 +360,13 @@ export default function MeetingsManagement() {
             </div>
 
             {/* Resources card */}
-            <div className="card card-body" style={{ background: '#0F172A', color: '#fff' }}>
+            <div className="card card-body" style={{ background: '#061B44', color: '#fff' }}>
               <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '4px' }}>Meeting Resources</div>
               <p style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.4, marginBottom: '10px' }}>
                 Access guidelines, agenda rubrics, and virtual defense materials for supervisor reviews.
               </p>
-              <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#10B981', cursor: 'pointer' }} onClick={() => toast.success('Rubrics downloaded.')}>
-                Browse Assessment Rubrics →
+              <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#1E7D45', cursor: 'pointer' }} onClick={() => toast.success('Rubrics downloaded.')}>
+                Browse Assessment Rubrics 
               </span>
             </div>
           </div>

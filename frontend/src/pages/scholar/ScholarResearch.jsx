@@ -48,11 +48,11 @@ export default function ScholarResearch() {
   const overallProgress = project?.progress !== undefined ? project.progress : 68
 
   const researchPhases = [
-    { phase: 'Course Work', pct: overallProgress >= 20 ? 100 : overallProgress * 5, color: '#10B981' },
-    { phase: 'Synopsis Preparation', pct: overallProgress >= 40 ? 100 : overallProgress >= 20 ? Math.round((overallProgress - 20) * 5) : 0, color: '#10B981' },
-    { phase: 'Literature Review', pct: overallProgress >= 60 ? 100 : overallProgress >= 40 ? Math.round((overallProgress - 40) * 5) : 0, color: '#10B981' },
-    { phase: 'Data Collection & Experimentation', pct: overallProgress >= 80 ? 100 : overallProgress >= 60 ? Math.round((overallProgress - 60) * 5) : 0, color: '#6C63FF' },
-    { phase: 'Thesis Writing', pct: overallProgress >= 100 ? 100 : overallProgress >= 80 ? Math.round((overallProgress - 80) * 5) : 0, color: '#3B82F6' },
+    { phase: 'Course Work', pct: overallProgress >= 20 ? 100 : overallProgress * 5, color: '#1E7D45' },
+    { phase: 'Synopsis Preparation', pct: overallProgress >= 40 ? 100 : overallProgress >= 20 ? Math.round((overallProgress - 20) * 5) : 0, color: '#1E7D45' },
+    { phase: 'Literature Review', pct: overallProgress >= 60 ? 100 : overallProgress >= 40 ? Math.round((overallProgress - 40) * 5) : 0, color: '#1E7D45' },
+    { phase: 'Data Collection & Experimentation', pct: overallProgress >= 80 ? 100 : overallProgress >= 60 ? Math.round((overallProgress - 60) * 5) : 0, color: '#174EA6' },
+    { phase: 'Thesis Writing', pct: overallProgress >= 100 ? 100 : overallProgress >= 80 ? Math.round((overallProgress - 80) * 5) : 0, color: '#174EA6' },
     { phase: 'Final Submission & Viva Voce', pct: overallProgress === 100 ? 100 : 0, color: '#E2E8F0' },
   ]
 
@@ -76,7 +76,7 @@ export default function ScholarResearch() {
       <div className="page-body">
         {/* Topic Banner */}
         <div style={{
-          background: 'linear-gradient(135deg, #1E1B4B, #312E81)',
+          background: 'linear-gradient(135deg, #061B44, #0A2A66)',
           borderRadius: 'var(--radius-xl)',
           padding: '28px 32px',
           color: '#fff',
@@ -115,7 +115,7 @@ export default function ScholarResearch() {
         <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
           {['overview', 'phases', 'publications', 'keywords'].map(t => (
             <button key={t} onClick={() => setTab(t)} className={`btn ${tab === t ? 'btn-primary' : 'btn-ghost'} btn-sm`}
-              style={tab === t ? { background: 'linear-gradient(90deg,#10B981,#059669)', boxShadow: '0 2px 8px rgba(16,185,129,0.3)' } : {}}>
+              style={tab === t ? { background: 'linear-gradient(90deg,#1E7D45,#166A3A)', boxShadow: '0 2px 8px rgba(30,125,69,0.24)' } : {}}>
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
           ))}
@@ -163,10 +163,10 @@ export default function ScholarResearch() {
                 <div key={i} style={{ marginBottom: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                     <span style={{ fontSize: '13.5px', fontWeight: 600 }}>{p.phase}</span>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: p.pct === 0 ? 'var(--text-muted)' : '#10B981' }}>{p.pct}%</span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: p.pct === 0 ? 'var(--text-muted)' : '#1E7D45' }}>{p.pct}%</span>
                   </div>
                   <div className="progress-bar" style={{ height: '8px' }}>
-                    <div className="progress-fill" style={{ width: `${p.pct}%`, background: p.pct === 100 ? '#10B981' : '#6C63FF' }} />
+                    <div className="progress-fill" style={{ width: `${p.pct}%`, background: p.pct === 100 ? '#1E7D45' : '#174EA6' }} />
                   </div>
                 </div>
               ))}
@@ -182,7 +182,7 @@ export default function ScholarResearch() {
             <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
               {publications.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '8px' }}>📰</div>
+                  <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
                   <div>No publications recorded in database yet.</div>
                 </div>
               ) : (
@@ -215,7 +215,7 @@ export default function ScholarResearch() {
             <div className="card-title" style={{ marginBottom: '16px' }}>Research Domain Keywords</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {['Deep Learning', 'Neural Networks', 'Artificial Intelligence', 'Computational Methods', 'Pattern Recognition', 'Data Analysis', 'Model Validation', 'System Architecture'].map((kw, i) => (
-                <span key={i} style={{ padding: '7px 14px', borderRadius: 'var(--radius-full)', background: i % 3 === 0 ? '#EDE9FE' : i % 3 === 1 ? '#D1FAE5' : '#DBEAFE', color: i % 3 === 0 ? '#6C63FF' : i % 3 === 1 ? '#059669' : '#1D4ED8', fontSize: '13px', fontWeight: 600 }}>
+                <span key={i} style={{ padding: '7px 14px', borderRadius: 'var(--radius-full)', background: i % 3 === 0 ? '#E8EEF8' : i % 3 === 1 ? '#E7F4EC' : '#E8EEF8', color: i % 3 === 0 ? '#174EA6' : i % 3 === 1 ? '#166A3A' : '#0A2A66', fontSize: '13px', fontWeight: 600 }}>
                   {kw}
                 </span>
               ))}

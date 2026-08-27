@@ -1,8 +1,8 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-/* ── Publication Types ── */
+/* -- Publication Types -- */
 const PUB_TYPES = [
   'Conference Proceeding',
   'Journal Publishing',
@@ -14,19 +14,19 @@ const PUB_TYPES = [
 ]
 
 const TYPE_ICONS = {
-  'Conference Proceeding': '🏛️',
-  'Journal Publishing': '📄',
-  'Chapters': '📖',
-  'Books Authored': '📚',
-  'Books Edited': '✏️',
-  'Patent': '⚙️',
-  'Copy Rights': '©️',
+  'Conference Proceeding': '',
+  'Journal Publishing': '',
+  'Chapters': '',
+  'Books Authored': '',
+  'Books Edited': '',
+  'Patent': '',
+  'Copy Rights': '',
 }
 
 function typeDescription(type) {
   const desc = {
     'Conference Proceeding': 'Papers presented at academic conferences',
-    'Journal Publishing': 'Articles in peer-reviewed journals (SCI, Scopus…)',
+    'Journal Publishing': 'Articles in peer-reviewed journals (SCI, Scopus...)',
     'Chapters': 'Chapters contributed to edited books',
     'Books Authored': 'Full books written and authored',
     'Books Edited': 'Books edited/compiled from multiple authors',
@@ -36,11 +36,11 @@ function typeDescription(type) {
   return desc[type] || ''
 }
 
-/* ═══════════════════════════════════════════════
+/* -----------------------------------------------
    View Publication Details Modal
-═══════════════════════════════════════════════ */
+----------------------------------------------- */
 function ViewPublicationModal({ pub, onClose, onAction }) {
-  const statusColor = { Approved: '#10B981', Verified: '#3B82F6', Pending: '#F59E0B' }
+  const statusColor = { Approved: '#1E7D45', Verified: '#174EA6', Pending: '#C89B1E' }
   const rows = [
     { label: 'Scholar Name', value: pub.scholarName },
     { label: 'Scholar ID', value: pub.scholarId },
@@ -57,7 +57,7 @@ function ViewPublicationModal({ pub, onClose, onAction }) {
       <div className="modal" style={{ maxWidth: 580 }}>
         <div className="modal-header">
           <span className="modal-title">Publication Details</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
         <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
@@ -92,14 +92,14 @@ function ViewPublicationModal({ pub, onClose, onAction }) {
             className="btn btn-secondary btn-sm"
             onClick={() => { onAction(pub.id, 'Verified'); onClose() }}
           >
-            ✅ Mark Verified
+             Mark Verified
           </button>
           <button
             className="btn btn-primary btn-sm"
-            style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}
+            style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}
             onClick={() => { onAction(pub.id, 'Approved'); onClose() }}
           >
-            🏆 Approve
+             Approve
           </button>
         </div>
       </div>
@@ -107,9 +107,9 @@ function ViewPublicationModal({ pub, onClose, onAction }) {
   )
 }
 
-/* ═══════════════════════════════════════════════
+/* -----------------------------------------------
    Main Page
-═══════════════════════════════════════════════ */
+----------------------------------------------- */
 export default function PublicationsReview() {
   const [pubs, setPubs] = useState([])
   const [search, setSearch] = useState('')
@@ -131,7 +131,7 @@ export default function PublicationsReview() {
         scholarName: p.scholar,
         scholarId: p.scholarId,
         title: p.title,
-        journal: p.journal || '—',
+        journal: p.journal || '-',
         indexType: p.pubType === 'Journal Publishing' ? 'SCI' : p.pubType === 'Conference Proceeding' ? 'Scopus' : 'Other',
         issue: p.date ? `Date: ${p.date}` : '',
         status: p.status || 'Pending',
@@ -186,7 +186,7 @@ export default function PublicationsReview() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Verify and approve scholar research publications for graduation credit</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>📥 Export Report</button>
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}> Export Report</button>
         </div>
       </div>
 
@@ -194,10 +194,10 @@ export default function PublicationsReview() {
         {/* KPI Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Submissions', value: pubs.length, sub: 'Global History', icon: '📰', color: 'purple' },
-            { label: 'Pending Review', value: pubs.filter(p => p.status === 'Pending' || p.status === 'Submitted').length, sub: 'Awaiting Actions', icon: '⏳', color: 'red' },
+            { label: 'Total Submissions', value: pubs.length, sub: 'Global History', icon: '', color: 'blue' },
+            { label: 'Pending Review', value: pubs.filter(p => p.status === 'Pending' || p.status === 'Submitted').length, sub: 'Awaiting Actions', icon: '', color: 'red' },
             { label: 'Scopus Indexed', value: pubs.filter(p => p.indexType === 'Scopus').length, sub: 'Verified', icon: 'blue' },
-            { label: 'SCI Indexed', value: pubs.filter(p => p.indexType === 'SCI').length, sub: 'SCI-E included', icon: '⭐', color: 'orange' },
+            { label: 'SCI Indexed', value: pubs.filter(p => p.indexType === 'SCI').length, sub: 'SCI-E included', icon: '', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -214,7 +214,7 @@ export default function PublicationsReview() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input
                 className="form-control"
                 placeholder="Search papers or scholars..."
@@ -229,7 +229,7 @@ export default function PublicationsReview() {
                   key={type}
                   onClick={() => setFilterType(type === 'All' ? 'All' : type)}
                   className={`btn btn-sm ${filterType === type ? 'btn-primary' : 'btn-ghost'}`}
-                  style={filterType === type ? { background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' } : {}}
+                  style={filterType === type ? { background: 'linear-gradient(90deg,#174EA6,#0A2A66)' } : {}}
                 >
                   {type === 'All' ? 'All Types' : type}
                 </button>
@@ -262,7 +262,7 @@ export default function PublicationsReview() {
                     <tr key={p.id}>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div className="avatar avatar-sm" style={{ background: '#6C63FF' }}>{p.scholarName?.charAt(0)}</div>
+                          <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{p.scholarName?.charAt(0)}</div>
                           <div>
                             <div style={{ fontWeight: 600, fontSize: '13px' }}>{p.scholarName}</div>
                           </div>
@@ -275,7 +275,7 @@ export default function PublicationsReview() {
                       </td>
                       <td>
                         <span style={{ fontSize: '18px' }} title={p.pubType || 'Journal Publishing'}>
-                          {TYPE_ICONS[p.pubType] || '📄'}
+                          {TYPE_ICONS[p.pubType] || ''}
                         </span>
                         <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', maxWidth: '90px' }}>{p.pubType || 'Journal'}</div>
                       </td>
@@ -295,9 +295,9 @@ export default function PublicationsReview() {
                             <button className="btn btn-secondary btn-sm" onClick={() => handleAction(p.id, 'Verified')}>Verify</button>
                           )}
                           {p.status !== 'Approved' && (
-                            <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={() => handleAction(p.id, 'Approved')}>Approve</button>
+                            <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} onClick={() => handleAction(p.id, 'Approved')}>Approve</button>
                           )}
-                          <button className="btn btn-ghost btn-sm" title="View Details" onClick={() => setViewPub(p)}>👁️</button>
+                          <button className="btn btn-ghost btn-sm" title="View Details" onClick={() => setViewPub(p)}></button>
                         </div>
                       </td>
                     </tr>

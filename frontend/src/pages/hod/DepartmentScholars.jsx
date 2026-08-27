@@ -11,7 +11,7 @@ const scholars = [
 ]
 
 const STATUS_COLORS = { Active: 'badge-success', Completed: 'badge-info', 'On Hold': 'badge-warning' }
-const AREA_COLORS = { 'Quantum Computing': '#8B5CF6', 'Machine Learning': '#3B82F6', 'Biotechnology': '#10B981', 'Renewable Energy': '#F59E0B', 'Cybersecurity': '#EF4444', 'Data Science': '#EC4899' }
+const AREA_COLORS = { 'Quantum Computing': '#174EA6', 'Machine Learning': '#174EA6', 'Biotechnology': '#1E7D45', 'Renewable Energy': '#C89B1E', 'Cybersecurity': '#B4232A', 'Data Science': '#B4232A' }
 
 export default function DepartmentScholars() {
   const [statusFilter, setStatusFilter] = useState('All')
@@ -51,7 +51,7 @@ export default function DepartmentScholars() {
               <button key={s} onClick={() => setStatusFilter(s)} style={{
                 padding: '6px 14px', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
                 background: statusFilter === s ? '#fff' : 'transparent',
-                color: statusFilter === s ? '#3B82F6' : 'var(--text-secondary)',
+                color: statusFilter === s ? '#174EA6' : 'var(--text-secondary)',
                 boxShadow: statusFilter === s ? 'var(--shadow-sm)' : 'none',
               }}>{s}</button>
             ))}
@@ -61,7 +61,7 @@ export default function DepartmentScholars() {
             {[...new Set(scholars.map(s => s.area))].map(a => <option key={a} value={a}>{a}</option>)}
           </select>
           <button className="btn btn-ghost btn-sm">More Filters</button>
-          <button className="btn btn-ghost btn-sm">📥 Export CSV</button>
+          <button className="btn btn-ghost btn-sm"> Export CSV</button>
         </div>
 
         <div className="card">
@@ -82,7 +82,7 @@ export default function DepartmentScholars() {
                   <tr key={s.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div className="avatar avatar-sm" style={{ background: AREA_COLORS[s.area] || '#6C63FF' }}>{s.name.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: AREA_COLORS[s.area] || '#174EA6' }}>{s.name.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{s.name}</div>
                           <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.email}</div>
@@ -99,7 +99,7 @@ export default function DepartmentScholars() {
                       {s.supervisor ? (
                         <span style={{ fontSize: '12.5px', fontWeight: 600 }}>{s.supervisor}</span>
                       ) : (
-                        <button className="btn btn-warning btn-sm" style={{ fontSize: '11px', padding: '3px 10px', background: '#FEF3C7', color: '#D97706', border: '1px solid #FCD34D' }}>
+                        <button className="btn btn-warning btn-sm" style={{ fontSize: '11px', padding: '3px 10px', background: '#FFF6D8', color: '#936C00', border: '1px solid #FCD34D' }}>
                           Assign Supervisor
                         </button>
                       )}
@@ -109,9 +109,9 @@ export default function DepartmentScholars() {
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '4px' }}>
-                        <button className="btn btn-ghost btn-sm" title="View">👁️</button>
-                        <button className="btn btn-ghost btn-sm" title="Edit">✏️</button>
-                        <button className="btn btn-ghost btn-sm" title="Reassign">🔗</button>
+                        <button className="btn btn-ghost btn-sm" title="View"></button>
+                        <button className="btn btn-ghost btn-sm" title="Edit"></button>
+                        <button className="btn btn-ghost btn-sm" title="Reassign"></button>
                       </div>
                     </td>
                   </tr>
@@ -123,16 +123,16 @@ export default function DepartmentScholars() {
           {/* Summary Row */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', padding: '16px 20px', borderTop: '1px solid var(--border)', background: '#FAFBFF' }}>
             {[
-              { label: 'TOTAL SCHOLARS', value: total, sub: '+10% this semester', icon: '🎓', color: '#3B82F6' },
-              { label: 'UNASSIGNED', value: unassigned, sub: 'Requires attention', icon: '⚠️', color: '#EF4444' },
-              { label: 'COMPLETED YTD', value: completed, sub: 'On track for annual target', icon: '✅', color: '#10B981' },
+              { label: 'TOTAL SCHOLARS', value: total, sub: '+10% this semester', icon: '', color: '#174EA6' },
+              { label: 'UNASSIGNED', value: unassigned, sub: 'Requires attention', icon: '', color: '#B4232A' },
+              { label: 'COMPLETED YTD', value: completed, sub: 'On track for annual target', icon: '', color: '#1E7D45' },
             ].map((s, i) => (
               <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '10px', borderRadius: 'var(--radius-md)', background: '#fff', boxShadow: 'var(--shadow-sm)' }}>
                 <span style={{ fontSize: '22px' }}>{s.icon}</span>
                 <div>
                   <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</div>
                   <div style={{ fontSize: '22px', fontWeight: 800, color: s.color }}>{s.value.toString().padStart(2, '0')}</div>
-                  <div style={{ fontSize: '11px', color: s.color === '#EF4444' ? '#EF4444' : 'var(--text-muted)' }}>{s.sub}</div>
+                  <div style={{ fontSize: '11px', color: s.color === '#B4232A' ? '#B4232A' : 'var(--text-muted)' }}>{s.sub}</div>
                 </div>
               </div>
             ))}

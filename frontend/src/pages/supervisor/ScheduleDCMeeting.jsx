@@ -167,7 +167,7 @@ export default function ScheduleDCMeeting() {
               <div className="card-header">
                 <div>
                   <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span>👥</span> Scholar Selection
+                    Scholar Selection
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
                     Choose the scholar for whom this Doctoral Committee meeting is scheduled.
@@ -208,7 +208,7 @@ export default function ScheduleDCMeeting() {
                             <div style={{ fontWeight: 600, fontSize: '13px' }}>{s.name}</div>
                             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.id} | {s.dept}</div>
                           </div>
-                          <span style={{ background: '#D1FAE5', color: '#065F46', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '99px' }}>{s.status}</span>
+                          <span style={{ background: '#E7F4EC', color: '#166A3A', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '99px' }}>{s.status}</span>
                         </div>
                       ))}
                     </div>
@@ -217,11 +217,11 @@ export default function ScheduleDCMeeting() {
                 {selectedScholar && (
                   <div style={{
                     marginTop: '12px', padding: '12px 16px',
-                    background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 'var(--radius-md)',
+                    background: '#F3F7FF', border: '1px solid #B9C9EA', borderRadius: 'var(--radius-md)',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#6C63FF,#EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#174EA6,#B4232A)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>
                         {selectedScholar.name.charAt(0)}
                       </div>
                       <div>
@@ -229,7 +229,7 @@ export default function ScheduleDCMeeting() {
                         <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>Reg / ID: {selectedScholar.id} | Dept: {selectedScholar.dept}</div>
                       </div>
                     </div>
-                    <span style={{ background: '#D1FAE5', color: '#065F46', fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '99px' }}>
+                    <span style={{ background: '#E7F4EC', color: '#166A3A', fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '99px' }}>
                       {selectedScholar.status}
                     </span>
                   </div>
@@ -241,7 +241,7 @@ export default function ScheduleDCMeeting() {
             <div className="card" style={{ marginBottom: '16px' }}>
               <div className="card-header">
                 <div style={{ fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>📋</span> Meeting Details
+                  Meeting Details
                 </div>
               </div>
               <div className="card-body">
@@ -278,7 +278,7 @@ export default function ScheduleDCMeeting() {
             <div className="card" style={{ marginBottom: '16px' }}>
               <div className="card-header">
                 <div style={{ fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>📍</span> Venue & Mode
+                  Venue & Mode
                 </div>
               </div>
               <div className="card-body">
@@ -310,7 +310,7 @@ export default function ScheduleDCMeeting() {
             <div className="card" style={{ marginBottom: '20px' }}>
               <div className="card-header">
                 <div style={{ fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>📝</span> Agenda & Remarks
+                  Agenda & Remarks
                 </div>
               </div>
               <div className="card-body">
@@ -326,11 +326,11 @@ export default function ScheduleDCMeeting() {
             </div>
 
             <div style={{
-              background: '#F0F9FF', border: '1px solid #BAE6FD',
+              background: '#F3F7FF', border: '1px solid #B9C9EA',
               borderRadius: 'var(--radius-md)', padding: '12px 16px', marginBottom: '20px',
-              fontSize: '12px', color: '#0369A1', lineHeight: 1.6,
+              fontSize: '12px', color: '#0A2A66', lineHeight: 1.6,
             }}>
-              📌 <strong>Notification Notice:</strong> Clicking &ldquo;Schedule Meeting&rdquo; automatically dispatches an alert with the Date, Time, Venue, and Agenda to the Scholar and Admin portals.
+              <strong>Notification Notice:</strong> Clicking &ldquo;Schedule Meeting&rdquo; automatically dispatches an alert with the Date, Time, Venue, and Agenda to the Scholar and Admin portals.
             </div>
 
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
@@ -339,13 +339,13 @@ export default function ScheduleDCMeeting() {
                 disabled={submitting}
                 style={{
                   padding: '10px 28px', borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(90deg, #4F46E5, #6C63FF)', color: '#fff',
+                  background: 'linear-gradient(90deg, #0A2A66, #174EA6)', color: '#fff',
                   fontWeight: 700, fontSize: '13.5px', border: 'none',
                   cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1,
-                  boxShadow: '0 4px 12px rgba(79,70,229,0.4)',
+                  boxShadow: '0 4px 12px rgba(23,78,166,0.28)',
                 }}
               >
-                {submitting ? '⏳ Scheduling...' : '📅 Schedule Meeting'}
+                {submitting ? 'Scheduling...' : 'Schedule Meeting'}
               </button>
             </div>
           </form>
@@ -355,7 +355,7 @@ export default function ScheduleDCMeeting() {
             <div className="card">
               <div className="card-header">
                 <div style={{ fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>📄</span> Minutes & Attachments
+                  Minutes & Attachments
                 </div>
               </div>
               <div className="card-body">
@@ -369,13 +369,13 @@ export default function ScheduleDCMeeting() {
                   onDrop={e => { e.preventDefault(); setDragOver(false); handleFileUpload(e.dataTransfer.files) }}
                   onClick={() => document.getElementById('fileInput').click()}
                   style={{
-                    border: `2px dashed ${dragOver ? '#4F46E5' : '#CBD5E1'}`,
+                    border: `2px dashed ${dragOver ? '#0A2A66' : '#CBD5E1'}`,
                     borderRadius: 'var(--radius-md)', padding: '24px 16px', textAlign: 'center',
-                    cursor: 'pointer', background: dragOver ? '#EEF2FF' : '#FAFAFA',
+                    cursor: 'pointer', background: dragOver ? '#E8EEF8' : '#FAFAFA',
                     marginBottom: '14px', transition: 'all 0.2s',
                   }}
                 >
-                  <div style={{ fontSize: '28px', marginBottom: '6px' }}>📁</div>
+                  <div style={{ fontSize: '28px', marginBottom: '6px' }} />
                   <div style={{ fontWeight: 600, fontSize: '12.5px', color: 'var(--text-primary)', marginBottom: '2px' }}>Click to upload or drag & drop</div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>PDF, DOCX up to 15MB</div>
                   <input id="fileInput" type="file" multiple style={{ display: 'none' }} onChange={e => handleFileUpload(e.target.files)} />
@@ -393,12 +393,12 @@ export default function ScheduleDCMeeting() {
                       border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
                       marginBottom: '8px',
                     }}>
-                      <span style={{ fontSize: '18px' }}>📄</span>
+                      <span style={{ fontSize: '18px' }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{doc.name}</div>
-                        <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>{doc.uploaded} • {doc.size}</div>
+                        <div style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>{doc.uploaded} - {doc.size}</div>
                       </div>
-                      <button onClick={() => setDocuments(prev => prev.filter((_, idx) => idx !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', fontSize: '14px' }}>✕</button>
+                      <button onClick={() => setDocuments(prev => prev.filter((_, idx) => idx !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', fontSize: '14px' }}>Remove</button>
                     </div>
                   ))
                 )}
@@ -409,14 +409,14 @@ export default function ScheduleDCMeeting() {
             <div className="card" style={{ marginTop: '16px' }}>
               <div className="card-header">
                 <div style={{ fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>💡</span> Committee Guidelines
+                  Committee Guidelines
                 </div>
               </div>
               <div className="card-body" style={{ padding: '12px 16px' }}>
                 {[
-                  { icon: '👥', color: '#EEF2FF', text: 'Ensure Doctoral Committee constitution has at least 2 members nominated.' },
-                  { icon: '🔔', color: '#D1FAE5', text: 'Scholar and Admin receive real-time notifications with Date, Time, Venue, and Agenda upon scheduling.' },
-                  { icon: '📝', color: '#FEF3C7', text: 'DC meeting minutes and committee remarks should be uploaded following the session.' },
+                  { icon: '', color: '#E8EEF8', text: 'Ensure Doctoral Committee constitution has at least 2 members nominated.' },
+                  { icon: '', color: '#E7F4EC', text: 'Scholar and Admin receive real-time notifications with Date, Time, Venue, and Agenda upon scheduling.' },
+                  { icon: '', color: '#FFF6D8', text: 'DC meeting minutes and committee remarks should be uploaded following the session.' },
                 ].map((item, i) => (
                   <div key={i} style={{
                     display: 'flex', gap: '8px', padding: '8px 10px',

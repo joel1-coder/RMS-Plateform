@@ -1,11 +1,11 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 const STATUS_MAP = {
-  'Pending':   { cls: 'badge-warning', icon: '🔍' },
-  'Approved':       { cls: 'badge-success', icon: '✅' },
-  'Rejected': { cls: 'badge-danger', icon: '❌' },
+  'Pending':   { cls: 'badge-warning', icon: '' },
+  'Approved':       { cls: 'badge-success', icon: '' },
+  'Rejected': { cls: 'badge-danger', icon: '' },
 }
 
 export default function ScholarThesis() {
@@ -87,7 +87,7 @@ export default function ScholarThesis() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Upload Thesis Draft / Chapter</span>
-              <button className="modal-close" onClick={() => setShowUpload(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowUpload(false)}></button>
             </div>
             <form onSubmit={handleUpload}>
               <div className="modal-body">
@@ -101,7 +101,7 @@ export default function ScholarThesis() {
                     style={{ border: '2px dashed var(--border)', borderRadius: 'var(--radius-md)', padding: '32px', textAlign: 'center', cursor: 'pointer' }}
                     onClick={() => document.getElementById('thesis-file').click()}
                   >
-                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>📚</div>
+                    <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
                     <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{file ? file.name : 'Click to select and upload PDF'}</div>
                   </div>
                   <input id="thesis-file" type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => setFile(e.target.files[0])} required />
@@ -109,8 +109,8 @@ export default function ScholarThesis() {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-ghost" onClick={() => setShowUpload(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}>
-                  📤 Upload Draft
+                <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}>
+                   Upload Draft
                 </button>
               </div>
             </form>
@@ -124,8 +124,8 @@ export default function ScholarThesis() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Track your thesis chapters and get supervisor feedback</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }} onClick={() => setShowUpload(true)}>
-            📤 Upload Thesis Draft
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }} onClick={() => setShowUpload(true)}>
+             Upload Thesis Draft
           </button>
         </div>
       </div>
@@ -134,10 +134,10 @@ export default function ScholarThesis() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Submissions',   value: theses.length, icon: '📚', color: 'purple' },
-            { label: 'Approved Drafts',     value: approvedCount,  icon: '✅', color: 'green' },
-            { label: 'Under Review',        value: theses.filter(t => t.status === 'Pending').length, icon: '🔍', color: 'orange' },
-            { label: 'Rejections / Revision', value: theses.filter(t => t.status === 'Rejected').length, icon: '↩', color: 'red' },
+            { label: 'Total Submissions',   value: theses.length, icon: '', color: 'blue' },
+            { label: 'Approved Drafts',     value: approvedCount,  icon: '', color: 'green' },
+            { label: 'Under Review',        value: theses.filter(t => t.status === 'Pending').length, icon: '', color: 'orange' },
+            { label: 'Rejections / Revision', value: theses.filter(t => t.status === 'Rejected').length, icon: '', color: 'red' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -183,7 +183,7 @@ export default function ScholarThesis() {
                         </span>
                       </td>
                       <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: '250px' }}>
-                        {ch.remarks || '—'}
+                        {ch.remarks || '-'}
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '6px' }}>
@@ -194,7 +194,7 @@ export default function ScholarThesis() {
                             className="btn btn-secondary btn-sm"
                             style={{ textDecoration: 'none' }}
                           >
-                            👁️ View
+                             View
                           </a>
                         </div>
                       </td>

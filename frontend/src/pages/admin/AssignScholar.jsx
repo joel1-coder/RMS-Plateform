@@ -1,4 +1,4 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -11,7 +11,7 @@ export default function AssignScholar() {
   const [supervisorSearch, setSupervisorSearch] = useState('')
   const [loading, setLoading] = useState(true)
 
-  /* ─── load on mount ─── */
+  /* --- load on mount --- */
   useEffect(() => {
     loadUsers()
   }, [])
@@ -52,7 +52,7 @@ export default function AssignScholar() {
     }
   }
 
-  /* ─── assign ─── */
+  /* --- assign --- */
   const handleAssign = async (e) => {
     e.preventDefault()
     if (!selectedScholar || !selectedSupervisor) {
@@ -86,7 +86,7 @@ export default function AssignScholar() {
     }
   }
 
-  /* ─── reassign ─── */
+  /* --- reassign --- */
   const handleReassign = async (scholarId, newSupId) => {
     try {
       const token = localStorage.getItem('rms_token')
@@ -107,7 +107,7 @@ export default function AssignScholar() {
     }
   }
 
-  /* ─── unassign ─── */
+  /* --- unassign --- */
   const handleUnassign = async (scholarId) => {
     if (!window.confirm("Remove this scholar's supervisor assignment?")) return
     try {
@@ -127,11 +127,11 @@ export default function AssignScholar() {
     }
   }
 
-  /* ─── derived lists ─── */
+  /* --- derived lists --- */
   const unassignedScholars = scholars.filter(s => !s.assignedSupervisor)
   const assignedScholars = scholars.filter(s => s.assignedSupervisor)
 
-  /* ─── per-supervisor counts ─── */
+  /* --- per-supervisor counts --- */
   const supLoad = supervisors.map(sup => ({
     ...sup,
     count: scholars.filter(s => String(s.assignedSupervisorId) === String(sup.id || sup._id)).length,
@@ -152,10 +152,10 @@ export default function AssignScholar() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4,1fr)', marginBottom: 24 }}>
           {[
-            { label: 'Total Scholars', value: scholars.length, icon: '🎓', color: 'purple' },
-            { label: 'Assigned', value: assignedScholars.length, icon: '✅', color: 'green' },
-            { label: 'Unassigned', value: unassignedScholars.length, icon: '⏳', color: 'orange' },
-            { label: 'Supervisors', value: supervisors.length, icon: '👨‍🏫', color: 'blue' },
+            { label: 'Total Scholars', value: scholars.length, icon: '', color: 'blue' },
+            { label: 'Assigned', value: assignedScholars.length, icon: '', color: 'green' },
+            { label: 'Unassigned', value: unassignedScholars.length, icon: '', color: 'orange' },
+            { label: 'Supervisors', value: supervisors.length, icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -173,12 +173,12 @@ export default function AssignScholar() {
             {/* Assignment form */}
             <div className="card">
               <div className="card-header">
-                <div className="card-title">🔗 New Assignment</div>
+                <div className="card-title"> New Assignment</div>
               </div>
               <form onSubmit={handleAssign} style={{ padding: '20px' }}>
                 {unassignedScholars.length === 0 ? (
-                  <div style={{ padding: '16px', background: '#F0FDF4', borderRadius: 8, color: '#15803D', fontWeight: 600, fontSize: 13, textAlign: 'center' }}>
-                    ✅ All scholars are already assigned!
+                  <div style={{ padding: '16px', background: '#E7F4EC', borderRadius: 8, color: '#166A3A', fontWeight: 600, fontSize: 13, textAlign: 'center' }}>
+                     All scholars are already assigned!
                   </div>
                 ) : (
                   <>
@@ -192,7 +192,7 @@ export default function AssignScholar() {
                       >
                         <option value="">-- Choose Scholar --</option>
                         {unassignedScholars.map(s => (
-                          <option key={s.id || s._id} value={s.id || s._id}>{s.name} · {s.dept}</option>
+                          <option key={s.id || s._id} value={s.id || s._id}>{s.name} - {s.dept}</option>
                         ))}
                       </select>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
@@ -220,10 +220,10 @@ export default function AssignScholar() {
                     <button
                       type="submit"
                       className="btn btn-primary"
-                      style={{ width: '100%', marginTop: 18, background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}
+                      style={{ width: '100%', marginTop: 18, background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}
                       disabled={!selectedScholar || !selectedSupervisor}
                     >
-                      🔗 Assign Scholar
+                       Assign Scholar
                     </button>
                   </>
                 )}
@@ -233,7 +233,7 @@ export default function AssignScholar() {
             {/* Supervisor load card */}
             <div className="card">
               <div className="card-header">
-                <div className="card-title">👨‍🏫 Supervisor Load</div>
+                <div className="card-title"> Supervisor Load</div>
               </div>
               <div style={{ padding: '12px 16px', maxHeight: '300px', overflowY: 'auto' }}>
                 {supLoad.map(sup => (
@@ -245,7 +245,7 @@ export default function AssignScholar() {
                     <div className="progress-bar" style={{ height: 7 }}>
                       <div className="progress-fill" style={{
                         width: `${Math.min((sup.count / 6) * 100, 100)}%`,
-                        background: sup.count >= 6 ? '#EF4444' : sup.count >= 4 ? '#F59E0B' : '#10B981'
+                        background: sup.count >= 6 ? '#B4232A' : sup.count >= 4 ? '#C89B1E' : '#1E7D45'
                       }} />
                     </div>
                   </div>
@@ -262,9 +262,9 @@ export default function AssignScholar() {
           {/* Right panel: current allocations table */}
           <div className="card">
             <div className="card-header">
-              <div className="card-title">📋 Current Allocations</div>
+              <div className="card-title"> Current Allocations</div>
               <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-                {assignedScholars.length} assigned · {unassignedScholars.length} pending
+                {assignedScholars.length} assigned - {unassignedScholars.length} pending
               </span>
             </div>
             <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
@@ -283,7 +283,7 @@ export default function AssignScholar() {
                     <tr key={scholar.id || scholar._id}>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div className="avatar avatar-sm" style={{ background: `hsl(${((scholar.id || scholar._id).toString().charCodeAt(0) * 55) % 360},60%,55%)` }}>
+                          <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>
                             {scholar.name.charAt(0)}
                           </div>
                           <span style={{ fontWeight: 600, fontSize: 13 }}>{scholar.name}</span>
@@ -291,8 +291,8 @@ export default function AssignScholar() {
                       </td>
                       <td style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{scholar.dept}</td>
                       <td>
-                        <span style={{ padding: '4px 10px', background: '#EDE9FE', borderRadius: 6, fontSize: 12.5, fontWeight: 700, color: '#4F46E5' }}>
-                          👨‍🏫 {scholar.assignedSupervisor}
+                        <span style={{ padding: '4px 10px', background: '#E8EEF8', borderRadius: 6, fontSize: 12.5, fontWeight: 700, color: '#0A2A66' }}>
+                           {scholar.assignedSupervisor}
                         </span>
                       </td>
                       <td>
@@ -302,7 +302,7 @@ export default function AssignScholar() {
                           defaultValue=""
                           onChange={e => { if (e.target.value) handleReassign(scholar.id || scholar._id, e.target.value) }}
                         >
-                          <option value="">Change…</option>
+                          <option value="">Change...</option>
                           {supervisors
                             .filter(s => String(s.id || s._id) !== String(scholar.assignedSupervisorId))
                             .map(s => <option key={s.id || s._id} value={s.id || s._id}>{s.name}</option>)
@@ -312,7 +312,7 @@ export default function AssignScholar() {
                       <td>
                         <button
                           className="btn btn-ghost btn-sm"
-                          style={{ color: '#EF4444', fontWeight: 600 }}
+                          style={{ color: '#B4232A', fontWeight: 600 }}
                           onClick={() => handleUnassign(scholar.id || scholar._id)}
                           title="Remove assignment"
                         >
@@ -333,13 +333,13 @@ export default function AssignScholar() {
 
             {/* Unassigned scholars list */}
             {unassignedScholars.length > 0 && (
-              <div style={{ padding: '12px 20px', borderTop: '1px solid var(--border)', background: '#FFFBEB' }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#D97706', marginBottom: 8 }}>
-                  ⚠️ {unassignedScholars.length} Scholar{unassignedScholars.length > 1 ? 's' : ''} pending assignment:
+              <div style={{ padding: '12px 20px', borderTop: '1px solid var(--border)', background: '#FFF6D8' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#936C00', marginBottom: 8 }}>
+                   {unassignedScholars.length} Scholar{unassignedScholars.length > 1 ? 's' : ''} pending assignment:
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {unassignedScholars.map(s => (
-                    <span key={s.id || s._id} style={{ padding: '3px 10px', background: '#FEF3C7', borderRadius: 99, fontSize: 12, fontWeight: 600, color: '#92400E' }}>
+                    <span key={s.id || s._id} style={{ padding: '3px 10px', background: '#FFF6D8', borderRadius: 99, fontSize: 12, fontWeight: 600, color: '#936C00' }}>
                       {s.name}
                     </span>
                   ))}

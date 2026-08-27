@@ -1,5 +1,6 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useAuth } from '../../context/AuthContext'
+import AppIcon from '../../components/AppIcon'
 
 const progressTimeline = [
   { month: 'Aug 21', progress: 5 },
@@ -23,10 +24,10 @@ const milestones = [
 ]
 
 const recentActivity = [
-  { icon: '📋', text: 'Synopsis approved by DRC',           time: '2 weeks ago',  type: 'success' },
-  { icon: '📄', text: 'Thesis Chapter 3 submitted',         time: '5 days ago',   type: 'info' },
-  { icon: '🔔', text: 'Feedback received from supervisor',  time: '3 days ago',   type: 'warning' },
-  { icon: '📅', text: 'Viva voce date tentatively set',     time: '1 day ago',    type: 'primary' },
+  { icon: 'clipboardCheck', text: 'Synopsis approved by DRC', time: '2 weeks ago', type: 'success' },
+  { icon: 'file', text: 'Thesis Chapter 3 submitted', time: '5 days ago', type: 'info' },
+  { icon: 'bell', text: 'Feedback received from supervisor', time: '3 days ago', type: 'warning' },
+  { icon: 'calendar', text: 'Viva voce date tentatively set', time: '1 day ago', type: 'primary' },
 ]
 
 export default function ScholarDashboard() {
@@ -39,13 +40,13 @@ export default function ScholarDashboard() {
         <div>
           <div className="topbar-title">My Dashboard</div>
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-            Welcome back, {user?.name?.split(' ')[0] || 'Scholar'}! Here's your PhD journey at a glance.
+            Welcome back, {user?.name?.split(' ')[0] || 'Scholar'}. Your research progress and academic tasks are below.
           </span>
         </div>
         <div className="topbar-actions">
-          <button className="topbar-btn">🔔<span className="badge-dot" /></button>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#10B981,#059669)', boxShadow: '0 2px 8px rgba(16,185,129,0.3)' }}>
-            ＋ Upload Document
+          <button className="topbar-btn" aria-label="Notifications"><AppIcon name="bell" size={18} /><span className="badge-dot" /></button>
+          <button className="btn btn-primary btn-sm">
+            <AppIcon name="upload" size={15} /> Upload Document
           </button>
         </div>
       </div>
@@ -53,7 +54,7 @@ export default function ScholarDashboard() {
       <div className="page-body">
         {/* Hero Progress Card */}
         <div style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E3A5F 60%, #065F46 100%)',
+          background: 'linear-gradient(135deg, #061B44 0%, #0A2A66 65%, #174EA6 100%)',
           borderRadius: 'var(--radius-xl)',
           padding: '32px',
           marginBottom: '24px',
@@ -61,16 +62,14 @@ export default function ScholarDashboard() {
           position: 'relative',
           overflow: 'hidden',
         }}>
-          <div style={{ position: 'absolute', top: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'rgba(16,185,129,0.1)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', bottom: -40, right: 100, width: 140, height: 140, borderRadius: '50%', background: 'rgba(16,185,129,0.08)', pointerEvents: 'none' }} />
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
             <div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px' }}>PhD Progress</div>
               <div style={{ fontSize: '42px', fontWeight: 800, lineHeight: 1 }}>68%</div>
-              <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', marginTop: '8px' }}>Thesis Writing Stage · 3rd Year</div>
+              <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', marginTop: '8px' }}>Thesis Writing Stage - 3rd Year</div>
               <div style={{ marginTop: '16px', width: '300px', maxWidth: '100%' }}>
                 <div style={{ height: '8px', background: 'rgba(255,255,255,0.15)', borderRadius: '99px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '68%', background: 'linear-gradient(90deg,#10B981,#34D399)', borderRadius: '99px', transition: 'width 1s ease' }} />
+                  <div style={{ height: '100%', width: '68%', background: '#C89B1E', borderRadius: '99px', transition: 'width 1s ease' }} />
                 </div>
               </div>
             </div>
@@ -93,13 +92,13 @@ export default function ScholarDashboard() {
         {/* Stat Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Publications',     value: '4',       icon: '📰', color: 'purple', sub: '2 pending review' },
-            { label: 'Documents Filed',  value: '18',      icon: '📁', color: 'blue',   sub: '3 uploaded this month' },
-            { label: 'Days Since Reg.',  value: '1051',    icon: '📅', color: 'green',  sub: 'Aug 2021 onwards' },
-            { label: 'Feedback Items',   value: '7',       icon: '💬', color: 'orange', sub: '2 unread' },
+            { label: 'Publications', value: '4', icon: 'pen', color: 'blue', sub: '2 pending review' },
+            { label: 'Documents Filed', value: '18', icon: 'file', color: 'blue', sub: '3 uploaded this month' },
+            { label: 'Days Since Reg.', value: '1051', icon: 'calendar', color: 'green', sub: 'Aug 2021 onwards' },
+            { label: 'Feedback Items', value: '7', icon: 'bell', color: 'orange', sub: '2 unread' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
-              <div className={`stat-icon ${s.color}`}>{s.icon}</div>
+              <div className={`stat-icon ${s.color}`}><AppIcon name={s.icon} size={24} /></div>
               <div className="stat-info">
                 <div className="stat-value">{s.value}</div>
                 <div className="stat-label">{s.label}</div>
@@ -123,15 +122,15 @@ export default function ScholarDashboard() {
                 <AreaChart data={progressTimeline}>
                   <defs>
                     <linearGradient id="progressGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#1E7D45" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#1E7D45" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} unit="%" />
                   <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }} formatter={v => [`${v}%`, 'Progress']} />
-                  <Area type="monotone" dataKey="progress" stroke="#10B981" strokeWidth={2.5} fill="url(#progressGrad)" dot={{ r: 4, fill: '#10B981', stroke: '#fff', strokeWidth: 2 }} />
+                  <Area type="monotone" dataKey="progress" stroke="#1E7D45" strokeWidth={2.5} fill="url(#progressGrad)" dot={{ r: 4, fill: '#1E7D45', stroke: '#fff', strokeWidth: 2 }} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -148,12 +147,12 @@ export default function ScholarDashboard() {
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
                       width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                      background: m.done ? '#10B981' : 'var(--border)',
-                      border: m.done ? '2px solid #10B981' : '2px solid var(--border)',
+                      background: m.done ? '#1E7D45' : 'var(--border)',
+                      border: m.done ? '2px solid #1E7D45' : '2px solid var(--border)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: '11px', color: m.done ? '#fff' : 'var(--text-muted)',
                     }}>
-                      {m.done ? '✓' : (i + 1)}
+                      {m.done ? <AppIcon name="check" size={13} /> : (i + 1)}
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '12.5px', fontWeight: m.done ? 600 : 400, color: m.done ? 'var(--text-primary)' : 'var(--text-muted)' }}>{m.label}</div>
@@ -176,10 +175,11 @@ export default function ScholarDashboard() {
               <div key={i} style={{ display: 'flex', gap: '12px', padding: '12px 20px', borderBottom: '1px solid var(--border)', alignItems: 'center' }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: 'var(--radius-md)', flexShrink: 0,
-                  background: a.type === 'success' ? '#D1FAE5' : a.type === 'info' ? '#DBEAFE' : a.type === 'warning' ? '#FEF3C7' : '#EDE9FE',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px',
+                  background: a.type === 'success' ? '#E7F4EC' : a.type === 'info' ? '#E8EEF8' : a.type === 'warning' ? '#FFF6D8' : '#E8EEF8',
+                  color: a.type === 'success' ? '#1E7D45' : a.type === 'warning' ? '#936C00' : '#174EA6',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  {a.icon}
+                  <AppIcon name={a.icon} size={17} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '13px', fontWeight: 500 }}>{a.text}</div>
@@ -206,11 +206,11 @@ export default function ScholarDashboard() {
                 }}>
                   <div style={{
                     width: 44, height: 44, borderRadius: 'var(--radius-md)', flexShrink: 0,
-                    background: d.urgent ? '#FEF3C7' : '#EDE9FE',
+                    background: d.urgent ? '#FFF6D8' : '#E8EEF8',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <span style={{ fontSize: '15px', fontWeight: 800, color: d.urgent ? '#D97706' : '#6C63FF', lineHeight: 1 }}>{d.days}</span>
-                    <span style={{ fontSize: '9px', color: d.urgent ? '#D97706' : '#6C63FF', fontWeight: 600 }}>days</span>
+                    <span style={{ fontSize: '15px', fontWeight: 800, color: d.urgent ? '#936C00' : '#174EA6', lineHeight: 1 }}>{d.days}</span>
+                    <span style={{ fontSize: '9px', color: d.urgent ? '#936C00' : '#174EA6', fontWeight: 600 }}>days</span>
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '13px', fontWeight: 600 }}>{d.task}</div>

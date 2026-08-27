@@ -1,12 +1,12 @@
 import { useState } from 'react'
 
 const initialNotifs = [
-  { id: 1, icon: '📋', title: 'Synopsis Waiting DRC Review', msg: 'Aravind Sharma submitted his research synopsis for CS Board Approval.', time: '2 hours ago', read: false, type: 'warning' },
-  { id: 2, icon: '📅', title: 'DRC Evaluation Panel Confirmed', msg: 'The evaluation committee for Arjun Mehta has been scheduled for Oct 25.', time: '5 hours ago', read: false, type: 'success' },
-  { id: 3, icon: '📝', title: 'Meeting Minutes Draft Created', msg: 'A draft of the minutes of the meeting for the Biotechnology Board has been recorded.', time: 'Yesterday', read: true, type: 'info' },
+  { id: 1, icon: '', title: 'Synopsis Waiting DRC Review', msg: 'Aravind Sharma submitted his research synopsis for CS Board Approval.', time: '2 hours ago', read: false, type: 'warning' },
+  { id: 2, icon: '', title: 'DRC Evaluation Panel Confirmed', msg: 'The evaluation committee for Arjun Mehta has been scheduled for Oct 25.', time: '5 hours ago', read: false, type: 'success' },
+  { id: 3, icon: '', title: 'Meeting Minutes Draft Created', msg: 'A draft of the minutes of the meeting for the Biotechnology Board has been recorded.', time: 'Yesterday', read: true, type: 'info' },
 ]
 
-const TYPE_COLORS = { success: '#10B981', info: '#3B82F6', warning: '#F59E0B', danger: '#EF4444', primary: '#0D9488' }
+const TYPE_COLORS = { success: '#1E7D45', info: '#174EA6', warning: '#C89B1E', danger: '#B4232A', primary: '#174EA6' }
 
 export default function DRCNotifications() {
   const [notifs, setNotifs] = useState(initialNotifs)
@@ -30,7 +30,7 @@ export default function DRCNotifications() {
           </span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm" onClick={markAll}>✓ Mark all read</button>
+          <button className="btn btn-ghost btn-sm" onClick={markAll}> Mark all read</button>
         </div>
       </div>
 
@@ -40,15 +40,15 @@ export default function DRCNotifications() {
             {[{ id: 'all', label: `All (${notifs.length})` }, { id: 'unread', label: `Unread (${unread})` }, { id: 'read', label: 'Read' }].map(t => (
               <button key={t.id} onClick={() => setFilter(t.id)} style={{
                 padding: '7px 16px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
-                background: filter === t.id ? '#CCFBF1' : 'transparent',
-                color: filter === t.id ? '#0F766E' : 'var(--text-secondary)',
+                background: filter === t.id ? '#E8EEF8' : 'transparent',
+                color: filter === t.id ? '#0A2A66' : 'var(--text-secondary)',
                 fontWeight: filter === t.id ? 700 : 500, fontSize: '13px',
               }}>{t.label}</button>
             ))}
           </div>
 
           {filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-icon">🔕</div><h3>No notifications</h3><p>No messages to display.</p></div>
+            <div className="empty-state"><div className="empty-icon"></div><h3>No notifications</h3><p>No messages to display.</p></div>
           ) : (
             filtered.map(n => (
               <div key={n.id} className={`notification-item${n.read ? '' : ' unread'}`} onClick={() => markRead(n.id)}
@@ -63,7 +63,7 @@ export default function DRCNotifications() {
                   <div className="notification-time">{n.time}</div>
                 </div>
                 {!n.read && <div style={{ width: 8, height: 8, borderRadius: '50%', background: TYPE_COLORS[n.type], flexShrink: 0, marginTop: 6 }} />}
-                <button onClick={e => { e.stopPropagation(); del(n.id) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', borderRadius: '50%' }}>✕</button>
+                <button onClick={e => { e.stopPropagation(); del(n.id) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', borderRadius: '50%' }}></button>
               </div>
             ))
           )}

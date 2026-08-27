@@ -93,8 +93,8 @@ export default function DCMembersManagement() {
 
   const activeScholar = scholarsList.find(s => s.regNo === selectedScholarReg) || scholarsList[0] || {
     name: 'No Scholar Selected',
-    regNo: '—',
-    discipline: '—',
+    regNo: '-',
+    discipline: '-',
     status: 'PENDING'
   }
 
@@ -266,7 +266,7 @@ export default function DCMembersManagement() {
       <div className="page-body">
         {/* Scholar Selector Banner */}
         <div style={{
-          background: 'linear-gradient(90deg, #7C3AED 0%, #4F46E5 100%)',
+          background: 'linear-gradient(90deg, #174EA6 0%, #0A2A66 100%)',
           borderRadius: 'var(--radius-md)', padding: '16px 22px', marginBottom: '20px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px',
         }}>
@@ -280,7 +280,7 @@ export default function DCMembersManagement() {
                 onChange={e => setSelectedScholarReg(e.target.value)}
                 style={{
                   padding: '8px 14px', borderRadius: 'var(--radius-sm)', border: 'none',
-                  fontSize: '14px', fontWeight: 700, color: '#1E1B4B', background: '#fff',
+                  fontSize: '14px', fontWeight: 700, color: '#061B44', background: '#fff',
                   cursor: 'pointer', outline: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
                 }}
               >
@@ -295,7 +295,7 @@ export default function DCMembersManagement() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ background: activeScholar.status === 'APPROVED' ? '#10B981' : '#F59E0B', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '5px 14px', borderRadius: '99px' }}>
+            <span style={{ background: activeScholar.status === 'APPROVED' ? '#1E7D45' : '#C89B1E', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '5px 14px', borderRadius: '99px' }}>
               STATUS: {activeScholar.status}
             </span>
           </div>
@@ -307,12 +307,12 @@ export default function DCMembersManagement() {
           borderRadius: 'var(--radius-md)', padding: '14px 18px', marginBottom: '20px',
         }}>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-            <span style={{ color: '#F59E0B', fontSize: '18px', flexShrink: 0 }}>💡</span>
+            <span style={{ color: '#C89B1E', fontSize: '18px', flexShrink: 0 }} />
             <div style={{ fontSize: '12.5px', color: '#92400E', lineHeight: 1.6 }}>
               <strong>Smart Auto-Cache Instructions:</strong><br />
-              • When you enter and save a DC member's details once, they will be cached.<br />
-              • Whenever you type that member's name for another scholar, you will be prompted to auto-fill their previously saved data.<br />
-              • A minimum of 2 external/internal DC Members are required to constitute the Doctoral Committee.
+              - When you enter and save a DC member's details once, they will be cached.<br />
+              - Whenever you type that member's name for another scholar, you will be prompted to auto-fill their previously saved data.<br />
+              - A minimum of 2 external/internal DC Members are required to constitute the Doctoral Committee.
             </div>
           </div>
         </div>
@@ -328,7 +328,7 @@ export default function DCMembersManagement() {
               onClick={handleAddMember}
               style={{
                 padding: '8px 18px',
-                background: 'linear-gradient(90deg, #10B981, #059669)',
+                background: 'linear-gradient(90deg, #1E7D45, #166A3A)',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
@@ -338,10 +338,10 @@ export default function DCMembersManagement() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                boxShadow: '0 3px 10px rgba(16,185,129,0.3)',
+                boxShadow: '0 3px 10px rgba(30,125,69,0.24)',
               }}
             >
-              ➕ Add DC Member Card
+              Add DC Member Card
             </button>
           </div>
 
@@ -357,12 +357,12 @@ export default function DCMembersManagement() {
                 <div key={member.id} className="card" style={{ position: 'relative', overflow: 'visible' }}>
                   {/* Member Header */}
                   <div style={{
-                    background: 'linear-gradient(90deg, #4F46E5, #6C63FF)',
+                    background: 'linear-gradient(90deg, #0A2A66, #174EA6)',
                     color: '#fff', padding: '12px 18px',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between'
                   }}>
                     <span style={{ fontWeight: 700, fontSize: '13.5px' }}>
-                      👤 DC Member {idx + 1} {idx === 0 ? '(Research Adviser / External 1)' : idx === 1 ? '(Member 2)' : ''}
+                      DC Member {idx + 1} {idx === 0 ? '(Research Adviser / External 1)' : idx === 1 ? '(Member 2)' : ''}
                     </span>
                     {dcMembers.length > 2 && (
                       <button
@@ -380,7 +380,7 @@ export default function DCMembersManagement() {
                           cursor: 'pointer',
                         }}
                       >
-                        🗑️ Remove
+                        Remove
                       </button>
                     )}
                   </div>
@@ -389,24 +389,24 @@ export default function DCMembersManagement() {
                     {/* Prompt to Restore Previously Cached Data */}
                     {promptRestore && promptRestore.cardId === member.id && (
                       <div style={{
-                        background: '#EEF2FF', border: '1.5px solid #6366F1',
+                        background: '#E8EEF8', border: '1.5px solid #174EA6',
                         borderRadius: 'var(--radius-sm)', padding: '12px 14px', marginBottom: '16px',
                         display: 'flex', flexDirection: 'column', gap: '8px'
                       }}>
-                        <div style={{ fontSize: '12.5px', color: '#3730A3', fontWeight: 600 }}>
-                          💡 Would you like to enter the previously stored data for this DC member &ldquo;{promptRestore.member.name}&rdquo;?
+                        <div style={{ fontSize: '12.5px', color: '#0A2A66', fontWeight: 600 }}>
+                          Would you like to enter the previously stored data for this DC member &ldquo;{promptRestore.member.name}&rdquo;?
                         </div>
                         <div style={{ fontSize: '11px', color: '#4B5563' }}>
-                          Dept: {promptRestore.member.department} · Inst: {promptRestore.member.collegeInstitution}
+                          Dept: {promptRestore.member.department} - Inst: {promptRestore.member.collegeInstitution}
                         </div>
                         <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
                           <button
                             type="button"
                             className="btn btn-primary btn-sm"
-                            style={{ background: '#4F46E5', fontSize: '12px', padding: '4px 12px' }}
+                            style={{ background: '#0A2A66', fontSize: '12px', padding: '4px 12px' }}
                             onClick={() => applyRestoreData(member.id, promptRestore.member)}
                           >
-                            ✓ Yes, Restore Data
+                            Yes, Restore Data
                           </button>
                           <button
                             type="button"
@@ -414,7 +414,7 @@ export default function DCMembersManagement() {
                             style={{ fontSize: '12px', padding: '4px 12px', background: '#E5E7EB' }}
                             onClick={() => setPromptRestore(null)}
                           >
-                            ✕ No, Keep Blank
+                            No, Keep Blank
                           </button>
                         </div>
                       </div>
@@ -470,7 +470,7 @@ export default function DCMembersManagement() {
                         {showSuggestions[member.id] && hasTyped && suggestions.length > 0 && (
                           <div style={{
                             position: 'absolute', top: '100%', left: 0, right: 0,
-                            background: '#fff', border: '1.5px solid #6C63FF', borderRadius: '4px',
+                            background: '#fff', border: '1.5px solid #174EA6', borderRadius: '4px',
                             boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: '200px', overflowY: 'auto',
                             marginTop: '4px'
                           }}>
@@ -489,10 +489,10 @@ export default function DCMembersManagement() {
                                 onMouseLeave={e => e.currentTarget.style.background = '#fff'}
                               >
                                 <div>
-                                  <strong style={{ color: '#4F46E5' }}>{s.name}</strong>
-                                  <div style={{ fontSize: '11px', color: '#64748B' }}>{s.category} · {s.collegeInstitution}</div>
+                                  <strong style={{ color: '#0A2A66' }}>{s.name}</strong>
+                                  <div style={{ fontSize: '11px', color: '#64748B' }}>{s.category} - {s.collegeInstitution}</div>
                                 </div>
-                                <span style={{ fontSize: '10px', color: '#10B981', alignSelf: 'center', fontWeight: 'bold' }}>Click to prompt autofill</span>
+                                <span style={{ fontSize: '10px', color: '#1E7D45', alignSelf: 'center', fontWeight: 'bold' }}>Click to prompt autofill</span>
                               </div>
                             ))}
                           </div>
@@ -626,10 +626,10 @@ export default function DCMembersManagement() {
                             padding: '7px 14px', background: '#F1F5F9', border: '1.5px solid var(--border)',
                             borderRadius: 'var(--radius-sm)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: 'var(--text-secondary)',
                           }}>
-                            📎 Select File
+                            Select File
                             <input type="file" style={{ display: 'none' }} onChange={e => handleMemberChange(member.id, 'recognitionLetter', e.target.files[0])} />
                           </label>
-                          {member.recognitionLetter && <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>✓ {member.recognitionLetter.name}</span>}
+                          {member.recognitionLetter && <span style={{ fontSize: '11px', color: '#1E7D45', fontWeight: 600 }}>Selected: {member.recognitionLetter.name}</span>}
                         </div>
                       </div>
                     </div>
@@ -656,14 +656,14 @@ export default function DCMembersManagement() {
               disabled={submitting}
               style={{
                 padding: '12px 36px', borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(90deg, #7C3AED, #4F46E5)',
+                background: 'linear-gradient(90deg, #174EA6, #0A2A66)',
                 color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none',
                 cursor: submitting ? 'not-allowed' : 'pointer',
                 opacity: submitting ? 0.7 : 1, transition: 'opacity 0.2s',
-                boxShadow: '0 4px 14px rgba(108,99,255,0.4)',
+                boxShadow: '0 4px 14px rgba(23,78,166,0.28)',
               }}
             >
-              {submitting ? '⏳ Submitting...' : '✅ Submit DC Constitution'}
+              {submitting ? 'Submitting...' : 'Submit DC Constitution'}
             </button>
           </div>
         </form>

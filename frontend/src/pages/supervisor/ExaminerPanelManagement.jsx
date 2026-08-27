@@ -45,13 +45,13 @@ export default function ExaminerPanelManagement() {
             <button
               style={{ padding: '8px 16px', background: '#F1F5F9', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              🔽 Advanced Filter
+              Advanced Filter
             </button>
             <button
-              style={{ padding: '8px 16px', background: 'linear-gradient(90deg,#4F46E5,#6C63FF)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ padding: '8px 16px', background: 'linear-gradient(90deg,#0A2A66,#174EA6)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
               onClick={() => toast.success('Add Examiner form opened!')}
             >
-              ➕ Add Examiner
+              Add Examiner
             </button>
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function ExaminerPanelManagement() {
         {/* Table */}
         <div className="card" style={{ marginBottom: '20px' }}>
           <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '16px' }}>📋</span>
+            <span style={{ fontSize: '16px' }} />
             <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-primary)' }}>Examiner Panel - Candidate List</span>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -80,9 +80,9 @@ export default function ExaminerPanelManagement() {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>REGISTRATION NO ⇅</th>
-                  <th>DISCIPLINE ⇅</th>
-                  <th>APPLICANT NAME ⇅</th>
+                  <th>REGISTRATION NO</th>
+                  <th>DISCIPLINE</th>
+                  <th>APPLICANT NAME</th>
                   <th>ACTION</th>
                 </tr>
               </thead>
@@ -98,7 +98,7 @@ export default function ExaminerPanelManagement() {
                   <tr key={i}>
                     <td>{i + 1}</td>
                     <td style={{ fontWeight: 600 }}>{r.regNo}</td>
-                    <td><span style={{ fontSize: '12px', color: '#4338CA', fontWeight: 600 }}>{r.discipline}</span></td>
+                    <td><span style={{ fontSize: '12px', color: '#174EA6', fontWeight: 600 }}>{r.discipline}</span></td>
                     <td>{r.name}</td>
                     <td>
                       <button className="btn btn-primary btn-sm" onClick={() => toast.success(`Viewing panel for ${r.name}`)}>
@@ -111,9 +111,9 @@ export default function ExaminerPanelManagement() {
             </table>
           </div>
           <div style={{ padding: '12px 20px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button className="btn btn-ghost btn-sm">‹ Previous</button>
+            <button className="btn btn-ghost btn-sm">Previous</button>
             <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Showing 1 to {Math.min(filtered.length, perPage)} of {filtered.length} entries</span>
-            <button className="btn btn-ghost btn-sm">Next ›</button>
+            <button className="btn btn-ghost btn-sm">Next</button>
           </div>
         </div>
 
@@ -122,7 +122,7 @@ export default function ExaminerPanelManagement() {
           <div className="card">
             <div className="card-header">
               <div style={{ fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>📊</span> Status Overview
+                Status Overview
               </div>
             </div>
             <div className="card-body" style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
@@ -139,10 +139,10 @@ export default function ExaminerPanelManagement() {
               </div>
             </div>
           </div>
-          <div className="card" style={{ background: 'linear-gradient(135deg,#1E1B4B,#312E81)', color: '#fff' }}>
+          <div className="card" style={{ background: 'linear-gradient(135deg,#061B44,#0A2A66)', color: '#fff' }}>
             <div className="card-body">
               <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                🤖 Automated Examiner Matching
+                Automated Examiner Matching
               </div>
               <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, marginBottom: '14px' }}>
                 Our new AI-powered system helps you find the most suitable examiners based on research discipline and citation records.
@@ -155,7 +155,7 @@ export default function ExaminerPanelManagement() {
                   color: '#fff', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer',
                 }}
               >
-                🔍 TRY SMART MATCHING
+                TRY SMART MATCHING
               </button>
             </div>
           </div>

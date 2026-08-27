@@ -5,7 +5,7 @@ import { apiFetch, apiUrl } from '../../utils/api'
 export default function ScholarProgress() {
   const [reportsList, setReportsList] = useState([])
   const [showModal, setShowModal] = useState(false)
-  const [period, setPeriod] = useState('Jul 2024 – Dec 2024')
+  const [period, setPeriod] = useState('Jul 2024 - Dec 2024')
   const [workDone, setWorkDone] = useState('')
   const [planNext, setPlanNext] = useState('')
   const [publications, setPublications] = useState('')
@@ -86,17 +86,17 @@ export default function ScholarProgress() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Submit Bi-Annual Progress Report</span>
-              <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowModal(false)}></button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
                 <div className="form-group">
                   <label className="form-label">Report Period *</label>
                   <select className="form-control form-select" value={period} onChange={e => setPeriod(e.target.value)}>
-                    <option>Jul 2024 – Dec 2024</option>
-                    <option>Jan 2025 – Jun 2025</option>
-                    <option>Jul 2025 – Dec 2025</option>
-                    <option>Jan 2026 – Jun 2026</option>
+                    <option>Jul 2024 - Dec 2024</option>
+                    <option>Jan 2025 - Jun 2025</option>
+                    <option>Jul 2025 - Dec 2025</option>
+                    <option>Jan 2026 - Jun 2026</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -147,9 +147,9 @@ export default function ScholarProgress() {
                   type="submit"
                   disabled={submitting}
                   className="btn btn-primary"
-                  style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+                  style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
                 >
-                  {submitting ? 'Submitting...' : '📤 Submit Report'}
+                  {submitting ? 'Submitting...' : ' Submit Report'}
                 </button>
               </div>
             </form>
@@ -163,8 +163,8 @@ export default function ScholarProgress() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Submit and view your bi-annual progress reports</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }} onClick={() => setShowModal(true)}>
-            📤 Submit New Report
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }} onClick={() => setShowModal(true)}>
+             Submit New Report
           </button>
         </div>
       </div>
@@ -172,10 +172,10 @@ export default function ScholarProgress() {
       <div className="page-body">
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Reports', value: reportsList.length, icon: '📊', color: 'purple' },
-            { label: 'Approved', value: approvedCount, icon: '✅', color: 'green' },
-            { label: 'Under Review', value: underReviewCount, icon: '🔍', color: 'orange' },
-            { label: 'Next Due', value: 'Dec 2024', icon: '⏰', color: 'blue' },
+            { label: 'Total Reports', value: reportsList.length, icon: '', color: 'blue' },
+            { label: 'Approved', value: approvedCount, icon: '', color: 'green' },
+            { label: 'Under Review', value: underReviewCount, icon: '', color: 'orange' },
+            { label: 'Next Due', value: 'Dec 2024', icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -185,15 +185,15 @@ export default function ScholarProgress() {
         </div>
 
         {/* Next deadline */}
-        <div style={{ background: 'linear-gradient(135deg, #FEF3C7, #FDE68A)', border: '1px solid #FCD34D', borderRadius: 'var(--radius-lg)', padding: '18px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ fontSize: '28px' }}>⚠️</span>
+        <div style={{ background: 'linear-gradient(135deg, #FFF6D8, #FDE68A)', border: '1px solid #FCD34D', borderRadius: 'var(--radius-lg)', padding: '18px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <span style={{ fontSize: '28px' }}></span>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: '14px', color: '#92400E' }}>Upcoming Report Deadline</div>
-            <div style={{ fontSize: '13px', color: '#B45309', marginTop: '2px' }}>
-              Your next progress report (Jul – Dec 2024) is due on <strong>Dec 31, 2024</strong>. Submit at least 2 weeks before the deadline.
+            <div style={{ fontWeight: 700, fontSize: '14px', color: '#936C00' }}>Upcoming Report Deadline</div>
+            <div style={{ fontSize: '13px', color: '#936C00', marginTop: '2px' }}>
+              Your next progress report (Jul - Dec 2024) is due on <strong>Dec 31, 2024</strong>. Submit at least 2 weeks before the deadline.
             </div>
           </div>
-          <button className="btn btn-sm" style={{ background: '#F59E0B', color: '#fff', border: 'none' }} onClick={() => setShowModal(true)}>Submit Now</button>
+          <button className="btn btn-sm" style={{ background: '#C89B1E', color: '#fff', border: 'none' }} onClick={() => setShowModal(true)}>Submit Now</button>
         </div>
 
         {/* History Table */}
@@ -204,7 +204,7 @@ export default function ScholarProgress() {
               <div style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>Loading reports...</div>
             ) : reportsList.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-muted)' }}>
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📑</div>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
                 <div>No progress reports submitted yet.</div>
                 <div style={{ fontSize: '12px', marginTop: '4px' }}>Click "Submit New Report" above to file your first bi-annual review.</div>
               </div>
@@ -237,7 +237,7 @@ export default function ScholarProgress() {
                               title="Download"
                               style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
                             >
-                              📥
+                              
                             </a>
                           )}
                         </div>
@@ -256,12 +256,12 @@ export default function ScholarProgress() {
           <div className="card-body">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
               {[
-                { label: 'Research Progress', pct: 70, color: '#6C63FF' },
-                { label: 'Publications',       pct: 60, color: '#10B981' },
-                { label: 'Timely Submission',  pct: 90, color: '#3B82F6' },
-                { label: 'Seminar/Conference', pct: 50, color: '#F59E0B' },
-                { label: 'Supervisor Rating',  pct: 85, color: '#EC4899' },
-                { label: 'Overall Score',      pct: 75, color: '#10B981' },
+                { label: 'Research Progress', pct: 70, color: '#174EA6' },
+                { label: 'Publications',       pct: 60, color: '#1E7D45' },
+                { label: 'Timely Submission',  pct: 90, color: '#174EA6' },
+                { label: 'Seminar/Conference', pct: 50, color: '#C89B1E' },
+                { label: 'Supervisor Rating',  pct: 85, color: '#B4232A' },
+                { label: 'Overall Score',      pct: 75, color: '#1E7D45' },
               ].map((c, i) => (
                 <div key={i} style={{ padding: '14px', background: '#F8FAFC', borderRadius: 'var(--radius-md)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>

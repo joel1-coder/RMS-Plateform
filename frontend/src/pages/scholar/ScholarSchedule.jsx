@@ -2,24 +2,24 @@ import { useState } from 'react'
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const events = [
-  { id: 1, title: 'Supervisor Meeting',         day: 'Mon', time: '10:00 AM', duration: '1 hr',  type: 'meeting',  color: '#6C63FF' },
-  { id: 2, title: 'Lab Work / Experiments',     day: 'Tue', time: '09:00 AM', duration: '3 hrs', type: 'research', color: '#10B981' },
-  { id: 3, title: 'Literature Review Session',  day: 'Wed', time: '02:00 PM', duration: '2 hrs', type: 'research', color: '#10B981' },
-  { id: 4, title: 'DRC Progress Presentation',  day: 'Thu', time: '11:00 AM', duration: '1 hr',  type: 'drc',      color: '#F59E0B' },
-  { id: 5, title: 'Thesis Writing – Chapter 5', day: 'Fri', time: '09:00 AM', duration: '4 hrs', type: 'writing',  color: '#3B82F6' },
-  { id: 6, title: 'Paper Review (Co-author)',   day: 'Sat', time: '10:00 AM', duration: '2 hrs', type: 'research', color: '#10B981' },
+  { id: 1, title: 'Supervisor Meeting',         day: 'Mon', time: '10:00 AM', duration: '1 hr',  type: 'meeting',  color: '#174EA6' },
+  { id: 2, title: 'Lab Work / Experiments',     day: 'Tue', time: '09:00 AM', duration: '3 hrs', type: 'research', color: '#1E7D45' },
+  { id: 3, title: 'Literature Review Session',  day: 'Wed', time: '02:00 PM', duration: '2 hrs', type: 'research', color: '#1E7D45' },
+  { id: 4, title: 'DRC Progress Presentation',  day: 'Thu', time: '11:00 AM', duration: '1 hr',  type: 'drc',      color: '#C89B1E' },
+  { id: 5, title: 'Thesis Writing - Chapter 5', day: 'Fri', time: '09:00 AM', duration: '4 hrs', type: 'writing',  color: '#174EA6' },
+  { id: 6, title: 'Paper Review (Co-author)',   day: 'Sat', time: '10:00 AM', duration: '2 hrs', type: 'research', color: '#1E7D45' },
 ]
 
 const upcomingEvents = [
-  { title: 'Chapter 4 Submission to Supervisor', date: 'Aug 5, 2024',  urgent: true,  icon: '📚' },
-  { title: 'DRC Progress Review Meeting',         date: 'Jul 25, 2024', urgent: true,  icon: '🏛️' },
-  { title: 'IJCA Paper Review Deadline',          date: 'Aug 15, 2024', urgent: false, icon: '📰' },
-  { title: 'Progress Report Submission',           date: 'Aug 31, 2024', urgent: false, icon: '📊' },
-  { title: 'Final Thesis Submission',             date: 'Sep 30, 2024', urgent: false, icon: '🎓' },
-  { title: 'Viva Voce (Tentative)',               date: 'Nov 12, 2024', urgent: false, icon: '🎤' },
+  { title: 'Chapter 4 Submission to Supervisor', date: 'Aug 5, 2024',  urgent: true,  icon: '' },
+  { title: 'DRC Progress Review Meeting',         date: 'Jul 25, 2024', urgent: true,  icon: '' },
+  { title: 'IJCA Paper Review Deadline',          date: 'Aug 15, 2024', urgent: false, icon: '' },
+  { title: 'Progress Report Submission',           date: 'Aug 31, 2024', urgent: false, icon: '' },
+  { title: 'Final Thesis Submission',             date: 'Sep 30, 2024', urgent: false, icon: '' },
+  { title: 'Viva Voce (Tentative)',               date: 'Nov 12, 2024', urgent: false, icon: '' },
 ]
 
-const TYPE_ICON = { meeting: '🤝', research: '🔬', drc: '🏛️', writing: '✍️' }
+const TYPE_ICON = { meeting: '', research: '', drc: '', writing: '' }
 
 export default function ScholarSchedule() {
   const [view, setView] = useState('week')
@@ -45,7 +45,7 @@ export default function ScholarSchedule() {
               </button>
             ))}
           </div>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}>＋ Add Event</button>
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}>+ Add Event</button>
         </div>
       </div>
 
@@ -54,11 +54,11 @@ export default function ScholarSchedule() {
           {/* Calendar / Week View */}
           <div className="card">
             <div className="card-header">
-              <div className="card-title">Week View — July 2024</div>
+              <div className="card-title">Week View - July 2024</div>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button className="btn btn-ghost btn-sm">◀ Prev</button>
+                <button className="btn btn-ghost btn-sm"> Prev</button>
                 <button className="btn btn-ghost btn-sm">Today</button>
-                <button className="btn btn-ghost btn-sm">Next ▶</button>
+                <button className="btn btn-ghost btn-sm">Next </button>
               </div>
             </div>
             <div style={{ overflow: 'auto' }}>
@@ -72,7 +72,7 @@ export default function ScholarSchedule() {
                   return (
                     <div key={day} style={{
                       padding: '10px', textAlign: 'center', borderBottom: '1px solid var(--border)', borderRight: '1px solid var(--border)',
-                      background: isToday ? '#F5F3FF' : 'transparent',
+                      background: isToday ? '#F3F7FF' : 'transparent',
                     }}>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>{day}</div>
                       <div style={{ fontSize: '18px', fontWeight: 800, color: isToday ? 'var(--primary)' : 'var(--text-primary)', marginTop: '2px' }}>{dates[i]}</div>
@@ -97,7 +97,7 @@ export default function ScholarSchedule() {
                               boxShadow: `0 2px 8px ${ev.color}40`,
                             }}>
                               {TYPE_ICON[ev.type]} {ev.title}
-                              <div style={{ fontSize: '10px', opacity: 0.8 }}>{ev.time} · {ev.duration}</div>
+                              <div style={{ fontSize: '10px', opacity: 0.8 }}>{ev.time} - {ev.duration}</div>
                             </div>
                           )}
                         </div>
@@ -115,10 +115,10 @@ export default function ScholarSchedule() {
             <div className="card card-body">
               <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '12px' }}>Event Types</div>
               {[
-                { color: '#6C63FF', label: 'Supervisor Meeting' },
-                { color: '#10B981', label: 'Research / Lab' },
-                { color: '#F59E0B', label: 'DRC / Committee' },
-                { color: '#3B82F6', label: 'Thesis Writing' },
+                { color: '#174EA6', label: 'Supervisor Meeting' },
+                { color: '#1E7D45', label: 'Research / Lab' },
+                { color: '#C89B1E', label: 'DRC / Committee' },
+                { color: '#174EA6', label: 'Thesis Writing' },
               ].map((l, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                   <div style={{ width: 12, height: 12, borderRadius: '3px', background: l.color, flexShrink: 0 }} />

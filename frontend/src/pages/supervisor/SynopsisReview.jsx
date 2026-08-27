@@ -55,7 +55,7 @@ export default function SynopsisReview() {
       }
 
       if (newStatus === 'Pending DRC Review') {
-        toast.success('✓ Synopsis approved! Forwarded to DRC committee for review.')
+        toast.success(' Synopsis approved! Forwarded to DRC committee for review.')
       } else if (newStatus === 'Changes Requested') {
         toast.success('Revisions requested from scholar.')
       } else {
@@ -98,14 +98,14 @@ export default function SynopsisReview() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Review Synopsis Submission</span>
-              <button className="modal-close" onClick={() => setSelectedSub(null)}>✕</button>
+              <button className="modal-close" onClick={() => setSelectedSub(null)}></button>
             </div>
             <div className="modal-body">
               <div style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
                 <div>
                   <label className="form-label" style={{ fontWeight: 700 }}>Scholar</label>
                   <div style={{ fontSize: '13.5px' }}>
-                    {selectedSub.scholarName} {selectedSub.scholarRegNo ? `(${selectedSub.scholarRegNo})` : ''} · {selectedSub.scholarDept || 'Computer Science'}
+                    {selectedSub.scholarName} {selectedSub.scholarRegNo ? `(${selectedSub.scholarRegNo})` : ''} - {selectedSub.scholarDept || 'Computer Science'}
                   </div>
                 </div>
                 <div>
@@ -135,7 +135,7 @@ export default function SynopsisReview() {
                       className="btn btn-outline btn-sm"
                       style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}
                     >
-                      📄 Download & Read Synopsis PDF
+                       Download & Read Synopsis PDF
                     </a>
                   </div>
                 )}
@@ -158,7 +158,7 @@ export default function SynopsisReview() {
                 disabled={actionLoading}
                 onClick={() => handleAction(selectedSub.id, 'Rejected', 'Rejected by supervisor.')}
               >
-                ✕ Reject
+                 Reject
               </button>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
@@ -166,15 +166,15 @@ export default function SynopsisReview() {
                   disabled={actionLoading}
                   onClick={() => handleAction(selectedSub.id, 'Changes Requested', 'Changes requested by supervisor.')}
                 >
-                  📝 Request Changes
+                   Request Changes
                 </button>
                 <button
                   className="btn btn-primary btn-sm"
-                  style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+                  style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
                   disabled={actionLoading}
                   onClick={() => handleAction(selectedSub.id, 'Pending DRC Review', 'Approved by supervisor. Forwarded to DRC committee.')}
                 >
-                  {actionLoading ? 'Processing...' : '✓ Approve & Forward to DRC'}
+                  {actionLoading ? 'Processing...' : ' Approve & Forward to DRC'}
                 </button>
                 <button className="btn btn-ghost" onClick={() => setSelectedSub(null)}>Cancel</button>
               </div>
@@ -195,10 +195,10 @@ export default function SynopsisReview() {
         {/* KPI Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Pending Your Review', value: loading ? '--' : pendingCount, icon: '📋', color: 'blue' },
-            { label: 'Forwarded to DRC', value: loading ? '--' : forwardedCount, icon: '✅', color: 'green' },
-            { label: 'Revisions Requested', value: loading ? '--' : revisionCount, icon: '⏳', color: 'orange' },
-            { label: 'Total Submissions', value: loading ? '--' : submissions.length, icon: '📁', color: 'purple' },
+            { label: 'Pending Your Review', value: loading ? '--' : pendingCount, icon: '', color: 'blue' },
+            { label: 'Forwarded to DRC', value: loading ? '--' : forwardedCount, icon: '', color: 'green' },
+            { label: 'Revisions Requested', value: loading ? '--' : revisionCount, icon: '', color: 'orange' },
+            { label: 'Total Submissions', value: loading ? '--' : submissions.length, icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -230,7 +230,7 @@ export default function SynopsisReview() {
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading submissions...</div>
               ) : filtered.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '8px' }}>📋</div>
+                  <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
                   <div>No synopsis submissions found for your scholars.</div>
                   <div style={{ fontSize: '12px', marginTop: '4px' }}>When an assigned scholar submits their synopsis, it will appear here for your review.</div>
                 </div>
@@ -250,7 +250,7 @@ export default function SynopsisReview() {
                       <tr key={sub.id}>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div className="avatar avatar-sm" style={{ background: '#4F46E5' }}>{(sub.scholarName || 'S').charAt(0)}</div>
+                            <div className="avatar avatar-sm" style={{ background: '#0A2A66' }}>{(sub.scholarName || 'S').charAt(0)}</div>
                             <div>
                               <div style={{ fontWeight: 600, fontSize: '13px' }}>{sub.scholarName}</div>
                               <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{sub.scholarDept || 'Computer Science'} {sub.scholarRegNo ? `(${sub.scholarRegNo})` : ''}</div>
@@ -276,7 +276,7 @@ export default function SynopsisReview() {
                                 title="Download PDF"
                                 style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
                               >
-                                📄
+                                
                               </a>
                             )}
                           </div>
@@ -303,10 +303,10 @@ export default function SynopsisReview() {
             <div className="card card-body">
               <div className="card-title" style={{ fontSize: '14px', marginBottom: '8px' }}>Standards Checklist</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                ✓ Clear problem formulation<br />
-                ✓ Comprehensive literature summary<br />
-                ✓ Proposed research methodology<br />
-                ✓ Anti-plagiarism index within bounds
+                 Clear problem formulation<br />
+                 Comprehensive literature summary<br />
+                 Proposed research methodology<br />
+                 Anti-plagiarism index within bounds
               </div>
             </div>
           </div>

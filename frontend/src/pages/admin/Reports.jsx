@@ -102,8 +102,8 @@ export default function Reports() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Generate and export research data reports</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm" onClick={handleExportPDF}>📥 Export PDF</button>
-          <button className="btn btn-success btn-sm" onClick={handleExportExcel}>📊 Export Excel</button>
+          <button className="btn btn-ghost btn-sm" onClick={handleExportPDF}> Export PDF</button>
+          <button className="btn btn-success btn-sm" onClick={handleExportExcel}> Export Excel</button>
         </div>
       </div>
 
@@ -111,10 +111,10 @@ export default function Reports() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '20px' }}>
           {[
-            { label: 'Total Projects', value: totalReports.toString(), icon: '📊', color: 'purple' },
-            { label: 'Completion Rate', value: `${completionRate}%`, icon: '✅', color: 'green' },
-            { label: 'Avg. PhD Duration', value: `${avgDurationYrs} yr`, icon: '📅', color: 'blue' },
-            { label: 'Success Rate', value: `${successRate}%`, icon: '🎓', color: 'orange' },
+            { label: 'Total Projects', value: totalReports.toString(), icon: '', color: 'blue' },
+            { label: 'Completion Rate', value: `${completionRate}%`, icon: '', color: 'green' },
+            { label: 'Avg. PhD Duration', value: `${avgDurationYrs} yr`, icon: '', color: 'blue' },
+            { label: 'Success Rate', value: `${successRate}%`, icon: '', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -127,10 +127,10 @@ export default function Reports() {
         </div>
 
         {/* Scholar Name Lookup Card */}
-        <div className="card" style={{ marginBottom: '20px', border: '2px solid #EFF6FF' }}>
-          <div className="card-header" style={{ background: 'linear-gradient(90deg, #EFF6FF, #DBEAFE)' }}>
+        <div className="card" style={{ marginBottom: '20px', border: '2px solid #F3F7FF' }}>
+          <div className="card-header" style={{ background: 'linear-gradient(90deg, #F3F7FF, #E8EEF8)' }}>
             <div>
-              <div className="card-title">🎓 Scholar Progress Lookup</div>
+              <div className="card-title"> Scholar Progress Lookup</div>
               <div className="card-subtitle">Enter a scholar name to view their complete research history and generate a report</div>
             </div>
           </div>
@@ -147,42 +147,42 @@ export default function Reports() {
                   style={{ fontSize: '14px' }}
                 />
               </div>
-              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)', whiteSpace: 'nowrap' }} onClick={handleScholarSearch}>
-                🔍 Search Scholar
+              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)', whiteSpace: 'nowrap' }} onClick={handleScholarSearch}>
+                 Search Scholar
               </button>
             </div>
 
             {scholarSearched && !scholarResult && (
-              <div style={{ padding: '16px', background: '#FEF2F2', borderRadius: 'var(--radius-md)', color: '#EF4444', fontWeight: 600, textAlign: 'center' }}>
-                ❌ No scholar found matching "{scholarName}". Check the name or add this scholar in Research Management.
+              <div style={{ padding: '16px', background: '#F9E6E8', borderRadius: 'var(--radius-md)', color: '#B4232A', fontWeight: 600, textAlign: 'center' }}>
+                 No scholar found matching "{scholarName}". Check the name or add this scholar in Research Management.
               </div>
             )}
 
             {scholarResult && (
-              <div style={{ border: '1.5px solid #BFDBFE', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+              <div style={{ border: '1.5px solid #B9C9EA', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
                 {/* Scholar header */}
-                <div style={{ background: 'linear-gradient(135deg, #1E3A5F, #0F172A)', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ background: 'linear-gradient(135deg, #0A2A66, #061B44)', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div className="avatar" style={{ background: 'linear-gradient(135deg,#6C63FF,#4F46E5)', width: 50, height: 50, fontSize: 20 }}>
+                    <div className="avatar" style={{ background: 'linear-gradient(135deg,#174EA6,#0A2A66)', width: 50, height: 50, fontSize: 20 }}>
                       {scholarResult.scholar?.charAt(0)}
                     </div>
                     <div>
                       <div style={{ fontWeight: 800, fontSize: '16px', color: '#fff' }}>{scholarResult.scholar}</div>
-                      <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>{scholarResult.dept} · {scholarResult.supervisor}</div>
+                      <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>{scholarResult.dept} - {scholarResult.supervisor}</div>
                     </div>
                   </div>
-                  <button className="btn btn-primary btn-sm" style={{ background: '#10B981', border: 'none' }} onClick={handleGenerateScholarReport}>
-                    📄 Generate Report
+                  <button className="btn btn-primary btn-sm" style={{ background: '#1E7D45', border: 'none' }} onClick={handleGenerateScholarReport}>
+                     Generate Report
                   </button>
                 </div>
 
                 {/* Scholar details grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: '#E2E8F0' }}>
                   {[
-                    { label: 'Research Duration', value: `${years}y ${months}m`, icon: '📅', bg: '#F0FDF4', color: '#15803D' },
-                    { label: 'Current Stage', value: scholarResult.stage, icon: '🔬', bg: '#EFF6FF', color: '#1D4ED8' },
-                    { label: 'Progress', value: `${scholarResult.progress}%`, icon: '📈', bg: '#FFF7ED', color: '#C2410C' },
-                    { label: 'Status', value: scholarResult.status, icon: '🟢', bg: scholarResult.status === 'Active' ? '#F0FDF4' : '#FEF2F2', color: scholarResult.status === 'Active' ? '#15803D' : '#EF4444' },
+                    { label: 'Research Duration', value: `${years}y ${months}m`, icon: '', bg: '#E7F4EC', color: '#166A3A' },
+                    { label: 'Current Stage', value: scholarResult.stage, icon: '', bg: '#F3F7FF', color: '#0A2A66' },
+                    { label: 'Progress', value: `${scholarResult.progress}%`, icon: '', bg: '#FFF7ED', color: '#C2410C' },
+                    { label: 'Status', value: scholarResult.status, icon: '', bg: scholarResult.status === 'Active' ? '#E7F4EC' : '#F9E6E8', color: scholarResult.status === 'Active' ? '#166A3A' : '#B4232A' },
                   ].map((item, idx) => (
                     <div key={idx} style={{ background: item.bg, padding: '16px', textAlign: 'center' }}>
                       <div style={{ fontSize: '20px', marginBottom: '4px' }}>{item.icon}</div>
@@ -199,7 +199,7 @@ export default function Reports() {
                     {scholarResult.topic}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
-                    📅 Enrolled: {scholarResult.startDate} · Supervisor: {scholarResult.supervisor}
+                     Enrolled: {scholarResult.startDate} - Supervisor: {scholarResult.supervisor}
                   </div>
                 </div>
 
@@ -207,12 +207,12 @@ export default function Reports() {
                 <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <span style={{ fontSize: '12.5px', fontWeight: 700 }}>Overall Completion Level</span>
-                    <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#6C63FF' }}>{scholarResult.progress}%</span>
+                    <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#174EA6' }}>{scholarResult.progress}%</span>
                   </div>
                   <div className="progress-bar" style={{ height: '10px' }}>
                     <div className="progress-fill" style={{
                       width: `${scholarResult.progress}%`,
-                      background: scholarResult.progress === 100 ? '#10B981' : scholarResult.progress >= 60 ? '#3B82F6' : '#F59E0B',
+                      background: scholarResult.progress === 100 ? '#1E7D45' : scholarResult.progress >= 60 ? '#174EA6' : '#C89B1E',
                       borderRadius: '99px', transition: 'width 1s ease'
                     }} />
                   </div>
@@ -246,8 +246,8 @@ export default function Reports() {
               </select>
             </div>
             <div style={{ alignSelf: 'flex-end' }}>
-              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={handleGenerate}>
-                🔄 Generate
+              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} onClick={handleGenerate}>
+                 Generate
               </button>
             </div>
           </div>
@@ -269,9 +269,9 @@ export default function Reports() {
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px' }} />
-                  <Bar dataKey="submitted" fill="#6C63FF" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="approved" fill="#10B981" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="rejected" fill="#EF4444" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="submitted" fill="#174EA6" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="approved" fill="#1E7D45" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="rejected" fill="#B4232A" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -291,9 +291,9 @@ export default function Reports() {
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px' }} />
-                  <Area type="monotone" dataKey="active" stroke="#6C63FF" fill="#EDE9FE" strokeWidth={2} />
-                  <Area type="monotone" dataKey="completed" stroke="#10B981" fill="#D1FAE5" strokeWidth={2} />
-                  <Area type="monotone" dataKey="discontinued" stroke="#EF4444" fill="#FEE2E2" strokeWidth={2} />
+                  <Area type="monotone" dataKey="active" stroke="#174EA6" fill="#E8EEF8" strokeWidth={2} />
+                  <Area type="monotone" dataKey="completed" stroke="#1E7D45" fill="#E7F4EC" strokeWidth={2} />
+                  <Area type="monotone" dataKey="discontinued" stroke="#B4232A" fill="#F9E6E8" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -335,7 +335,7 @@ export default function Reports() {
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <div className="progress-bar" style={{ width: '80px' }}>
-                            <div className="progress-fill" style={{ width: `${r.progress}%`, background: r.progress === 100 ? '#10B981' : '#6C63FF' }} />
+                            <div className="progress-fill" style={{ width: `${r.progress}%`, background: r.progress === 100 ? '#1E7D45' : '#174EA6' }} />
                           </div>
                           <span style={{ fontSize: '11.5px', fontWeight: 700 }}>{r.progress}%</span>
                         </div>

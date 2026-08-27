@@ -1,9 +1,9 @@
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const pieData = [
-  { name: 'Approved', value: 48, color: '#0D9488' },
-  { name: 'Pending Review', value: 5, color: '#F59E0B' },
-  { name: 'Requires Revision', value: 2, color: '#EF4444' },
+  { name: 'Approved', value: 48, color: '#174EA6' },
+  { name: 'Pending Review', value: 5, color: '#C89B1E' },
+  { name: 'Requires Revision', value: 2, color: '#B4232A' },
 ]
 
 const barData = [
@@ -28,8 +28,8 @@ export default function DRCReports() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Analyze synopsis evaluation metrics, committee loads and decision distribution.</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: '#0D9488' }}>
-            📥 Export Report Summary
+          <button className="btn btn-primary btn-sm" style={{ background: '#174EA6' }}>
+             Export Report Summary
           </button>
         </div>
       </div>
@@ -79,7 +79,7 @@ export default function DRCReports() {
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#0D9488" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" fill="#174EA6" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -107,7 +107,7 @@ export default function DRCReports() {
                   <tr key={idx}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="avatar avatar-sm" style={{ background: '#0F766E' }}>{r.scholar.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: '#0A2A66' }}>{r.scholar.charAt(0)}</div>
                         <span style={{ fontWeight: 700, fontSize: '13px' }}>{r.scholar}</span>
                       </div>
                     </td>

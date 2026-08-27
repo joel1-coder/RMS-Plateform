@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
 
   if (loading) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh' }}>
-      <div className="spinner" style={{ borderColor:'rgba(108,99,255,0.3)', borderTopColor:'#6C63FF' }} />
+      <div className="spinner" style={{ borderColor:'rgba(23,78,166,0.18)', borderTopColor:'#174EA6' }} />
     </div>
   )
 

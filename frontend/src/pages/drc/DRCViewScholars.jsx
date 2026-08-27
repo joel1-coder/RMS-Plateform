@@ -91,7 +91,7 @@ export default function DRCViewScholars() {
         {/* Search and Filters */}
         <div className="card" style={{ marginBottom: '20px' }}>
           <div style={{ display: 'flex', gap: '12px', padding: '16px', alignItems: 'center' }}>
-            <span style={{ fontSize: '18px' }}>🔍</span>
+            <span style={{ fontSize: '18px' }}></span>
             <input
               type="text"
               placeholder="Search by scholar name, supervisor, or department..."
@@ -114,24 +114,24 @@ export default function DRCViewScholars() {
                 style={{
                   padding: '24px',
                   position: 'relative',
-                  border: recent ? '2px solid #10B981' : '1px solid var(--border)',
-                  boxShadow: recent ? '0 10px 25px -5px rgba(16,185,129,0.1)' : 'var(--shadow-sm)',
-                  background: recent ? 'linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)' : '#fff',
+                  border: recent ? '2px solid #1E7D45' : '1px solid var(--border)',
+                  boxShadow: recent ? '0 10px 25px -5px rgba(30,125,69,0.1)' : 'var(--shadow-sm)',
+                  background: recent ? 'linear-gradient(180deg, #E7F4EC 0%, #FFFFFF 100%)' : '#fff',
                 }}
               >
                 {recent && (
                   <span style={{
                     position: 'absolute', top: '12px', right: '12px',
-                    background: '#10B981', color: '#fff', fontSize: '10px', fontWeight: 800,
+                    background: '#1E7D45', color: '#fff', fontSize: '10px', fontWeight: 800,
                     padding: '4px 10px', borderRadius: '99px', letterSpacing: '0.5px'
                   }}>
-                    ✨ RECENTLY JOINED
+                     RECENTLY JOINED
                   </span>
                 )}
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <div className="avatar" style={{
-                    background: recent ? 'linear-gradient(135deg, #10B981, #059669)' : 'linear-gradient(135deg, #6C63FF, #4F46E5)',
+                    background: recent ? 'linear-gradient(135deg, #1E7D45, #166A3A)' : 'linear-gradient(135deg, #174EA6, #0A2A66)',
                     color: '#fff', width: '45px', height: '45px', fontSize: '18px', fontWeight: 'bold'
                   }}>
                     {s.name.charAt(0)}
@@ -154,8 +154,8 @@ export default function DRCViewScholars() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <strong>Supervisor:</strong>
                     <span style={{
-                      background: s.assignedSupervisor ? '#EFF6FF' : '#FEF2F2',
-                      color: s.assignedSupervisor ? '#1D4ED8' : '#B91C1C',
+                      background: s.assignedSupervisor ? '#F3F7FF' : '#F9E6E8',
+                      color: s.assignedSupervisor ? '#0A2A66' : '#B4232A',
                       padding: '3px 8px', borderRadius: '4px', fontWeight: 600, fontSize: '12px'
                     }}>
                       {s.assignedSupervisor || 'Not Assigned'}
@@ -174,7 +174,7 @@ export default function DRCViewScholars() {
                   className="btn btn-secondary btn-sm"
                   style={{ width: '100%', padding: '10px', fontWeight: 700 }}
                 >
-                  📄 View Full Profile
+                   View Full Profile
                 </button>
               </div>
             )
@@ -195,13 +195,13 @@ export default function DRCViewScholars() {
             <div className="modal" style={{ maxWidth: '850px', width: '90%' }}>
               <div className="modal-header">
                 <span className="modal-title">Scholar Academic Profile Details</span>
-                <button className="modal-close" onClick={() => setSelectedScholar(null)}>✕</button>
+                <button className="modal-close" onClick={() => setSelectedScholar(null)}></button>
               </div>
               <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', padding: '24px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
                   
                   <div>
-                    <h4 style={{ color: '#0F766E', borderBottom: '2px solid #E2E8F0', paddingBottom: '6px', marginBottom: '12px', fontWeight: 700 }}>
+                    <h4 style={{ color: '#0A2A66', borderBottom: '2px solid #E2E8F0', paddingBottom: '6px', marginBottom: '12px', fontWeight: 700 }}>
                       Basic Information
                     </h4>
                     <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
@@ -218,12 +218,12 @@ export default function DRCViewScholars() {
                   </div>
 
                   <div>
-                    <h4 style={{ color: '#0F766E', borderBottom: '2px solid #E2E8F0', paddingBottom: '6px', marginBottom: '12px', fontWeight: 700 }}>
+                    <h4 style={{ color: '#0A2A66', borderBottom: '2px solid #E2E8F0', paddingBottom: '6px', marginBottom: '12px', fontWeight: 700 }}>
                       Ph.D. & Guide Info
                     </h4>
                     <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
                       <tbody>
-                        <tr><td style={{ padding: '6px 0', color: '#64748B', width: '40%' }}><strong>Guide (Supervisor):</strong></td><td style={{ fontWeight: 600, color: '#1E3A8A' }}>{p.nameOfGuide}</td></tr>
+                        <tr><td style={{ padding: '6px 0', color: '#64748B', width: '40%' }}><strong>Guide (Supervisor):</strong></td><td style={{ fontWeight: 600, color: '#0A2A66' }}>{p.nameOfGuide}</td></tr>
                         <tr><td style={{ padding: '6px 0', color: '#64748B' }}><strong>Registration No:</strong></td><td>{p.universityRegistrationNo}</td></tr>
                         <tr><td style={{ padding: '6px 0', color: '#64748B' }}><strong>Session / Year:</strong></td><td>{p.registrationSessionYear}</td></tr>
                         <tr><td style={{ padding: '6px 0', color: '#64748B' }}><strong>Working Status:</strong></td><td>{p.workingStatus}</td></tr>
@@ -234,7 +234,7 @@ export default function DRCViewScholars() {
                   </div>
 
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <h4 style={{ color: '#0F766E', borderBottom: '2px solid #E2E8F0', paddingBottom: '6px', marginBottom: '12px', fontWeight: 700 }}>
+                    <h4 style={{ color: '#0A2A66', borderBottom: '2px solid #E2E8F0', paddingBottom: '6px', marginBottom: '12px', fontWeight: 700 }}>
                       Addresses & Contact Records
                     </h4>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', fontSize: '13px' }}>

@@ -1,9 +1,9 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const drcStats = [
-  { label: 'Active Committees', value: '12', icon: '👥', color: 'blue', sub: 'Across CS & Biotech' },
-  { label: 'Meetings Scheduled', value: '03', icon: '📅', color: 'green', sub: 'Next: Oct 25, 10 AM' },
-  { label: 'Approved YTD', value: '48', icon: '✅', color: 'teal', sub: 'On track' },
+  { label: 'Active Committees', value: '12', icon: '', color: 'blue', sub: 'Across CS & Biotech' },
+  { label: 'Meetings Scheduled', value: '03', icon: '', color: 'green', sub: 'Next: Oct 25, 10 AM' },
+  { label: 'Approved YTD', value: '48', icon: '', color: 'green', sub: 'On track' },
 ]
 
 const activityData = [
@@ -27,7 +27,7 @@ export default function DRCDashboard() {
         <div>
           <div className="topbar-title">DRC Dashboard</div>
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-            Research RMS · DRC Administration
+            Research RMS - DRC Administration
           </span>
         </div>
       </div>
@@ -65,8 +65,8 @@ export default function DRCDashboard() {
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Bar dataKey="Approved" fill="#0D9488" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Rejected" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Approved" fill="#174EA6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Rejected" fill="#B4232A" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -79,15 +79,15 @@ export default function DRCDashboard() {
             </div>
             <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {[
-                { title: '📝 Document Review', desc: 'Verify 5 pending synopses submissions', color: 'orange' },
-                { title: '👥 Select Committee Panel', desc: 'Assign 3 faculty members to evaluation panel', color: 'blue' },
-                { title: '📅 Schedule DRC Meeting', desc: 'Coordinate next VIVA reviews for CS Batch 2021', color: 'green' },
+                { title: ' Document Review', desc: 'Verify 5 pending synopses submissions', color: 'orange' },
+                { title: ' Select Committee Panel', desc: 'Assign 3 faculty members to evaluation panel', color: 'blue' },
+                { title: ' Schedule DRC Meeting', desc: 'Coordinate next VIVA reviews for CS Batch 2021', color: 'green' },
               ].map((t, idx) => (
                 <div key={idx} style={{
                   padding: '12px', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-md)',
                   background: '#F8FAFC', display: 'flex', gap: '10px', alignItems: 'start'
                 }}>
-                  <div style={{ marginTop: '2px' }}>🟢</div>
+                  <div style={{ marginTop: '2px' }}></div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '13px' }}>{t.title}</div>
                     <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>{t.desc}</div>
@@ -113,10 +113,10 @@ export default function DRCDashboard() {
                       <span style={{ fontWeight: 700, fontSize: '13.5px' }}>{m.title}</span>
                       <span className="badge badge-info" style={{ fontSize: '9px' }}>{m.room}</span>
                     </div>
-                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>📅 {m.date} at {m.time}</div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}> {m.date} at {m.time}</div>
                     <div style={{ display: 'flex', gap: '4px', marginTop: '8px', flexWrap: 'wrap' }}>
                       {m.members.map((mem, idx) => (
-                        <span key={idx} style={{ fontSize: '9px', background: '#E0F2FE', color: '#0369A1', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>{mem}</span>
+                        <span key={idx} style={{ fontSize: '9px', background: '#E8EEF8', color: '#0A2A66', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>{mem}</span>
                       ))}
                     </div>
                   </div>

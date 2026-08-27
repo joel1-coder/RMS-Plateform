@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 import { apiFetch, apiUrl } from '../../utils/api'
 
 const CATEGORIES = ['All', 'Synopsis', 'Thesis', 'Publication', 'Report', 'Certificate']
-const CAT_ICON = { Synopsis: '📋', Thesis: '📚', Publication: '📰', Report: '📊', Certificate: '🏆', Other: '📁' }
+const CAT_ICON = { Synopsis: '', Thesis: '', Publication: '', Report: '', Certificate: '', Other: '' }
 const STATUS_CLS = { Verified: 'badge-success', Approved: 'badge-success', 'Under Review': 'badge-warning', 'Pending Supervisor Approval': 'badge-warning', Pending: 'badge-info' }
 
 export default function ScholarDocuments() {
@@ -189,7 +189,7 @@ export default function ScholarDocuments() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Upload Research Document</span>
-              <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowModal(false)}></button>
             </div>
             <form onSubmit={handleUploadSubmit}>
               <div className="modal-body">
@@ -224,9 +224,9 @@ export default function ScholarDocuments() {
                   type="submit"
                   disabled={uploading}
                   className="btn btn-primary"
-                  style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+                  style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
                 >
-                  {uploading ? 'Uploading...' : '📤 Upload Document'}
+                  {uploading ? 'Uploading...' : ' Upload Document'}
                 </button>
               </div>
             </form>
@@ -242,10 +242,10 @@ export default function ScholarDocuments() {
         <div className="topbar-actions">
           <button
             className="btn btn-primary btn-sm"
-            style={{ background: 'linear-gradient(90deg,#10B981,#059669)' }}
+            style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
             onClick={() => setShowModal(true)}
           >
-            📤 Upload Document
+             Upload Document
           </button>
         </div>
       </div>
@@ -254,10 +254,10 @@ export default function ScholarDocuments() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Files', value: docsList.length, icon: '📁', color: 'purple' },
-            { label: 'Verified', value: docsList.filter(d => d.status === 'Verified').length, icon: '✅', color: 'green' },
-            { label: 'Under Review', value: docsList.filter(d => d.status === 'Under Review').length, icon: '🔍', color: 'orange' },
-            { label: 'Pending', value: docsList.filter(d => d.status === 'Pending').length, icon: '⏳', color: 'blue' },
+            { label: 'Total Files', value: docsList.length, icon: '', color: 'blue' },
+            { label: 'Verified', value: docsList.filter(d => d.status === 'Verified').length, icon: '', color: 'green' },
+            { label: 'Under Review', value: docsList.filter(d => d.status === 'Under Review').length, icon: '', color: 'orange' },
+            { label: 'Pending', value: docsList.filter(d => d.status === 'Pending').length, icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -269,13 +269,13 @@ export default function ScholarDocuments() {
         {/* Drop Zone */}
         <div
           style={{
-            border: `2px dashed ${dragging ? '#10B981' : 'var(--border)'}`,
+            border: `2px dashed ${dragging ? '#1E7D45' : 'var(--border)'}`,
             borderRadius: 'var(--radius-xl)',
             padding: '36px',
             textAlign: 'center',
             cursor: 'pointer',
             marginBottom: '24px',
-            background: dragging ? '#F0FDF4' : 'var(--bg-card)',
+            background: dragging ? '#E7F4EC' : 'var(--bg-card)',
             transition: 'all 0.2s',
           }}
           onDragOver={e => { e.preventDefault(); setDragging(true) }}
@@ -283,18 +283,18 @@ export default function ScholarDocuments() {
           onDrop={handleDrop}
           onClick={() => setShowModal(true)}
         >
-          <div style={{ fontSize: '40px', marginBottom: '10px' }}>📂</div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: dragging ? '#059669' : 'var(--text-primary)' }}>
+          <div style={{ fontSize: '40px', marginBottom: '10px' }}></div>
+          <div style={{ fontSize: '15px', fontWeight: 600, color: dragging ? '#166A3A' : 'var(--text-primary)' }}>
             {dragging ? 'Drop files here!' : 'Drag & Drop files here'}
           </div>
-          <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>or click to browse — PDF, DOCX, ZIP · max 20MB</div>
+          <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>or click to browse - PDF, DOCX, ZIP - max 20MB</div>
           <button
             type="button"
             className="btn btn-outline btn-sm"
-            style={{ marginTop: '14px', borderColor: '#10B981', color: '#10B981' }}
+            style={{ marginTop: '14px', borderColor: '#1E7D45', color: '#1E7D45' }}
             onClick={(e) => { e.stopPropagation(); setShowModal(true) }}
           >
-            📤 Choose Files
+             Choose Files
           </button>
         </div>
 
@@ -302,14 +302,14 @@ export default function ScholarDocuments() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search documents..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <div style={{ display: 'flex', gap: '6px' }}>
               {CATEGORIES.map(cat => (
                 <button key={cat} onClick={() => setFilter(cat)} className={`btn btn-sm ${filter === cat ? 'btn-primary' : 'btn-ghost'}`}
-                  style={filter === cat ? { background: 'linear-gradient(90deg,#10B981,#059669)', boxShadow: '0 2px 8px rgba(16,185,129,0.3)' } : {}}>
-                  {CAT_ICON[cat] || '📁'} {cat}
+                  style={filter === cat ? { background: 'linear-gradient(90deg,#1E7D45,#166A3A)', boxShadow: '0 2px 8px rgba(30,125,69,0.24)' } : {}}>
+                  {CAT_ICON[cat] || ''} {cat}
                 </button>
               ))}
             </div>
@@ -321,7 +321,7 @@ export default function ScholarDocuments() {
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading documents...</div>
             ) : filtered.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📂</div>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
                 <div>No documents matching the criteria</div>
               </div>
             ) : (
@@ -335,7 +335,7 @@ export default function ScholarDocuments() {
                       <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{i + 1}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ fontSize: '20px' }}>{CAT_ICON[doc.category] || '📄'}</span>
+                          <span style={{ fontSize: '20px' }}>{CAT_ICON[doc.category] || ''}</span>
                           <span style={{ fontWeight: 600, fontSize: '13px' }}>{doc.name}</span>
                         </div>
                       </td>
@@ -354,10 +354,10 @@ export default function ScholarDocuments() {
                               title="Download"
                               style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                             >
-                              📥
+                              
                             </a>
                           )}
-                          <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }} title="Delete" onClick={() => handleDelete(doc)}>🗑️</button>
+                          <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }} title="Delete" onClick={() => handleDelete(doc)}></button>
                         </div>
                       </td>
                     </tr>

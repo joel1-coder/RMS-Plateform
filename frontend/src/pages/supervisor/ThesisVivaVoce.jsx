@@ -105,7 +105,7 @@ function ScheduleVivaModal({ onClose, onSave }) {
       <div className="modal" style={{ maxWidth: '600px' }}>
         <div className="modal-header">
           <span className="modal-title">Schedule Viva Voce Meeting</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}>Close</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -141,7 +141,7 @@ function ScheduleVivaModal({ onClose, onSave }) {
             {/* Viva Examiner Sub-Section */}
             <div style={{ borderTop: '1.5px solid var(--border)', paddingTop: '16px', marginTop: '8px' }}>
               <h4 style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span>🔬</span> Viva Examiner Details
+                Viva Examiner Details
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -170,7 +170,7 @@ function ScheduleVivaModal({ onClose, onSave }) {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>Schedule Viva</button>
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}>Schedule Viva</button>
           </div>
         </form>
       </div>
@@ -243,8 +243,8 @@ export default function ThesisVivaVoce() {
           </span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary btn-sm" style={{ background: '#0D9488', borderColor: '#0D9488', display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setShowModal(true)}>
-            📅 Schedule Meeting
+          <button className="btn btn-primary btn-sm" style={{ background: '#174EA6', borderColor: '#174EA6', display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setShowModal(true)}>
+            Schedule Meeting
           </button>
         </div>
       </div>
@@ -299,14 +299,14 @@ export default function ThesisVivaVoce() {
                       <div>
                         <div style={{ fontWeight: 600 }}>{r.name}</div>
                         <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Reg: {r.regNo}</div>
-                        <div style={{ fontSize: '11.5px', color: '#4338CA', fontWeight: 600, marginTop: '2px' }}>{r.discipline}</div>
+                        <div style={{ fontSize: '11.5px', color: '#174EA6', fontWeight: 600, marginTop: '2px' }}>{r.discipline}</div>
                       </div>
                     </td>
                     <td>
                       <div style={{ fontWeight: 600 }}>{r.date}</div>
                       <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>{r.time}</div>
                     </td>
-                    <td style={{ fontWeight: 500, fontSize: '12.5px' }}>📍 {r.venue}</td>
+                    <td style={{ fontWeight: 500, fontSize: '12.5px' }}>{r.venue}</td>
                     <td>
                       <div>
                         <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{r.examinerName}</div>
@@ -321,7 +321,7 @@ export default function ThesisVivaVoce() {
                       </span>
                     </td>
                     <td>
-                      <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }} onClick={() => handleDelete(r.id)}>
+                      <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }} onClick={() => handleDelete(r.id)}>
                         Remove
                       </button>
                     </td>

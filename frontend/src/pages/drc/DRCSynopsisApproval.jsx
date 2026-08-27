@@ -40,7 +40,7 @@ export default function DRCSynopsisApproval() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Review & Approve Research Synopsis</span>
-              <button className="modal-close" onClick={() => setSelectedSub(null)}>✕</button>
+              <button className="modal-close" onClick={() => setSelectedSub(null)}></button>
             </div>
             <div className="modal-body">
               <div style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
@@ -79,8 +79,8 @@ export default function DRCSynopsisApproval() {
               <button className="btn btn-danger btn-sm" onClick={() => handleAction(selectedSub.id, 'Needs DRC Revision')}>
                 Request Revisions
               </button>
-              <button className="btn btn-primary btn-sm" style={{ background: '#0D9488' }} onClick={() => handleAction(selectedSub.id, 'Approved by DRC')}>
-                ✓ Approve Synopsis
+              <button className="btn btn-primary btn-sm" style={{ background: '#174EA6' }} onClick={() => handleAction(selectedSub.id, 'Approved by DRC')}>
+                 Approve Synopsis
               </button>
               <button className="btn btn-ghost" onClick={() => setSelectedSub(null)}>Cancel</button>
             </div>
@@ -109,10 +109,10 @@ export default function DRCSynopsisApproval() {
         {/* KPI Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Pending DRC Review', value: submissions.filter(s => s.status.includes('Pending')).length, icon: '📋', color: 'orange' },
-            { label: 'Approved DRC', value: submissions.filter(s => s.status.includes('Approved')).length, icon: '✅', color: 'teal' },
-            { label: 'Revisions Requested', value: submissions.filter(s => s.status.includes('Needs')).length, icon: '⚠️', color: 'red' },
-            { label: 'Total Submissions', value: submissions.length, icon: '📚', color: 'blue' },
+            { label: 'Pending DRC Review', value: submissions.filter(s => s.status.includes('Pending')).length, icon: '', color: 'orange' },
+            { label: 'Approved DRC', value: submissions.filter(s => s.status.includes('Approved')).length, icon: '', color: 'green' },
+            { label: 'Revisions Requested', value: submissions.filter(s => s.status.includes('Needs')).length, icon: '', color: 'red' },
+            { label: 'Total Submissions', value: submissions.length, icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -143,10 +143,10 @@ export default function DRCSynopsisApproval() {
                   <tr key={sub.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="avatar avatar-sm" style={{ background: '#0D9488' }}>{sub.scholar.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{sub.scholar.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '13px' }}>{sub.scholar}</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{sub.id} · {sub.version}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{sub.id} - {sub.version}</div>
                         </div>
                       </div>
                     </td>
@@ -159,7 +159,7 @@ export default function DRCSynopsisApproval() {
                     <td>
                       <div style={{ display: 'flex', gap: '5px' }}>
                         <button className="btn btn-secondary btn-sm" style={{ fontSize: '11px', padding: '4px 8px' }} onClick={() => setSelectedSub(sub)}>Review & Sign</button>
-                        <button className="btn btn-ghost btn-sm" title="View Document File">📄</button>
+                        <button className="btn btn-ghost btn-sm" title="View Document File"></button>
                       </div>
                     </td>
                   </tr>

@@ -14,18 +14,18 @@ const courseworkRecords = [
 ]
 
 const NAV_ITEMS = [
-  { icon: '🏠', label: 'Dashboard' },
-  { icon: '👤', label: 'Account Details' },
-  { icon: '👥', label: 'Scholars List' },
-  { icon: '📄', label: 'DC-Constitution' },
-  { icon: '📊', label: 'DC-I Status' },
-  { icon: '📝', label: 'Coursework Mark Entry', active: true },
-  { icon: '🤝', label: 'Co-Supervisor Nomination' },
-  { icon: '📋', label: 'Synopsis Submission' },
-  { icon: '📚', label: 'Thesis Submission' },
-  { icon: '🔬', label: 'Examiner Panel' },
-  { icon: '🎓', label: 'Thesis Viva-voce' },
-  { icon: '❌', label: 'Cancellation' },
+  { icon: '', label: 'Dashboard' },
+  { icon: '', label: 'Account Details' },
+  { icon: '', label: 'Scholars List' },
+  { icon: '', label: 'DC-Constitution' },
+  { icon: '', label: 'DC-I Status' },
+  { icon: '', label: 'Coursework Mark Entry', active: true },
+  { icon: '', label: 'Co-Supervisor Nomination' },
+  { icon: '', label: 'Synopsis Submission' },
+  { icon: '', label: 'Thesis Submission' },
+  { icon: '', label: 'Examiner Panel' },
+  { icon: '', label: 'Thesis Viva-voce' },
+  { icon: '', label: 'Cancellation' },
 ]
 
 export default function CourseworkListManagement() {
@@ -84,7 +84,7 @@ export default function CourseworkListManagement() {
                     <td style={{ fontWeight: 600 }}>{i + 1}</td>
                     <td style={{ fontSize: '12px', lineHeight: 1.5 }}>{r.regNo}</td>
                     <td>
-                      <span style={{ fontSize: '12px', color: '#4338CA', fontWeight: 600 }}>{r.discipline}</span>
+                      <span style={{ fontSize: '12px', color: '#174EA6', fontWeight: 600 }}>{r.discipline}</span>
                     </td>
                   </tr>
                 ))}
@@ -95,13 +95,13 @@ export default function CourseworkListManagement() {
             <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Showing 1 to {Math.min(perPage, filtered.length)} of {filtered.length} entries</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <button className="btn btn-ghost btn-sm">Previous</button>
-              <button style={{ padding: '5px 10px', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 700, cursor: 'pointer', fontSize: '12.5px' }}>1</button>
+              <button style={{ padding: '5px 10px', background: '#0A2A66', color: '#fff', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 700, cursor: 'pointer', fontSize: '12.5px' }}>1</button>
               <button className="btn btn-ghost btn-sm">Next</button>
             </div>
           </div>
         </div>
 
-        <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>© 2024 Research Section Management</div>
+        <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>2024 Research Section Management</div>
       </div>
     </div>
   )

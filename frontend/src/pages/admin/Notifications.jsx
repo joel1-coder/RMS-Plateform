@@ -1,14 +1,14 @@
-﻿import { apiFetch } from '../../utils/api'
+import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 const TYPE_COLORS = {
-  info: '#3B82F6', 
-  success: '#10B981', 
-  danger: '#EF4444', 
-  warning: '#F59E0B', 
-  primary: '#6C63FF',
-  allocation: '#8B5CF6'
+  info: '#174EA6', 
+  success: '#1E7D45', 
+  danger: '#B4232A', 
+  warning: '#C89B1E', 
+  primary: '#174EA6',
+  allocation: '#174EA6'
 }
 
 export default function Notifications() {
@@ -84,8 +84,8 @@ export default function Notifications() {
           </span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm" onClick={markAllRead}>✓ Mark all as read</button>
-          <button className="btn btn-danger btn-sm" style={{ background: '#EF4444', borderColor: '#EF4444' }} onClick={handleClearAll}>✕ Clear all</button>
+          <button className="btn btn-ghost btn-sm" onClick={markAllRead}> Mark all as read</button>
+          <button className="btn btn-danger btn-sm" style={{ background: '#B4232A', borderColor: '#B4232A' }} onClick={handleClearAll}> Clear all</button>
         </div>
       </div>
 
@@ -93,10 +93,10 @@ export default function Notifications() {
         {/* Stats */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '20px' }}>
           {[
-            { label: 'Total Alerts', value: notifs.length, icon: '🔔', color: 'purple' },
-            { label: 'Unread Logs', value: unreadCount, icon: '📩', color: 'blue' },
-            { label: 'Allocations', value: notifs.filter(n => n.type === 'allocation').length, icon: '🔗', color: 'green' },
-            { label: 'General Alerts', value: notifs.filter(n => n.type === 'general' || n.type === 'info').length, icon: '📢', color: 'orange' },
+            { label: 'Total Alerts', value: notifs.length, icon: '', color: 'blue' },
+            { label: 'Unread Logs', value: unreadCount, icon: '', color: 'blue' },
+            { label: 'Allocations', value: notifs.filter(n => n.type === 'allocation').length, icon: '', color: 'green' },
+            { label: 'General Alerts', value: notifs.filter(n => n.type === 'general' || n.type === 'info').length, icon: '', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -141,7 +141,7 @@ export default function Notifications() {
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading alerts...</div>
           ) : filtered.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">🔕</div>
+              <div className="empty-icon"></div>
               <h3>No notifications</h3>
               <p>You're all caught up!</p>
             </div>
@@ -154,11 +154,11 @@ export default function Notifications() {
               >
                 <div style={{
                   width: 42, height: 42, borderRadius: 'var(--radius-md)',
-                  background: `${TYPE_COLORS[notif.type || 'info'] || '#6C63FF'}18`,
+                  background: `${TYPE_COLORS[notif.type || 'info'] || '#174EA6'}18`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '18px', flexShrink: 0,
                 }}>
-                  {notif.type === 'allocation' ? '🔗' : '🔔'}
+                  {notif.type === 'allocation' ? '' : ''}
                 </div>
                 <div className="notification-body" style={{ flex: 1 }}>
                   <div className="notification-title" style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>{notif.title}</div>
@@ -168,7 +168,7 @@ export default function Notifications() {
                   </div>
                 </div>
                 {!notif.read && (
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: TYPE_COLORS[notif.type || 'info'] || '#6C63FF', flexShrink: 0 }} />
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: TYPE_COLORS[notif.type || 'info'] || '#174EA6', flexShrink: 0 }} />
                 )}
               </div>
             ))

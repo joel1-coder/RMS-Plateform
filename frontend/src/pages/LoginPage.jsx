@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import { apiFetch } from '../utils/api'
+import AppIcon from '../components/AppIcon'
+import { InstitutionBrand } from '../components/InstitutionBrand'
 
 const ROLES = [
   { id: 'admin', label: 'Admin' },
@@ -13,15 +15,7 @@ const ROLES = [
   { id: 'librarian', label: 'Librarian' },
 ]
 
-// Default fallback credentials per role
-const DEFAULT_CREDENTIALS = {
-  admin:      { email: 'admin@rms.edu',      password: 'admin123',      name: 'Dr. Admin Singh',    role: 'admin',      department: 'Administration' },
-  supervisor: { email: 'supervisor@rms.edu', password: 'super123',      name: 'Dr. Priya Kumar',    role: 'supervisor', department: 'Computer Science' },
-  scholar:    { email: 'scholar@rms.edu',    password: 'scholar123',    name: 'Rahul Sharma',       role: 'scholar',    department: 'Computer Science' },
-  hod:        { email: 'hod@rms.edu',        password: 'hod123',        name: 'Prof. Anita Verma',  role: 'hod',        department: 'Computer Science' },
-  drc:        { email: 'drc@rms.edu',        password: 'drc123',        name: 'Dr. Mohan Reddy',    role: 'drc',        department: 'Research Committee' },
-  librarian:  { email: 'librarian@rms.edu',  password: 'library123',    name: 'Ms. Deepa Nair',     role: 'librarian',  department: 'Central Library' },
-}
+
 
 function getEmailForRole(roleId) {
   try {
@@ -33,7 +27,7 @@ function getEmailForRole(roleId) {
   }
 }
 
-/* ─── Test Login Modal ──────────────────────────────────────────── */
+/* Test Login Modal */
 function TestLoginModal({ onClose, onSuccess }) {
   const [testId, setTestId] = useState('')
   const [testPassword, setTestPassword] = useState('')
@@ -89,7 +83,7 @@ function TestLoginModal({ onClose, onSuccess }) {
       }}>
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #1e3a5f 0%, #0f2540 100%)',
+          background: 'linear-gradient(135deg, #061B44 0%, #0A2A66 100%)',
           padding: '24px 28px 20px',
           position: 'relative',
         }}>
@@ -99,14 +93,14 @@ function TestLoginModal({ onClose, onSuccess }) {
             borderRadius: '50%', width: '32px', height: '32px',
             color: '#fff', fontSize: '16px', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>×</button>
+          }}>x</button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
               width: '44px', height: '44px', borderRadius: '12px',
               background: 'rgba(255,255,255,0.15)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '22px',
-            }}>🧪</div>
+              color: '#C89B1E',
+            }}><AppIcon name="flask" size={22} /></div>
             <div>
               <div style={{ color: '#fff', fontWeight: 700, fontSize: '18px', lineHeight: 1.2 }}>
                 Test Account Login
@@ -120,11 +114,11 @@ function TestLoginModal({ onClose, onSuccess }) {
 
         {/* Info Banner */}
         <div style={{
-          background: '#EFF6FF', borderBottom: '1px solid #BFDBFE',
+          background: '#F3F7FF', borderBottom: '1px solid #B9C9EA',
           padding: '10px 28px', display: 'flex', gap: '8px', alignItems: 'flex-start',
         }}>
-          <span style={{ fontSize: '14px', marginTop: '1px' }}>ℹ️</span>
-          <p style={{ fontSize: '12px', color: '#1D4ED8', margin: 0, lineHeight: 1.5 }}>
+          <AppIcon name="help" size={15} style={{ marginTop: '2px', color: '#174EA6', flexShrink: 0 }} />
+          <p style={{ fontSize: '12px', color: '#0A2A66', margin: 0, lineHeight: 1.5 }}>
             Test accounts are issued by the Admin for evaluation or demo purposes.
             Contact your administrator if you do not have credentials.
           </p>
@@ -137,7 +131,7 @@ function TestLoginModal({ onClose, onSuccess }) {
               Test User ID
             </label>
             <div className="input-group">
-              <span className="input-icon">🪪</span>
+              <span className="input-icon"><AppIcon name="userCheck" size={16} /></span>
               <input
                 type="text"
                 className="form-control"
@@ -156,7 +150,7 @@ function TestLoginModal({ onClose, onSuccess }) {
               Test Password
             </label>
             <div className="input-group">
-              <span className="input-icon">🔑</span>
+              <span className="input-icon"><AppIcon name="key" size={16} /></span>
               <input
                 type={showPwd ? 'text' : 'password'}
                 className="form-control has-right"
@@ -170,7 +164,7 @@ function TestLoginModal({ onClose, onSuccess }) {
                 onClick={() => setShowPwd(!showPwd)}
                 style={{ fontSize: '14px', cursor: 'pointer' }}
               >
-                {showPwd ? '🙈' : '👁️'}
+                <AppIcon name={showPwd ? 'x' : 'eye'} size={16} />
               </span>
             </div>
           </div>
@@ -181,8 +175,8 @@ function TestLoginModal({ onClose, onSuccess }) {
             style={{
               width: '100%', padding: '13px',
               background: loading
-                ? '#93C5FD'
-                : 'linear-gradient(135deg, #1e3a5f 0%, #2563EB 100%)',
+                ? '#B9C9EA'
+                : 'linear-gradient(135deg, #061B44 0%, #174EA6 100%)',
               color: '#fff', border: 'none', borderRadius: '10px',
               fontWeight: 700, fontSize: '15px', cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
@@ -193,7 +187,7 @@ function TestLoginModal({ onClose, onSuccess }) {
             {loading ? (
               <><div className="spinner" /><span>Verifying...</span></>
             ) : (
-              <span>Access Scholar Portal →</span>
+              <span>Access Scholar Portal</span>
             )}
           </button>
         </form>
@@ -209,7 +203,7 @@ function TestLoginModal({ onClose, onSuccess }) {
   )
 }
 
-/* ─── Main Login Page ───────────────────────────────────────────── */
+/* --- Main Login Page --------------------------------------------- */
 export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState('admin')
   const [email, setEmail] = useState('')
@@ -263,8 +257,8 @@ export default function LoginPage() {
 
       if (selectedRole.toLowerCase() === 'scholar' && !data.user.isProfileCompleted) {
         toast.custom((t) => (
-          <div style={{ background: '#3B82F6', color: '#fff', padding: '12px 20px', borderRadius: '8px', display: 'flex', gap: '10px', alignItems: 'center', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)' }}>
-            <span style={{ fontSize: '20px' }}>👋</span>
+          <div style={{ background: '#0A2A66', color: '#fff', padding: '12px 20px', borderRadius: '8px', display: 'flex', gap: '10px', alignItems: 'center', boxShadow: '0 4px 12px rgba(10,42,102,0.28)' }}>
+            <AppIcon name="userCheck" size={20} />
             <div>
               <div style={{ fontWeight: 600 }}>Welcome to RMS!</div>
               <div style={{ fontSize: '13px', opacity: 0.9 }}>Please fill in your details in My Profile first.</div>
@@ -282,21 +276,15 @@ export default function LoginPage() {
     }
   }
 
-  // Called when test login succeeds
+  // Called when test login succeeds; always redirect to registration form.
   const handleTestLoginSuccess = (data) => {
     localStorage.setItem('rms_token', data.token)
     login(data.user)
-    toast.success(`Welcome, ${data.user.name.split(' ').pop()}! (Test Account)`)
+    toast.success(`Welcome, ${data.user.name.split(' ').pop()}! Please fill in your registration details.`)
     setShowTestModal(false)
-    // Test accounts always log in as scholar
-    if (!data.user.isProfileCompleted) {
-      navigate('/scholar/profile')
-    } else {
-      navigate('/scholar')
-    }
+    // Test accounts always go to the standalone registration form, NOT the scholar portal
+    navigate('/register')
   }
-
-  const currentDemo = DEFAULT_CREDENTIALS[selectedRole]
 
   return (
     <div className="login-page">
@@ -310,7 +298,7 @@ export default function LoginPage() {
       <div className="login-container">
         {/* Left Panel */}
         <div className="login-left">
-          <div className="brand-icon">R</div>
+          <InstitutionBrand title="Research Management System" subtitle="Official Academic Platform" size="lg" />
           <h1>Research Management System</h1>
           <p>
             A comprehensive digital platform for managing PhD research workflows,
@@ -318,15 +306,15 @@ export default function LoginPage() {
           </p>
           <div className="login-features">
             {[
-              { icon: '🎓', text: 'Multi-role access control' },
-              { icon: '📄', text: 'Thesis & synopsis management' },
-              { icon: '📅', text: 'Viva voce scheduling' },
-              { icon: '📊', text: 'Research progress tracking' },
-              { icon: '🔔', text: 'Real-time notifications' },
-              { icon: '📈', text: 'Audit logs & reports' },
+              { icon: 'graduation', text: 'Multi-role academic access control' },
+              { icon: 'file', text: 'Thesis and synopsis management' },
+              { icon: 'calendar', text: 'Viva voce scheduling' },
+              { icon: 'clipboardCheck', text: 'Research progress tracking' },
+              { icon: 'bell', text: 'Institutional notifications' },
+              { icon: 'audit', text: 'Audit logs and reports' },
             ].map((f, i) => (
               <div className="login-feature" key={i}>
-                <div className="login-feature-icon">{f.icon}</div>
+                <div className="login-feature-icon"><AppIcon name={f.icon} size={16} /></div>
                 <span>{f.text}</span>
               </div>
             ))}
@@ -335,7 +323,8 @@ export default function LoginPage() {
 
         {/* Right Panel */}
         <div className="login-right">
-          <h2>Welcome Back 👋</h2>
+          <InstitutionBrand title="Institution RMS" subtitle="Secure academic access" size="sm" />
+          <h2>Welcome Back</h2>
           <p className="login-desc">Sign in to access your RMS dashboard</p>
 
           {/* Role Selector */}
@@ -363,7 +352,7 @@ export default function LoginPage() {
             <div className="form-group">
               <label className="form-label">Email Address</label>
               <div className="input-group">
-                <span className="input-icon">✉️</span>
+                <span className="input-icon"><AppIcon name="mail" size={16} /></span>
                 <input
                   type="email"
                   className="form-control"
@@ -379,7 +368,7 @@ export default function LoginPage() {
             <div className="form-group">
               <label className="form-label">Password</label>
               <div className="input-group">
-                <span className="input-icon">🔒</span>
+                <span className="input-icon"><AppIcon name="key" size={16} /></span>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="form-control has-right"
@@ -394,7 +383,7 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   style={{ fontSize: '14px' }}
                 >
-                  {showPassword ? '🙈' : '👁️'}
+                  <AppIcon name={showPassword ? 'x' : 'eye'} size={16} />
                 </span>
               </div>
             </div>
@@ -417,12 +406,12 @@ export default function LoginPage() {
                   <span>Signing in...</span>
                 </>
               ) : (
-                <span>Sign In →</span>
+                <span>Sign In</span>
               )}
             </button>
           </form>
 
-          {/* ── Test Login Divider ── */}
+          {/* -- Test Login Divider -- */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: '10px',
             margin: '20px 0 14px',
@@ -441,7 +430,7 @@ export default function LoginPage() {
             onClick={() => setShowTestModal(true)}
             style={{
               width: '100%', padding: '11px 16px',
-              background: 'linear-gradient(135deg, #0f2540 0%, #1e3a5f 100%)',
+              background: 'linear-gradient(135deg, #061B44 0%, #0A2A66 100%)',
               color: '#fff', border: 'none', borderRadius: '10px',
               fontWeight: 600, fontSize: '14px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -451,8 +440,8 @@ export default function LoginPage() {
             onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >
-            <span style={{ fontSize: '16px' }}>🧪</span>
-            Register Scholar Details — Test Login
+            <AppIcon name="flask" size={16} />
+            Register Scholar Details - Test Login
           </button>
 
           <p style={{
@@ -464,7 +453,7 @@ export default function LoginPage() {
 
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <p style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-              © 2024 Research Management System · University of Excellence
+              2024 Research Management System - University of Excellence
             </p>
           </div>
         </div>

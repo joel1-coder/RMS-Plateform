@@ -34,7 +34,7 @@ export default function SupervisorProfile() {
         <input name={name} type={type} className="form-control" value={form[name]} onChange={handleChange} />
       ) : (
         <div style={{ padding: '10px 14px', background: '#F8FAFC', borderRadius: 'var(--radius-md)', fontSize: '14px', color: 'var(--text-primary)', border: '1.5px solid var(--border)' }}>
-          {profile[name] || '—'}
+          {profile[name] || '-'}
         </div>
       )}
     </div>
@@ -51,11 +51,11 @@ export default function SupervisorProfile() {
         <div className="topbar-actions">
           {editing ? (
             <>
-              <button className="btn btn-ghost btn-sm" onClick={() => { setEditing(false); setForm(profile) }}>✕ Cancel</button>
-              <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={handleSave}>💾 Save Changes</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => { setEditing(false); setForm(profile) }}> Cancel</button>
+              <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} onClick={handleSave}> Save Changes</button>
             </>
           ) : (
-            <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={() => setEditing(true)}>✏️ Edit Profile</button>
+            <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} onClick={() => setEditing(true)}> Edit Profile</button>
           )}
         </div>
       </div>
@@ -67,10 +67,10 @@ export default function SupervisorProfile() {
             <div className="card" style={{ textAlign: 'center', padding: '28px 20px' }}>
               <div style={{
                 width: 90, height: 90, borderRadius: '50%', margin: '0 auto 16px',
-                background: 'linear-gradient(135deg, #6C63FF, #EC4899)',
+                background: 'linear-gradient(135deg, #174EA6, #B4232A)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '34px', fontWeight: 800, color: '#fff',
-                boxShadow: '0 8px 24px rgba(108,99,255,0.35)',
+                boxShadow: '0 8px 24px rgba(23,78,166,0.26)',
               }}>
                 {profile.name.charAt(4)}
               </div>
@@ -78,7 +78,7 @@ export default function SupervisorProfile() {
               <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '12px' }}>{profile.title}</div>
               <span className="badge badge-success" style={{ fontSize: '12px' }}>Faculty Advisor</span>
               <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <button className="btn btn-ghost btn-sm" style={{ width: '100%', justifyContent: 'center' }}>📷 Update Photo</button>
+                <button className="btn btn-ghost btn-sm" style={{ width: '100%', justifyContent: 'center' }}> Update Photo</button>
               </div>
             </div>
 
@@ -87,7 +87,7 @@ export default function SupervisorProfile() {
               <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '12px', color: 'var(--text-primary)' }}>Research Focus Areas</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {profile.specialization.split(',').map((kw, i) => (
-                  <span key={i} style={{ padding: '4px 10px', borderRadius: 'var(--radius-full)', background: '#EDE9FE', color: '#6C63FF', fontSize: '11px', fontWeight: 600 }}>
+                  <span key={i} style={{ padding: '4px 10px', borderRadius: 'var(--radius-full)', background: '#E8EEF8', color: '#174EA6', fontSize: '11px', fontWeight: 600 }}>
                     {kw.trim()}
                   </span>
                 ))}
@@ -98,7 +98,7 @@ export default function SupervisorProfile() {
           {/* Form Content */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="card">
-              <div className="card-header"><div className="card-title">👤 Faculty Personal Information</div></div>
+              <div className="card-header"><div className="card-title"> Faculty Personal Information</div></div>
               <div className="card-body">
                 <div className="grid-2">
                   <Field label="Full Name" name="name" />
@@ -120,7 +120,7 @@ export default function SupervisorProfile() {
             </div>
 
             <div className="card">
-              <div className="card-header"><div className="card-title">🎓 Academic & Departmental Info</div></div>
+              <div className="card-header"><div className="card-title"> Academic & Departmental Info</div></div>
               <div className="card-body">
                 <div className="grid-2">
                   <Field label="Department" name="dept" readOnly />

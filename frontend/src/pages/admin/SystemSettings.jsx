@@ -45,7 +45,7 @@ export default function SystemSettings() {
 
   const handleSave = () => {
     localStorage.setItem('rms_settings', JSON.stringify(settings))
-    toast.success('✅ Settings saved and applied successfully!')
+    toast.success(' Settings saved and applied successfully!')
     setHasChanges(false)
   }
 
@@ -67,10 +67,10 @@ export default function SystemSettings() {
   }
 
   const tabs = [
-    { id: 'general', label: '🏛️ General' },
-    { id: 'academic', label: '🎓 Academic' },
-    { id: 'email', label: '✉️ Email / SMTP' },
-    { id: 'security', label: '🔒 Security' },
+    { id: 'general', label: ' General' },
+    { id: 'academic', label: ' Academic' },
+    { id: 'email', label: ' Email / SMTP' },
+    { id: 'security', label: ' Security' },
   ]
 
   const Input = ({ name, label, type = 'text', placeholder = '' }) => (
@@ -90,7 +90,7 @@ export default function SystemSettings() {
         <input type="checkbox" name={name} checked={!!settings[name]} onChange={handleChange} style={{ opacity: 0, width: 0, height: 0 }} />
         <span style={{
           position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          background: settings[name] ? '#6C63FF' : '#CBD5E1',
+          background: settings[name] ? '#174EA6' : '#CBD5E1',
           borderRadius: '99px', transition: 'all 0.2s',
         }} />
         <span style={{
@@ -112,13 +112,13 @@ export default function SystemSettings() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Configure platform-wide settings and policies</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm" onClick={handleReset}>↩ Reset Defaults</button>
+          <button className="btn btn-ghost btn-sm" onClick={handleReset}> Reset Defaults</button>
           <button
             className="btn btn-primary btn-sm"
-            style={{ background: hasChanges ? 'linear-gradient(90deg,#6C63FF,#4F46E5)' : '#94A3B8', cursor: hasChanges ? 'pointer' : 'not-allowed' }}
+            style={{ background: hasChanges ? 'linear-gradient(90deg,#174EA6,#0A2A66)' : '#94A3B8', cursor: hasChanges ? 'pointer' : 'not-allowed' }}
             onClick={handleSave}
           >
-            💾 {hasChanges ? 'Save Changes' : 'No Changes'}
+             {hasChanges ? 'Save Changes' : 'No Changes'}
           </button>
         </div>
       </div>
@@ -133,8 +133,8 @@ export default function SystemSettings() {
                 onClick={() => setActive(tab.id)}
                 style={{
                   width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', border: 'none',
-                  background: active === tab.id ? '#EDE9FE' : 'transparent',
-                  color: active === tab.id ? '#4F46E5' : 'var(--text-secondary)',
+                  background: active === tab.id ? '#E8EEF8' : 'transparent',
+                  color: active === tab.id ? '#0A2A66' : 'var(--text-secondary)',
                   fontWeight: active === tab.id ? 700 : 500, fontSize: '13.5px', cursor: 'pointer',
                   textAlign: 'left', marginBottom: '4px', transition: 'all 0.2s',
                 }}
@@ -150,7 +150,7 @@ export default function SystemSettings() {
                 { label: 'Version', value: 'v2.5.1' },
                 { label: 'Build', value: '#20240718' },
                 { label: 'DB', value: 'LocalStorage' },
-                { label: 'Status', value: '🟢 Online' },
+                { label: 'Status', value: ' Online' },
               ].map((row, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', marginBottom: '3px' }}>
                   <span style={{ color: 'var(--text-muted)' }}>{row.label}</span>
@@ -164,7 +164,7 @@ export default function SystemSettings() {
           <div className="card">
             {active === 'general' && (
               <div>
-                <div className="card-header"><div className="card-title">🏛️ General Information</div></div>
+                <div className="card-header"><div className="card-title"> General Information</div></div>
                 <div style={{ padding: '20px 24px' }}>
                   <div className="grid-2">
                     <Input name="uniName" label="University / Institution Name" placeholder="e.g. University of Excellence" />
@@ -189,7 +189,7 @@ export default function SystemSettings() {
 
             {active === 'academic' && (
               <div>
-                <div className="card-header"><div className="card-title">🎓 Academic Policy Settings</div></div>
+                <div className="card-header"><div className="card-title"> Academic Policy Settings</div></div>
                 <div style={{ padding: '20px 24px' }}>
                   <div className="grid-2">
                     <div className="form-group">
@@ -217,9 +217,9 @@ export default function SystemSettings() {
                       <input name="maxResearchYears" type="number" min={1} max={10} className="form-control" value={settings.maxResearchYears} onChange={handleChange} />
                     </div>
                   </div>
-                  <div style={{ padding: '16px', background: '#FFFBEB', borderRadius: 'var(--radius-md)', border: '1px solid #FCD34D', marginTop: '16px' }}>
-                    <span style={{ fontSize: '12.5px', color: '#D97706', fontWeight: 600 }}>
-                      ⚠️ Changing academic policies will affect all active scholars. Review carefully before saving.
+                  <div style={{ padding: '16px', background: '#FFF6D8', borderRadius: 'var(--radius-md)', border: '1px solid #FCD34D', marginTop: '16px' }}>
+                    <span style={{ fontSize: '12.5px', color: '#936C00', fontWeight: 600 }}>
+                       Changing academic policies will affect all active scholars. Review carefully before saving.
                     </span>
                   </div>
                 </div>
@@ -229,8 +229,8 @@ export default function SystemSettings() {
             {active === 'email' && (
               <div>
                 <div className="card-header">
-                  <div className="card-title">✉️ Email & SMTP Configuration</div>
-                  <button className="btn btn-ghost btn-sm" onClick={handleTestEmail}>📤 Send Test Email</button>
+                  <div className="card-title"> Email & SMTP Configuration</div>
+                  <button className="btn btn-ghost btn-sm" onClick={handleTestEmail}> Send Test Email</button>
                 </div>
                 <div style={{ padding: '20px 24px' }}>
                   <div className="grid-2">
@@ -239,7 +239,7 @@ export default function SystemSettings() {
                     <Input name="smtpUser" label="SMTP Username / From Email" placeholder="noreply@university.edu" />
                     <div className="form-group">
                       <label className="form-label">SMTP Password</label>
-                      <input name="smtpPass" type="password" className="form-control" placeholder="•••••••••" value={settings.smtpPass} onChange={handleChange} />
+                      <input name="smtpPass" type="password" className="form-control" placeholder="---------" value={settings.smtpPass} onChange={handleChange} />
                     </div>
                   </div>
                   <div style={{ paddingTop: '20px', borderTop: '1px solid var(--border)', marginTop: '8px' }}>
@@ -251,7 +251,7 @@ export default function SystemSettings() {
 
             {active === 'security' && (
               <div>
-                <div className="card-header"><div className="card-title">🔒 Security & Access Settings</div></div>
+                <div className="card-header"><div className="card-title"> Security & Access Settings</div></div>
                 <div style={{ padding: '20px 24px' }}>
                   <div className="form-group" style={{ marginBottom: '20px' }}>
                     <label className="form-label">Session Timeout (minutes)</label>
@@ -262,8 +262,8 @@ export default function SystemSettings() {
                     <Toggle name="twoFactor" label="Two-Factor Authentication (2FA)" desc="Require OTP verification for all admin logins." />
                     <Toggle name="allowSelfReg" label="Allow Self-Registration" desc="New users can sign up without admin approval." />
                   </div>
-                  <div style={{ marginTop: '20px', padding: '16px', background: '#FEF2F2', borderRadius: 'var(--radius-md)', border: '1px solid #FECACA' }}>
-                    <div style={{ fontWeight: 700, color: '#DC2626', marginBottom: '8px' }}>⚠️ Danger Zone</div>
+                  <div style={{ marginTop: '20px', padding: '16px', background: '#F9E6E8', borderRadius: 'var(--radius-md)', border: '1px solid #FECACA' }}>
+                    <div style={{ fontWeight: 700, color: '#9F1E24', marginBottom: '8px' }}> Danger Zone</div>
                     <button
                       className="btn btn-danger btn-sm"
                       onClick={() => {
@@ -273,7 +273,7 @@ export default function SystemSettings() {
                         }
                       }}
                     >
-                      🗑️ Clear All Application Data
+                       Clear All Application Data
                     </button>
                   </div>
                 </div>
@@ -283,16 +283,16 @@ export default function SystemSettings() {
             {/* Save footer bar */}
             <div style={{
               padding: '14px 24px', borderTop: '1px solid var(--border)',
-              display: 'flex', justifyContent: 'flex-end', gap: '10px', background: hasChanges ? '#FFFBEB' : '#F8FAFC'
+              display: 'flex', justifyContent: 'flex-end', gap: '10px', background: hasChanges ? '#FFF6D8' : '#F8FAFC'
             }}>
-              {hasChanges && <span style={{ fontSize: '12.5px', color: '#D97706', fontWeight: 600, alignSelf: 'center' }}>⚠️ Unsaved changes</span>}
+              {hasChanges && <span style={{ fontSize: '12.5px', color: '#936C00', fontWeight: 600, alignSelf: 'center' }}> Unsaved changes</span>}
               <button className="btn btn-ghost btn-sm" onClick={handleReset}>Reset</button>
               <button
                 className="btn btn-primary btn-sm"
-                style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}
+                style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}
                 onClick={handleSave}
               >
-                💾 Save Settings
+                 Save Settings
               </button>
             </div>
           </div>

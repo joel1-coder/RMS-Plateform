@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 const pieData = [
-  { name: 'AI/ML (40%)', value: 57, color: '#3B82F6' },
-  { name: 'ML (25%)', value: 36, color: '#8B5CF6' },
-  { name: 'Data Sci (10%)', value: 14, color: '#F59E0B' },
-  { name: 'Cyber (9%)', value: 13, color: '#10B981' },
+  { name: 'AI/ML (40%)', value: 57, color: '#174EA6' },
+  { name: 'ML (25%)', value: 36, color: '#174EA6' },
+  { name: 'Data Sci (10%)', value: 14, color: '#C89B1E' },
+  { name: 'Cyber (9%)', value: 13, color: '#1E7D45' },
   { name: 'Other (16%)', value: 22, color: '#E5E7EB' },
 ]
 
@@ -27,9 +27,9 @@ const scholars = [
 ]
 
 const bottomKPIs = [
-  { label: 'Yearly Projection', value: '+12.4%', sub: 'vs last year', icon: '📈', bg: '#EFF6FF', color: '#1D4ED8' },
-  { label: 'Approval Rate', value: '94.2%', sub: 'High Efficiency', icon: '✅', bg: '#F0FDF4', color: '#15803D' },
-  { label: 'Pending Reviews', value: '18', sub: 'Require attention', icon: '⚠️', bg: '#FEF3C7', color: '#D97706' },
+  { label: 'Yearly Projection', value: '+12.4%', sub: 'vs last year', icon: '', bg: '#F3F7FF', color: '#0A2A66' },
+  { label: 'Approval Rate', value: '94.2%', sub: 'High Efficiency', icon: '', bg: '#E7F4EC', color: '#166A3A' },
+  { label: 'Pending Reviews', value: '18', sub: 'Require attention', icon: '', bg: '#FFF6D8', color: '#936C00' },
 ]
 
 export default function HODReports() {
@@ -41,11 +41,11 @@ export default function HODReports() {
       <div className="topbar">
         <div>
           <div style={{ fontWeight: 800, fontSize: '18px' }}>Research Management System</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Reports & Analytics · Departmental performance and research distribution overview</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Reports & Analytics - Departmental performance and research distribution overview</div>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📊 Export Excel</button>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#3B82F6,#1D4ED8)' }}>📄 Download PDF</button>
+          <button className="btn btn-ghost btn-sm"> Export Excel</button>
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}> Download PDF</button>
         </div>
       </div>
 
@@ -55,7 +55,7 @@ export default function HODReports() {
           {/* Pie chart */}
           <div className="card">
             <div className="card-header">
-              <div className="card-title">Scholars by Research Area ℹ️</div>
+              <div className="card-title">Scholars by Research Area Info</div>
             </div>
             <div className="card-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: '240px' }}>
               <div style={{ position: 'relative', width: '150px', height: '150px' }}>
@@ -90,7 +90,7 @@ export default function HODReports() {
                 {['Annual', 'Quarterly'].map(m => (
                   <button key={m} onClick={() => setChartMode(m)} style={{
                     padding: '5px 12px', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
-                    background: chartMode === m ? '#3B82F6' : '#F1F5F9',
+                    background: chartMode === m ? '#174EA6' : '#F1F5F9',
                     color: chartMode === m ? '#fff' : 'var(--text-secondary)',
                   }}>{m}</button>
                 ))}
@@ -104,7 +104,7 @@ export default function HODReports() {
                   <XAxis dataKey="year" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} domain={[50, 100]} />
                   <Tooltip formatter={v => [`${v}%`, 'Completion Rate']} contentStyle={{ borderRadius: '8px', fontSize: '12px', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }} />
-                  <Line type="monotone" dataKey="rate" stroke="#3B82F6" strokeWidth={2.5} dot={{ fill: '#3B82F6', r: 4 }} />
+                  <Line type="monotone" dataKey="rate" stroke="#174EA6" strokeWidth={2.5} dot={{ fill: '#174EA6', r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -115,7 +115,7 @@ export default function HODReports() {
         <div className="card">
           <div className="card-header">
             <div className="card-title">Scholar Performance Summary</div>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Showing 1-10 of 143 scholars ▸</span>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Showing 1-10 of 143 scholars </span>
           </div>
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
             <table className="table">
@@ -133,7 +133,7 @@ export default function HODReports() {
                   <tr key={i}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="avatar avatar-sm" style={{ background: '#3B82F6' }}>{s.name.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{s.name.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '13px' }}>{s.name}</div>
                           <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.id}</div>
@@ -144,7 +144,7 @@ export default function HODReports() {
                     <td style={{ fontSize: '13px', fontWeight: 600 }}>{s.supervisor}</td>
                     <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{s.area}</td>
                     <td>
-                      <button className="btn btn-ghost btn-sm">⋮</button>
+                      <button className="btn btn-ghost btn-sm">More</button>
                     </td>
                   </tr>
                 ))}

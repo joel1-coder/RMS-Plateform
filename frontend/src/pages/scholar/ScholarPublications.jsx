@@ -2,7 +2,7 @@ import { apiFetch } from '../../utils/api'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-/* ── Publication Types ── */
+/* -- Publication Types -- */
 const PUB_TYPES = [
   'Conference Proceeding',
   'Journal Publishing',
@@ -14,19 +14,19 @@ const PUB_TYPES = [
 ]
 
 const TYPE_ICONS = {
-  'Conference Proceeding': '🏛️',
-  'Journal Publishing': '📄',
-  'Chapters': '📖',
-  'Books Authored': '📚',
-  'Books Edited': '✏️',
-  'Patent': '⚙️',
-  'Copy Rights': '©️',
+  'Conference Proceeding': '',
+  'Journal Publishing': '',
+  'Chapters': '',
+  'Books Authored': '',
+  'Books Edited': '',
+  'Patent': '',
+  'Copy Rights': '',
 }
 
 const FILTER_TYPES = ['All', ...PUB_TYPES]
 const STATUS_CLS = { Published: 'badge-success', 'Under Review': 'badge-warning', Draft: 'badge-gray', Accepted: 'badge-info' }
 
-/* ── Default form state per type ── */
+/* -- Default form state per type -- */
 const defaultForm = () => ({
   pubType: 'Conference Proceeding',
   // Common
@@ -82,9 +82,9 @@ const defaultForm = () => ({
   copyrightNature: '',
 })
 
-/* ═══════════════════════════════════════════════
+/* -----------------------------------------------
    Add Publication Modal
-═══════════════════════════════════════════════ */
+----------------------------------------------- */
 function AddPublicationModal({ onClose, onSave }) {
   const [step, setStep] = useState(1)          // 1 = select type, 2 = fill form
   const [form, setForm] = useState(defaultForm())
@@ -116,14 +116,14 @@ function AddPublicationModal({ onClose, onSave }) {
     onSave(form)
   }
 
-  /* ── Type Selector Step ── */
+  /* -- Type Selector Step -- */
   if (step === 1) {
     return (
       <div className="modal-backdrop">
         <div className="modal" style={{ maxWidth: 620 }}>
           <div className="modal-header">
-            <span className="modal-title">Add Publication — Select Type</span>
-            <button className="modal-close" onClick={onClose}>✕</button>
+            <span className="modal-title">Add Publication - Select Type</span>
+            <button className="modal-close" onClick={onClose}></button>
           </div>
           <div className="modal-body">
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
@@ -136,12 +136,12 @@ function AddPublicationModal({ onClose, onSave }) {
                   onClick={() => { set('pubType', type); setStep(2) }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '12px',
-                    padding: '16px 18px', border: `2px solid ${form.pubType === type ? '#10B981' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius-md)', background: form.pubType === type ? '#F0FDF4' : 'var(--bg-card)',
+                    padding: '16px 18px', border: `2px solid ${form.pubType === type ? '#1E7D45' : 'var(--border)'}`,
+                    borderRadius: 'var(--radius-md)', background: form.pubType === type ? '#E7F4EC' : 'var(--bg-card)',
                     cursor: 'pointer', textAlign: 'left', transition: '0.2s',
                     fontWeight: 600, fontSize: '13.5px', color: 'var(--text-primary)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#10B981'; e.currentTarget.style.background = '#F0FDF4' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#1E7D45'; e.currentTarget.style.background = '#E7F4EC' }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg-card)' }}
                 >
                   <span style={{ fontSize: '26px' }}>{TYPE_ICONS[type]}</span>
@@ -163,11 +163,11 @@ function AddPublicationModal({ onClose, onSave }) {
     )
   }
 
-  /* ── Form Step ── */
+  /* -- Form Step -- */
   return (
     <div className="modal-backdrop">
       <div className="modal" style={{ maxWidth: 760 }}>
-        <div className="modal-header" style={{ background: 'linear-gradient(135deg,#10B981,#059669)', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0' }}>
+        <div className="modal-header" style={{ background: 'linear-gradient(135deg,#1E7D45,#166A3A)', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '22px' }}>{TYPE_ICONS[form.pubType]}</span>
             <div>
@@ -175,7 +175,7 @@ function AddPublicationModal({ onClose, onSave }) {
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{form.pubType}</div>
             </div>
           </div>
-          <button className="modal-close" style={{ color: '#fff' }} onClick={onClose}>✕</button>
+          <button className="modal-close" style={{ color: '#fff' }} onClick={onClose}></button>
         </div>
 
         <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', padding: '24px 28px' }}>
@@ -183,13 +183,13 @@ function AddPublicationModal({ onClose, onSave }) {
           <div style={{ marginBottom: '18px' }}>
             <button
               onClick={() => setStep(1)}
-              style={{ fontSize: '12.5px', color: '#10B981', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+              style={{ fontSize: '12.5px', color: '#1E7D45', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
             >
-              ← Change Publication Type
+               Change Publication Type
             </button>
           </div>
 
-          {/* ─── CONFERENCE PROCEEDING ─── */}
+          {/* --- CONFERENCE PROCEEDING --- */}
           {form.pubType === 'Conference Proceeding' && (
             <div className="grid-2">
               <div className="form-group" style={{ gridColumn: '1/-1' }}>
@@ -200,7 +200,7 @@ function AddPublicationModal({ onClose, onSave }) {
               {inp('Proceedings Publisher', 'proceedingsPublisher', { placeholder: 'e.g. IEEE, ACM, Springer' })}
               {inp('Conference Location', 'conferenceLocation', { placeholder: 'e.g. Paris, France' })}
               {inp('Publication Year *', 'year', { type: 'number', placeholder: '2024', min: '2000', max: '2030' })}
-              {inp('Page Numbers', 'pages', { placeholder: 'e.g. 123–130' })}
+              {inp('Page Numbers', 'pages', { placeholder: 'e.g. 123-130' })}
               {inp('DOI', 'doi', { placeholder: '10.xxxx/xxxxx' })}
               {inp('Paper URL', 'url', { placeholder: 'https://...' })}
               {sel('Indexing', 'indexed', ['Scopus', 'SCI', 'UGC Care', 'DBLP', 'Other'])}
@@ -208,7 +208,7 @@ function AddPublicationModal({ onClose, onSave }) {
             </div>
           )}
 
-          {/* ─── JOURNAL PUBLISHING ─── */}
+          {/* --- JOURNAL PUBLISHING --- */}
           {form.pubType === 'Journal Publishing' && (
             <div className="grid-2">
               <div className="form-group" style={{ gridColumn: '1/-1' }}>
@@ -222,7 +222,7 @@ function AddPublicationModal({ onClose, onSave }) {
               {inp('Impact Factor', 'impactFactor', { type: 'number', step: '0.01', placeholder: '3.5' })}
               {inp('Volume', 'volume', { placeholder: 'e.g. 45' })}
               {inp('Issue / Number', 'issue', { placeholder: 'e.g. 2' })}
-              {inp('Page Numbers', 'pages', { placeholder: 'e.g. 120–135' })}
+              {inp('Page Numbers', 'pages', { placeholder: 'e.g. 120-135' })}
               {inp('Publication Year *', 'year', { type: 'number', placeholder: '2024', min: '2000', max: '2030' })}
               {inp('DOI', 'doi', { placeholder: '10.xxxx/xxxxx' })}
               {inp('Journal URL', 'url', { placeholder: 'https://...' })}
@@ -231,7 +231,7 @@ function AddPublicationModal({ onClose, onSave }) {
             </div>
           )}
 
-          {/* ─── CHAPTERS ─── */}
+          {/* --- CHAPTERS --- */}
           {form.pubType === 'Chapters' && (
             <div className="grid-2">
               <div className="form-group" style={{ gridColumn: '1/-1' }}>
@@ -242,7 +242,7 @@ function AddPublicationModal({ onClose, onSave }) {
                 {inp('Book Title *', 'bookTitle', { placeholder: 'Title of the book in which the chapter appears' })}
               </div>
               {inp('Chapter Number', 'chapterNo', { placeholder: 'e.g. Chapter 4' })}
-              {inp('Page Numbers', 'chapterPages', { placeholder: 'e.g. 75–98' })}
+              {inp('Page Numbers', 'chapterPages', { placeholder: 'e.g. 75-98' })}
               {inp('Publisher *', 'chapterPublisher', { placeholder: 'e.g. Springer, Elsevier, Wiley' })}
               {inp('ISBN', 'chapterISBN', { placeholder: 'e.g. 978-3-030-12345-6' })}
               {inp('Editor(s)', 'chapterEditors', { placeholder: 'Names of book editors' })}
@@ -252,7 +252,7 @@ function AddPublicationModal({ onClose, onSave }) {
             </div>
           )}
 
-          {/* ─── BOOKS AUTHORED ─── */}
+          {/* --- BOOKS AUTHORED --- */}
           {form.pubType === 'Books Authored' && (
             <div className="grid-2">
               <div className="form-group" style={{ gridColumn: '1/-1' }}>
@@ -269,7 +269,7 @@ function AddPublicationModal({ onClose, onSave }) {
             </div>
           )}
 
-          {/* ─── BOOKS EDITED ─── */}
+          {/* --- BOOKS EDITED --- */}
           {form.pubType === 'Books Edited' && (
             <div className="grid-2">
               <div className="form-group" style={{ gridColumn: '1/-1' }}>
@@ -285,7 +285,7 @@ function AddPublicationModal({ onClose, onSave }) {
             </div>
           )}
 
-          {/* ─── PATENT ─── */}
+          {/* --- PATENT --- */}
           {form.pubType === 'Patent' && (
             <div className="grid-2">
               <div className="form-group" style={{ gridColumn: '1/-1' }}>
@@ -305,7 +305,7 @@ function AddPublicationModal({ onClose, onSave }) {
             </div>
           )}
 
-          {/* ─── COPY RIGHTS ─── */}
+          {/* --- COPY RIGHTS --- */}
           {form.pubType === 'Copy Rights' && (
             <div className="grid-2">
               <div className="form-group" style={{ gridColumn: '1/-1' }}>
@@ -327,10 +327,10 @@ function AddPublicationModal({ onClose, onSave }) {
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
           <button
             className="btn btn-primary"
-            style={{ background: 'linear-gradient(90deg,#10B981,#059669)', minWidth: 140 }}
+            style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)', minWidth: 140 }}
             onClick={handleSave}
           >
-            ＋ Add Publication
+            + Add Publication
           </button>
         </div>
       </div>
@@ -341,7 +341,7 @@ function AddPublicationModal({ onClose, onSave }) {
 function typeDescription(type) {
   const desc = {
     'Conference Proceeding': 'Papers presented at academic conferences',
-    'Journal Publishing': 'Articles in peer-reviewed journals (SCI, Scopus…)',
+    'Journal Publishing': 'Articles in peer-reviewed journals (SCI, Scopus...)',
     'Chapters': 'Chapters contributed to edited books',
     'Books Authored': 'Full books written and authored by you',
     'Books Edited': 'Books edited/compiled from multiple authors',
@@ -351,9 +351,9 @@ function typeDescription(type) {
   return desc[type] || ''
 }
 
-/* ═══════════════════════════════════════════════
+/* -----------------------------------------------
    Edit Publication Modal
-═══════════════════════════════════════════════ */
+----------------------------------------------- */
 function EditPublicationModal({ pub, onClose, onUpdate }) {
   const [title, setTitle] = useState(pub.title)
   const [venue, setVenue] = useState(pub.venue)
@@ -371,15 +371,15 @@ function EditPublicationModal({ pub, onClose, onUpdate }) {
   return (
     <div className="modal-backdrop">
       <div className="modal" style={{ maxWidth: 600 }}>
-        <div className="modal-header" style={{ background: 'linear-gradient(135deg,#10B981,#059669)', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0' }}>
+        <div className="modal-header" style={{ background: 'linear-gradient(135deg,#1E7D45,#166A3A)', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '22px' }}>{TYPE_ICONS[pub.type] || '📄'}</span>
+            <span style={{ fontSize: '22px' }}>{TYPE_ICONS[pub.type] || ''}</span>
             <div>
               <div className="modal-title" style={{ color: '#fff' }}>Edit Publication</div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{pub.type}</div>
             </div>
           </div>
-          <button className="modal-close" style={{ color: '#fff' }} onClick={onClose}>✕</button>
+          <button className="modal-close" style={{ color: '#fff' }} onClick={onClose}></button>
         </div>
 
         <div className="modal-body" style={{ padding: '24px 28px' }}>
@@ -423,10 +423,10 @@ function EditPublicationModal({ pub, onClose, onUpdate }) {
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
           <button
             className="btn btn-primary"
-            style={{ background: 'linear-gradient(90deg,#10B981,#059669)', minWidth: 130 }}
+            style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)', minWidth: 130 }}
             onClick={handleUpdate}
           >
-            💾 Save Changes
+             Save Changes
           </button>
         </div>
       </div>
@@ -434,9 +434,9 @@ function EditPublicationModal({ pub, onClose, onUpdate }) {
   )
 }
 
-/* ═══════════════════════════════════════════════
+/* -----------------------------------------------
    Main Page
-═══════════════════════════════════════════════ */
+----------------------------------------------- */
 export default function ScholarPublications() {
   const [pubs, setPubs] = useState([])
   const [filterType, setFilterType] = useState('All')
@@ -460,10 +460,10 @@ export default function ScholarPublications() {
       const mapped = data.map(p => ({
         id: p.id || p._id,
         title: p.title,
-        venue: p.journal || '—',
-        year: p.date ? new Date(p.date).getFullYear() : '—',
+        venue: p.journal || '-',
+        year: p.date ? new Date(p.date).getFullYear() : '-',
         type: p.pubType || 'Journal Publishing',
-        indexed: p.indexed || '—',
+        indexed: p.indexed || '-',
         status: p.status || 'Published',
         citations: p.citations || 0,
         impactFactor: p.impactFactor || null,
@@ -488,7 +488,7 @@ export default function ScholarPublications() {
       const token = localStorage.getItem('rms_token')
       const payload = {
         title: form.title,
-        journal: form.journalName || form.conferenceName || form.bookTitle || form.bookAuthoredTitle || form.bookEditedTitle || form.patentOffice || form.copyrightOffice || '—',
+        journal: form.journalName || form.conferenceName || form.bookTitle || form.bookAuthoredTitle || form.bookEditedTitle || form.patentOffice || form.copyrightOffice || '-',
         pubType: form.pubType,
         doi: form.doi || '',
         status: form.status || form.patentStatus || 'Published',
@@ -561,12 +561,12 @@ export default function ScholarPublications() {
 
   const filtered = pubs.filter(p => filterType === 'All' || p.type === filterType)
 
-  /* ── Stats ── */
+  /* -- Stats -- */
   const stats = [
-    { label: 'Total Publications', value: pubs.length, icon: '📰', color: 'purple' },
-    { label: 'Published', value: pubs.filter(p => p.status === 'Published' || p.status === 'Granted' || p.status === 'Registered').length, icon: '✅', color: 'green' },
-    { label: 'Total Citations', value: pubs.reduce((a, p) => a + (p.citations || 0), 0), icon: '🔗', color: 'blue' },
-    { label: 'SCI / High Impact', value: pubs.filter(p => p.indexed === 'SCI' || p.indexed === 'SCI-E').length, icon: '⭐', color: 'orange' },
+    { label: 'Total Publications', value: pubs.length, icon: '', color: 'blue' },
+    { label: 'Published', value: pubs.filter(p => p.status === 'Published' || p.status === 'Granted' || p.status === 'Registered').length, icon: '', color: 'green' },
+    { label: 'Total Citations', value: pubs.reduce((a, p) => a + (p.citations || 0), 0), icon: '', color: 'blue' },
+    { label: 'SCI / High Impact', value: pubs.filter(p => p.indexed === 'SCI' || p.indexed === 'SCI-E').length, icon: '', color: 'orange' },
   ]
 
   return (
@@ -574,7 +574,7 @@ export default function ScholarPublications() {
       {showModal && <AddPublicationModal onClose={() => setShowModal(false)} onSave={handleSave} />}
       {editPub && <EditPublicationModal pub={editPub} onClose={() => setEditPub(null)} onUpdate={handleUpdate} />}
 
-      {/* ── Topbar ── */}
+      {/* -- Topbar -- */}
       <div className="topbar">
         <div>
           <div className="topbar-title">Publications</div>
@@ -586,16 +586,16 @@ export default function ScholarPublications() {
           <button
             id="add-publication-btn"
             className="btn btn-primary btn-sm"
-            style={{ background: 'linear-gradient(90deg,#10B981,#059669)', display: 'flex', alignItems: 'center', gap: '6px' }}
+            style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)', display: 'flex', alignItems: 'center', gap: '6px' }}
             onClick={() => setShowModal(true)}
           >
-            <span style={{ fontSize: '16px' }}>＋</span> Add Publication
+            <span style={{ fontSize: '16px' }}>+</span> Add Publication
           </button>
         </div>
       </div>
 
       <div className="page-body">
-        {/* ── KPI Cards ── */}
+        {/* -- KPI Cards -- */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {stats.map((s, i) => (
             <div className="stat-card" key={i}>
@@ -608,7 +608,7 @@ export default function ScholarPublications() {
           ))}
         </div>
 
-        {/* ── Publication Type Summary Chips ── */}
+        {/* -- Publication Type Summary Chips -- */}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '22px' }}>
           {PUB_TYPES.map(type => {
             const count = pubs.filter(p => p.type === type).length
@@ -617,17 +617,17 @@ export default function ScholarPublications() {
               <div key={type} style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
                 padding: '6px 14px', borderRadius: 'var(--radius-full)',
-                background: '#F0FDF4', border: '1.5px solid #BBF7D0',
-                fontSize: '12.5px', fontWeight: 600, color: '#065F46',
+                background: '#E7F4EC', border: '1.5px solid #B8DFC6',
+                fontSize: '12.5px', fontWeight: 600, color: '#166A3A',
               }}>
                 <span>{TYPE_ICONS[type]}</span> {type}
-                <span style={{ background: '#10B981', color: '#fff', borderRadius: '999px', padding: '1px 7px', fontSize: '11px', marginLeft: '2px' }}>{count}</span>
+                <span style={{ background: '#1E7D45', color: '#fff', borderRadius: '999px', padding: '1px 7px', fontSize: '11px', marginLeft: '2px' }}>{count}</span>
               </div>
             )
           })}
         </div>
 
-        {/* ── Filter + List ── */}
+        {/* -- Filter + List -- */}
         <div className="card">
           <div className="filter-bar" style={{ flexWrap: 'wrap', gap: '8px' }}>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -636,7 +636,7 @@ export default function ScholarPublications() {
                   key={t}
                   onClick={() => setFilterType(t)}
                   className={`btn btn-sm ${filterType === t ? 'btn-primary' : 'btn-ghost'}`}
-                  style={filterType === t ? { background: 'linear-gradient(90deg,#10B981,#059669)' } : {}}
+                  style={filterType === t ? { background: 'linear-gradient(90deg,#1E7D45,#166A3A)' } : {}}
                 >
                   {t === 'All' ? 'All' : `${TYPE_ICONS[t]} ${t}`}
                 </button>
@@ -652,7 +652,7 @@ export default function ScholarPublications() {
               </div>
             ) : filtered.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-muted)' }}>
-                <div style={{ fontSize: '40px', marginBottom: '10px' }}>📭</div>
+                <div style={{ fontSize: '40px', marginBottom: '10px' }}></div>
                 <div style={{ fontWeight: 600 }}>No publications found</div>
                 <div style={{ fontSize: '13px', marginTop: '6px' }}>Click "Add Publication" to get started</div>
               </div>
@@ -661,45 +661,45 @@ export default function ScholarPublications() {
                 <div
                   key={pub.id}
                   style={{ padding: '18px', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-lg)', transition: 'box-shadow 0.2s, border-color 0.2s' }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#10B981'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(16,185,129,0.1)' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#1E7D45'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(30,125,69,0.1)' }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none' }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1 }}>
-                      <span style={{ fontSize: '20px', marginTop: '1px' }}>{TYPE_ICONS[pub.type] || '📄'}</span>
+                      <span style={{ fontSize: '20px', marginTop: '1px' }}>{TYPE_ICONS[pub.type] || ''}</span>
                       <div style={{ fontWeight: 700, fontSize: '14.5px', color: 'var(--text-primary)', lineHeight: 1.4 }}>{pub.title}</div>
                     </div>
                     <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                       <span className={`badge ${STATUS_CLS[pub.status] || 'badge-gray'}`}>{pub.status}</span>
-                      <span className="badge badge-primary" style={{ fontSize: '10px', background: '#EDE9FE', color: '#4F46E5' }}>{pub.type}</span>
+                      <span className="badge badge-primary" style={{ fontSize: '10px', background: '#E8EEF8', color: '#0A2A66' }}>{pub.type}</span>
                     </div>
                   </div>
                   <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '10px', paddingLeft: '30px' }}>
-                    <strong>{pub.venue}</strong> · {pub.year}
+                    <strong>{pub.venue}</strong> - {pub.year}
                   </div>
                   <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', paddingLeft: '30px' }}>
                     {pub.doi && (
-                      <span style={{ fontSize: '12px', color: '#3B82F6', cursor: 'pointer' }}>🔗 DOI: {pub.doi}</span>
+                      <span style={{ fontSize: '12px', color: '#174EA6', cursor: 'pointer' }}> DOI: {pub.doi}</span>
                     )}
-                    {pub.indexed && pub.indexed !== '—' && (
+                    {pub.indexed && pub.indexed !== '-' && (
                       <span className={`badge ${pub.indexed === 'SCI' || pub.indexed === 'SCI-E' ? 'badge-warning' : 'badge-info'}`} style={{ fontSize: '11px' }}>
                         {pub.indexed}
                       </span>
                     )}
                     {pub.impactFactor && (
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#059669' }}>IF: {pub.impactFactor}</span>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#166A3A' }}>IF: {pub.impactFactor}</span>
                     )}
                     {pub.citations > 0 && (
-                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>📖 {pub.citations} citations</span>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}> {pub.citations} citations</span>
                     )}
                     <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setEditPub(pub)}>✏️ Edit</button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setEditPub(pub)}> Edit</button>
                       <button
                         className="btn btn-ghost btn-sm"
-                        style={{ color: '#EF4444' }}
+                        style={{ color: '#B4232A' }}
                         onClick={() => handleDelete(pub.id)}
                       >
-                        🗑️
+                        
                       </button>
                     </div>
                   </div>

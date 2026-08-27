@@ -30,7 +30,7 @@ export default function SupervisorsManagement() {
 
   const statusColor = s => s === 'Available' ? 'badge-success' : s === 'At Capacity' ? 'badge-danger' : 'badge-warning'
   const loadPct = (s, max) => Math.round((s / max) * 100)
-  const loadColor = pct => pct >= 90 ? '#EF4444' : pct >= 70 ? '#F59E0B' : '#10B981'
+  const loadColor = pct => pct >= 90 ? '#B4232A' : pct >= 70 ? '#C89B1E' : '#1E7D45'
 
   return (
     <div className="animate-fade">
@@ -40,7 +40,7 @@ export default function SupervisorsManagement() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Add New Supervisor</span>
-              <button className="modal-close" onClick={() => setShowAddModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowAddModal(false)}></button>
             </div>
             <div className="modal-body">
               <div className="grid-2">
@@ -52,7 +52,7 @@ export default function SupervisorsManagement() {
             </div>
             <div className="modal-footer">
               <button className="btn btn-ghost" onClick={() => setShowAddModal(false)}>Cancel</button>
-              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#3B82F6,#1D4ED8)' }} onClick={handleAdd}>Add Supervisor</button>
+              <button className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} onClick={handleAdd}>Add Supervisor</button>
             </div>
           </div>
         </div>
@@ -65,8 +65,8 @@ export default function SupervisorsManagement() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Manage faculty supervisors and their scholar allocations</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📥 Export</button>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#3B82F6,#1D4ED8)' }} onClick={() => setShowAddModal(true)}>＋ Add Supervisor</button>
+          <button className="btn btn-ghost btn-sm"> Export</button>
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} onClick={() => setShowAddModal(true)}>+ Add Supervisor</button>
         </div>
       </div>
 
@@ -74,10 +74,10 @@ export default function SupervisorsManagement() {
         {/* KPI Row */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Supervisors', value: supervisors.length, icon: '👨‍🏫', color: 'blue' },
-            { label: 'Available', value: supervisors.filter(s => s.status === 'Available').length, icon: '✅', color: 'green' },
-            { label: 'At Capacity', value: supervisors.filter(s => s.status === 'At Capacity').length, icon: '🔴', color: 'red' },
-            { label: 'Total Scholars', value: supervisors.reduce((sum, s) => sum + s.scholars, 0), icon: '🎓', color: 'purple' },
+            { label: 'Total Supervisors', value: supervisors.length, icon: '', color: 'blue' },
+            { label: 'Available', value: supervisors.filter(s => s.status === 'Available').length, icon: '', color: 'green' },
+            { label: 'At Capacity', value: supervisors.filter(s => s.status === 'At Capacity').length, icon: '', color: 'red' },
+            { label: 'Total Scholars', value: supervisors.reduce((sum, s) => sum + s.scholars, 0), icon: '', color: 'blue' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -89,13 +89,13 @@ export default function SupervisorsManagement() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search supervisors..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
               {['All', 'Available', 'Near Capacity', 'At Capacity'].map(s => (
                 <button key={s} onClick={() => setFilterStatus(s)} className={`btn btn-sm ${filterStatus === s ? 'btn-primary' : 'btn-ghost'}`}
-                  style={filterStatus === s ? { background: 'linear-gradient(90deg,#3B82F6,#1D4ED8)' } : {}}>
+                  style={filterStatus === s ? { background: 'linear-gradient(90deg,#174EA6,#0A2A66)' } : {}}>
                   {s}
                 </button>
               ))}
@@ -121,7 +121,7 @@ export default function SupervisorsManagement() {
                     <tr key={s.id}>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div className="avatar avatar-sm" style={{ background: '#3B82F6' }}>{s.name.replace('Dr. ', '').replace('Prof. ', '').charAt(0)}</div>
+                          <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{s.name.replace('Dr. ', '').replace('Prof. ', '').charAt(0)}</div>
                           <div>
                             <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{s.name}</div>
                             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.email}</div>
@@ -144,7 +144,7 @@ export default function SupervisorsManagement() {
                       <td><span className={`badge ${statusColor(s.status)}`}>{s.status}</span></td>
                       <td>
                         <div style={{ display: 'flex', gap: '4px' }}>
-                          <button className="btn btn-ghost btn-sm">👁️</button>
+                          <button className="btn btn-ghost btn-sm"></button>
                           <button className="btn btn-secondary btn-sm" style={{ fontSize: '11px', padding: '3px 8px' }}>Manage</button>
                         </div>
                       </td>

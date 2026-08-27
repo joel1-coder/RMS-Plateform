@@ -6,13 +6,13 @@ const STAGES = ['Course Work', 'Synopsis Preparation', 'Literature Review', 'Dat
 const STATUSES_OPT = ['Active', 'Completed', 'Discontinued']
 
 const STAGE_COLORS = {
-  'Course Work': '#6C63FF',
-  'Synopsis Preparation': '#F59E0B',
-  'Literature Review': '#3B82F6',
-  'Data Collection': '#8B5CF6',
-  'Thesis Writing': '#10B981',
-  'Viva Voce': '#EF4444',
-  'Completed': '#059669',
+  'Course Work': '#174EA6',
+  'Synopsis Preparation': '#C89B1E',
+  'Literature Review': '#174EA6',
+  'Data Collection': '#174EA6',
+  'Thesis Writing': '#1E7D45',
+  'Viva Voce': '#B4232A',
+  'Completed': '#166A3A',
 }
 
 function ResearchModal({ onClose, onSave, editData = null, scholarsList = [] }) {
@@ -47,7 +47,7 @@ function ResearchModal({ onClose, onSave, editData = null, scholarsList = [] }) 
       <div className="modal" style={{ maxWidth: '600px' }}>
         <div className="modal-header">
           <span className="modal-title">{editData ? 'Edit Research Project' : 'Add New Research Project'}</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
@@ -111,7 +111,7 @@ function ResearchModal({ onClose, onSave, editData = null, scholarsList = [] }) 
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }}>
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}>
               {editData ? 'Save Changes' : '+ Add Research'}
             </button>
           </div>
@@ -254,8 +254,8 @@ export default function ResearchManagement() {
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Monitor all active and completed research projects</span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm">📥 Export</button>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#6C63FF,#4F46E5)' }} onClick={() => setShowModal(true)}>
+          <button className="btn btn-ghost btn-sm"> Export</button>
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }} onClick={() => setShowModal(true)}>
             + New Research
           </button>
         </div>
@@ -264,10 +264,10 @@ export default function ResearchManagement() {
       <div className="page-body">
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Projects', value: projects.length, icon: '🔬', color: 'purple' },
-            { label: 'Active', value: projects.filter(r => r.status === 'Active').length, icon: '▶', color: 'green' },
-            { label: 'Completed', value: projects.filter(r => r.status === 'Completed').length, icon: '🏆', color: 'blue' },
-            { label: 'Avg. Progress', value: `${avgProgress}%`, icon: '📈', color: 'orange' },
+            { label: 'Total Projects', value: projects.length, icon: '', color: 'blue' },
+            { label: 'Active', value: projects.filter(r => r.status === 'Active').length, icon: '', color: 'green' },
+            { label: 'Completed', value: projects.filter(r => r.status === 'Completed').length, icon: '', color: 'blue' },
+            { label: 'Avg. Progress', value: `${avgProgress}%`, icon: '', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
@@ -282,7 +282,7 @@ export default function ResearchManagement() {
         <div className="card">
           <div className="filter-bar">
             <div className="search-bar">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"></span>
               <input className="form-control" placeholder="Search research..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <select className="form-control form-select" style={{ width: '150px' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
@@ -299,7 +299,7 @@ export default function ResearchManagement() {
               <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading projects...</div>
             ) : filtered.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-icon">🔬</div>
+                <div className="empty-icon"></div>
                 <h3>No research projects found</h3>
                 <p>Try adjusting filters or add a new project.</p>
               </div>
@@ -324,7 +324,7 @@ export default function ResearchManagement() {
                       <td style={{ color: 'var(--text-muted)' }}>{i + 1}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div className="avatar avatar-sm" style={{ background: `hsl(${((r.id || r._id).toString().charCodeAt(0) * 55) % 360},60%,55%)` }}>{r.scholar?.charAt(0)}</div>
+                          <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{r.scholar?.charAt(0)}</div>
                           <div>
                             <div style={{ fontWeight: 600, fontSize: '13px' }}>{r.scholar}</div>
                             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{r.dept}</div>
@@ -337,8 +337,8 @@ export default function ResearchManagement() {
                       <td>
                         <span style={{
                           padding: '3px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 700,
-                          background: `${STAGE_COLORS[r.stage] || '#6C63FF'}18`,
-                          color: STAGE_COLORS[r.stage] || '#6C63FF',
+                          background: `${STAGE_COLORS[r.stage] || '#174EA6'}18`,
+                          color: STAGE_COLORS[r.stage] || '#174EA6',
                         }}>{r.stage}</span>
                       </td>
                       <td>
@@ -346,7 +346,7 @@ export default function ResearchManagement() {
                           <div className="progress-bar" style={{ flex: 1 }}>
                             <div className="progress-fill" style={{
                               width: `${r.progress}%`,
-                              background: r.progress === 100 ? '#10B981' : r.progress >= 60 ? '#3B82F6' : '#F59E0B'
+                              background: r.progress === 100 ? '#1E7D45' : r.progress >= 60 ? '#174EA6' : '#C89B1E'
                             }} />
                           </div>
                           <span style={{ fontSize: '11.5px', fontWeight: 700, minWidth: '28px' }}>{r.progress}%</span>
@@ -359,9 +359,9 @@ export default function ResearchManagement() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '4px' }}>
-                          <button className="btn btn-ghost btn-sm" title="View">👁️</button>
-                          <button className="btn btn-secondary btn-sm" onClick={() => setEditingProject(r)} title="Edit">✏️</button>
-                          <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444' }} onClick={() => handleDelete(r.id || r._id)} title="Delete">🗑️</button>
+                          <button className="btn btn-ghost btn-sm" title="View"></button>
+                          <button className="btn btn-secondary btn-sm" onClick={() => setEditingProject(r)} title="Edit"></button>
+                          <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }} onClick={() => handleDelete(r.id || r._id)} title="Delete"></button>
                         </div>
                       </td>
                     </tr>

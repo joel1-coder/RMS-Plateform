@@ -47,17 +47,17 @@ export default function CancellationManagement() {
 
         {/* Active Banner */}
             <div style={{
-              background: 'linear-gradient(90deg, #7C3AED, #4F46E5)',
+              background: 'linear-gradient(90deg, #174EA6, #0A2A66)',
               borderRadius: 'var(--radius-md)', padding: '12px 20px', marginBottom: '20px',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '14px' }}>❌</span>
+                <span style={{ fontSize: '14px' }} />
                 <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#fff' }}>Cancellation</span>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>∨</button>
-                <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✕</button>
+                <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>v</button>
+                <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>Close</button>
               </div>
             </div>
 
@@ -106,13 +106,13 @@ export default function CancellationManagement() {
                           <button
                             onClick={() => handleCancel(r.id, r.name)}
                             style={{
-                              padding: '5px 14px', background: 'linear-gradient(90deg,#EF4444,#DC2626)',
+                              padding: '5px 14px', background: 'linear-gradient(90deg,#B4232A,#9F1E24)',
                               color: '#fff', border: 'none', borderRadius: 'var(--radius-sm)',
                               fontSize: '12px', fontWeight: 700, cursor: 'pointer',
-                              boxShadow: '0 2px 8px rgba(239,68,68,0.35)',
+                              boxShadow: '0 2px 8px rgba(180,35,42,0.28)',
                             }}
                           >
-                            ❌ Cancellation
+                            Cancellation
                           </button>
                         </td>
                       </tr>
@@ -126,24 +126,24 @@ export default function CancellationManagement() {
                   Showing {paged.length > 0 ? (page - 1) * perPage + 1 : 0} to {Math.min(page * perPage, filtered.length)} of {filtered.length} entries
                 </span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                  <button onClick={() => setPage(p => Math.max(1, p - 1))} className="btn btn-ghost btn-sm">‹</button>
+                  <button onClick={() => setPage(p => Math.max(1, p - 1))} className="btn btn-ghost btn-sm">Prev</button>
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                     <button key={p} onClick={() => setPage(p)}
                       style={{
-                        padding: '5px 10px', border: `1px solid ${page === p ? '#4F46E5' : 'var(--border)'}`,
-                        borderRadius: 'var(--radius-sm)', background: page === p ? '#4F46E5' : '#fff',
+                        padding: '5px 10px', border: `1px solid ${page === p ? '#0A2A66' : 'var(--border)'}`,
+                        borderRadius: 'var(--radius-sm)', background: page === p ? '#0A2A66' : '#fff',
                         color: page === p ? '#fff' : 'var(--text-primary)', cursor: 'pointer', fontWeight: page === p ? 700 : 400, fontSize: '12.5px',
                       }}>
                       {p}
                     </button>
                   ))}
-                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="btn btn-ghost btn-sm">›</button>
+                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="btn btn-ghost btn-sm">Next</button>
                 </div>
               </div>
             </div>
 
         <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
-          © 2024 Research Section Management
+          2024 Research Section Management
         </div>
       </div>
     </div>
