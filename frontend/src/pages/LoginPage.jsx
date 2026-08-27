@@ -27,9 +27,9 @@ function getEmailForRole(roleId) {
   try {
     const users = JSON.parse(localStorage.getItem('rms_all_users') || '[]')
     const match = users.find(u => u.role && u.role.toLowerCase() === roleId.toLowerCase() && u.status === 'Active')
-    return match ? match.email : DEFAULT_CREDENTIALS[roleId]?.email
+    return match ? match.email : ''
   } catch {
-    return DEFAULT_CREDENTIALS[roleId]?.email
+    return ''
   }
 }
 
@@ -212,7 +212,7 @@ function TestLoginModal({ onClose, onSuccess }) {
 /* ─── Main Login Page ───────────────────────────────────────────── */
 export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState('admin')
-  const [email, setEmail] = useState('admin@rms.edu')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -222,7 +222,7 @@ export default function LoginPage() {
 
   const handleRoleSelect = (roleId) => {
     setSelectedRole(roleId)
-    setEmail(getEmailForRole(roleId) || DEFAULT_CREDENTIALS[roleId]?.email || '')
+    setEmail(getEmailForRole(roleId))
     setPassword('')
   }
 
@@ -357,18 +357,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Demo hint */}
-          <div style={{
-            background: '#F0FDF4',
-            border: '1px solid #BBF7D0',
-            borderRadius: 'var(--radius-md)',
-            padding: '10px 14px',
-            marginBottom: '20px',
-            fontSize: '12px',
-            color: '#166534',
-          }}>
-            <strong>Demo:</strong> {currentDemo.email} / <strong>{currentDemo.password}</strong>
-          </div>
+
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
