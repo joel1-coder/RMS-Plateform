@@ -109,7 +109,7 @@ function TestAccountsPanel({ scholars }) {
   const [accounts, setAccounts] = useState([])
   const [loadingAcc, setLoadingAcc] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
-  const [form, setForm] = useState({ testId: '', testPassword: '', scholarId: '', label: '', expiresAt: '' })
+  const [form, setForm] = useState({ testId: '', testPassword: '', applicantName: '', applicantEmail: '', label: '', expiresAt: '' })
   const [creating, setCreating] = useState(false)
 
   const fetchAccounts = async () => {
@@ -127,8 +127,8 @@ function TestAccountsPanel({ scholars }) {
 
   const handleCreate = async (e) => {
     e.preventDefault()
-    if (!form.testId || !form.testPassword || !form.scholarId || !form.expiresAt) {
-      toast.error('Test ID, Password, Scholar, and Expiry Date are required')
+    if (!form.testId || !form.testPassword || !form.applicantName || !form.applicantEmail || !form.expiresAt) {
+      toast.error('Test ID, Password, Name, Email, and Expiry Date are required')
       return
     }
     setCreating(true)
@@ -143,7 +143,7 @@ function TestAccountsPanel({ scholars }) {
       if (!res.ok) throw new Error(data.message || 'Failed to create')
       toast.success('Test account created!')
       setShowCreate(false)
-      setForm({ testId: '', testPassword: '', scholarId: '', label: '', expiresAt: '' })
+      setForm({ testId: '', testPassword: '', applicantName: '', applicantEmail: '', label: '', expiresAt: '' })
       fetchAccounts()
     } catch (err) { toast.error(err.message) }
     finally { setCreating(false) }
@@ -208,14 +208,14 @@ function TestAccountsPanel({ scholars }) {
                 value={form.testPassword} onChange={e => setForm({ ...form, testPassword: e.target.value })} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Linked Scholar *</label>
-              <select className="form-control form-select"
-                value={form.scholarId} onChange={e => setForm({ ...form, scholarId: e.target.value })} required>
-                <option value="">-- Select Scholar --</option>
-                {scholars.map(s => (
-                  <option key={s.id || s._id} value={s.id || s._id}>{s.name} ({s.dept})</option>
-                ))}
-              </select>
+              <label className="form-label">Applicant Name *</label>
+              <input className="form-control" placeholder="e.g. John Doe"
+                value={form.applicantName} onChange={e => setForm({ ...form, applicantName: e.target.value })} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Applicant Email *</label>
+              <input type="email" className="form-control" placeholder="john@example.com"
+                value={form.applicantEmail} onChange={e => setForm({ ...form, applicantEmail: e.target.value })} required />
             </div>
             <div className="form-group">
               <label className="form-label">Label (optional)</label>
@@ -254,7 +254,7 @@ function TestAccountsPanel({ scholars }) {
                 <th>#</th>
                 <th>Test ID</th>
                 <th>Password</th>
-                <th>Linked Scholar</th>
+                <th>Applicant Details</th>
                 <th>Label</th>
                 <th>Expires</th>
                 <th>Status</th>
@@ -269,8 +269,8 @@ function TestAccountsPanel({ scholars }) {
                   <td><code style={{ background: '#F3F7FF', padding: '2px 8px', borderRadius: '6px', color: '#0A2A66', fontWeight: 700 }}>{acc.testId}</code></td>
                   <td><code style={{ fontFamily: 'monospace', fontSize: '12px', color: 'var(--text-secondary)' }}>{acc.testPassword}</code></td>
                   <td>
-                    <div style={{ fontWeight: 600, fontSize: '13px' }}>{acc.scholarId?.name || '-'}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{acc.scholarId?.dept}</div>
+                    <div style={{ fontWeight: 600, fontSize: '13px' }}>{acc.applicantName}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{acc.applicantEmail}</div>
                   </td>
                   <td style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{acc.label || '-'}</td>
                   <td style={{ fontSize: '12px', color: acc.expiresAt && new Date(acc.expiresAt) < new Date() ? '#B4232A' : 'var(--text-secondary)' }}>

@@ -16,8 +16,11 @@ const testAccountSchema = new mongoose.Schema(
     // Plain-text password shown only to admin
     testPassword: { type: String, required: true, trim: true },
 
-    // The real scholar User this test account mirrors
-    scholarId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    // The name of the new scholar applicant
+    applicantName: { type: String, required: true, trim: true },
+
+    // Email to send credentials to
+    applicantEmail: { type: String, required: true, trim: true },
 
     // Label so admin remembers what this account is for
     label: { type: String, trim: true, default: '' },

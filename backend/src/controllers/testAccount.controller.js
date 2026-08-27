@@ -19,7 +19,7 @@ const testLogin = asyncHandler(async (req, res) => {
   const account = await TestAccount.findOne({
     testId: testId.trim().toUpperCase(),
     status: 'Active',
-  }).populate('scholarId');
+  });
 
   if (!account) {
     throw new AppError('Invalid Test ID or the account has been revoked', 401);
@@ -35,23 +35,18 @@ const testLogin = asyncHandler(async (req, res) => {
     throw new AppError('Incorrect test password', 401);
   }
 
-  const scholar = account.scholarId;
-  if (!scholar || scholar.status !== 'Active') {
-    throw new AppError('The scholar linked to this test account is inactive', 401);
-  }
-
   res.json({
-    token: signToken(scholar),
+    token: signToken({ _id: account._id, role: 'scholar', status: 'Active' }),
     user: {
-      id: scholar._id,
-      email: scholar.email,
-      name: scholar.name,
-      role: scholar.role,
-      dept: scholar.dept,
-      isProfileCompleted: scholar.isProfileCompleted,
-      profile: scholar.profile,
-      assignedSupervisor: scholar.assignedSupervisor,
-      assignedSupervisorId: scholar.assignedSupervisorId,
+      id: account._id,
+      email: account.applicantEmail,
+      name: account.applicantName,
+      role: 'scholar',
+      dept: 'Unknown',
+      isProfileCompleted: false,
+      profile: {},
+      assignedSupervisor: null,
+      assignedSupervisorId: null,
       isTestAccount: true,
       testAccountId: account._id,
       testLabel: account.label,
@@ -65,7 +60,6 @@ const testLogin = asyncHandler(async (req, res) => {
  */
 const listTestAccounts = asyncHandler(async (req, res) => {
   const accounts = await TestAccount.find()
-    .populate('scholarId', 'name email dept profile')
     .populate('createdBy', 'name')
     .sort({ createdAt: -1 });
   res.json({ data: accounts });
@@ -76,22 +70,20 @@ const listTestAccounts = asyncHandler(async (req, res) => {
  * Admin only — create a new test account and auto-email credentials.
  */
 const createTestAccount = asyncHandler(async (req, res) => {
-  const { testId, testPassword, scholarId, label, expiresAt } = req.body;
+  const { testId, testPassword, applicantName, applicantEmail, label, expiresAt } = req.body;
 
   if (!expiresAt) {
     throw new AppError('Expiry date is required for all test accounts', 400);
   }
-
-  // Verify scholar exists
-  const scholar = await User.findById(scholarId);
-  if (!scholar || scholar.role !== 'scholar') {
-    throw new AppError('Scholar not found', 404);
+  if (!applicantName || !applicantEmail) {
+    throw new AppError('Applicant name and email are required', 400);
   }
 
   const account = await TestAccount.create({
     testId: testId.trim().toUpperCase(),
     testPassword: testPassword.trim(),
-    scholarId,
+    applicantName: applicantName.trim(),
+    applicantEmail: applicantEmail.trim().toLowerCase(),
     label: label || '',
     expiresAt,
     createdBy: req.user.id,
@@ -99,8 +91,8 @@ const createTestAccount = asyncHandler(async (req, res) => {
 
   // Auto-send credentials to the scholar's email (non-blocking)
   sendTestCredentials({
-    to: scholar.email,
-    name: scholar.name,
+    to: account.applicantEmail,
+    name: account.applicantName,
     testId: account.testId,
     testPassword: account.testPassword,
     expiresAt: account.expiresAt,
@@ -110,7 +102,7 @@ const createTestAccount = asyncHandler(async (req, res) => {
   });
 
   res.status(201).json({
-    message: `Test account created. Credentials auto-sent to ${scholar.email}`,
+    message: `Test account created. Credentials auto-sent to ${account.applicantEmail}`,
     data: account,
   });
 });
