@@ -149,26 +149,26 @@ export default function HODAllocations() {
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {scholars.map(s => (
-                  <div
-                    key={s.id}
-                    onClick={() => setSelectedScholar(prev => prev?.id === s.id ? null : s)}
-                    style={{
-                      padding: '14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', transition: 'all 0.2s',
-                      border: `2px solid ${selectedScholar?.id === s.id ? s.color : 'var(--border)'}`,
-                      background: selectedScholar?.id === s.id ? `${s.color}08` : '#F8FAFC',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                      <div className="avatar avatar-sm" style={{ background: s.color }}>{s.name.charAt(0)}</div>
+                    <div
+                      key={s.id || s._id}
+                      onClick={() => setSelectedScholar(prev => (prev?.id || prev?._id) === (s.id || s._id) ? null : s)}
+                      style={{
+                        padding: '14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', transition: 'all 0.2s',
+                        border: `2px solid ${(selectedScholar?.id || selectedScholar?._id) === (s.id || s._id) ? '#174EA6' : 'var(--border)'}`,
+                        background: (selectedScholar?.id || selectedScholar?._id) === (s.id || s._id) ? `#174EA608` : '#F8FAFC',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                        <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{s.name.charAt(0)}</div>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
                           <span style={{ fontWeight: 700, fontSize: '13.5px' }}>{s.name}</span>
                           <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{s.id}</span>
                         </div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '8px' }}>{s.topic}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '8px' }}>{s.profile?.area || 'No Area Specified'}</div>
                         <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                          {s.tags.map(tag => (
-                            <span key={tag} style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px', background: `${s.color}18`, color: s.color, textTransform: 'uppercase', letterSpacing: '0.4px' }}>{tag}</span>
+                          {(s.profile?.area ? [s.profile.area] : []).map(tag => (
+                            <span key={tag} style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px', background: `#174EA618`, color: '#174EA6', textTransform: 'uppercase', letterSpacing: '0.4px' }}>{tag}</span>
                           ))}
                         </div>
                       </div>
