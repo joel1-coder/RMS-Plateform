@@ -2,7 +2,7 @@ const ResearchProject = require('../models/ResearchProject.model');
 const Submission = require('../models/Submission.model');
 const Meeting = require('../models/Meeting.model');
 const User = require('../models/User.model');
-const { asyncHandler } = require('../middlewares/errorHandler');
+const { asyncHandler, AppError } = require('../middlewares/errorHandler');
 
 const getAdminDashboardStats = asyncHandler(async (req, res) => {
   const [
@@ -179,17 +179,17 @@ const getHodDashboardStats = asyncHandler(async (req, res) => {
     User.countDocuments({ role: 'supervisor', dept }),
     User.countDocuments({ role: 'scholar', dept, 'profile.category': 'Full Time' }),
     User.countDocuments({ role: 'scholar', dept, 'profile.category': 'Part Time' }),
-    ResearchProject.countDocuments({ department: dept, status: 'Active' }),
-    ResearchProject.countDocuments({ department: dept, status: 'Completed' }),
+    ResearchProject.countDocuments({ dept, status: 'Active' }),
+    ResearchProject.countDocuments({ dept, status: 'Completed' }),
     User.find({ dept }).sort({ _id: -1 }).limit(3),
-    ResearchProject.find({ department: dept }).sort({ _id: -1 }).limit(3)
+    ResearchProject.find({ dept }).sort({ _id: -1 }).limit(3)
   ]);
 
   const deptSummary = [
     { name: 'Full Time', value: fullTimeScholars || 0, fill: '#174EA6' },
     { name: 'Part Time', value: partTimeScholars || 0, fill: '#174EA6' },
     { name: 'Research\nCompleted', value: completedResearch || 0, fill: '#1E7D45' },
-    { name: 'Projects\nOn Hold', value: await ResearchProject.countDocuments({ department: dept, status: 'On Hold' }) || 0, fill: '#C89B1E' }
+    { name: 'Projects\nOn Hold', value: await ResearchProject.countDocuments({ dept, status: 'On Hold' }) || 0, fill: '#C89B1E' }
   ];
 
   const recentActivities = [];

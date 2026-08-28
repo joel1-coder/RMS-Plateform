@@ -22,13 +22,13 @@ function authenticate() {
       throw new AppError('Invalid or expired token', 401);
     }
 
-    const user = await User.findById(payload.id).select('role status');
+    const user = await User.findById(payload.id).select('role status dept name email');
 
     if (!user || user.status !== 'Active') {
       throw new AppError('User is not authorized', 401);
     }
 
-    req.user = { id: user._id.toString(), role: user.role };
+    req.user = { id: user._id.toString(), role: user.role, dept: user.dept, name: user.name, email: user.email };
     next();
   });
 }
