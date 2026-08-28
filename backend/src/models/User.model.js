@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ['admin', 'supervisor', 'scholar', 'hod', 'drc', 'librarian']
+      enum: ['admin', 'supervisor', 'scholar', 'hod', 'drc', 'principal']
     },
     dept: { type: String, required: true, trim: true },
     status: { type: String, required: true, enum: ['Active', 'Inactive'], default: 'Active' },

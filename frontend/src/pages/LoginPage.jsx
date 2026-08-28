@@ -12,7 +12,7 @@ const ROLES = [
   { id: 'scholar', label: 'Scholar' },
   { id: 'hod', label: 'HOD' },
   { id: 'drc', label: 'DRC' },
-  { id: 'librarian', label: 'Librarian' },
+  { id: 'principal', label: 'Principal' },
 ]
 
 

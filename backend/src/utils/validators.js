@@ -3,7 +3,7 @@ const { AppError } = require('../middlewares/errorHandler');
 
 const objectId = Joi.string().hex().length(24);
 const email = Joi.string().email({ tlds: { allow: false } });
-const roles = ['admin', 'supervisor', 'scholar', 'hod', 'drc', 'librarian'];
+const roles = ['admin', 'supervisor', 'scholar', 'hod', 'drc', 'principal'];
 const userStatus = ['Active', 'Inactive'];
 const researchStages = ['Course Work', 'Synopsis Preparation', 'Literature Review', 'Data Collection', 'Thesis Writing', 'Viva Voce', 'Completed'];
 const researchStatus = ['Active', 'Completed', 'Discontinued'];

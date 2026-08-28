@@ -3,11 +3,11 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import AppIcon from '../../components/AppIcon'
 
-const ROLES = ['All', 'Admin', 'Supervisor', 'Scholar', 'HOD', 'DRC', 'Librarian']
+const ROLES = ['All', 'Admin', 'Supervisor', 'Scholar', 'HOD', 'DRC', 'Principal']
 const STATUSES = ['All', 'Active', 'Inactive']
 const ROLE_COLORS = {
   admin: 'badge-danger', supervisor: 'badge-info', scholar: 'badge-primary',
-  hod: 'badge-warning', drc: 'badge-success', librarian: 'badge-gray',
+  hod: 'badge-warning', drc: 'badge-success', principal: 'badge-gray',
 }
 
 function UserModal({ onClose, onSave, userToEdit = null }) {
