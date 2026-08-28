@@ -1,3 +1,5 @@
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import PortalLayout from './PortalLayout'
 
 const NAV_ITEMS = [
@@ -15,6 +17,11 @@ const NAV_ITEMS = [
 ]
 
 export default function ScholarLayout() {
+  const { user } = useAuth()
+  if (user?.isTestAccount) {
+    return <Navigate to="/register" replace />
+  }
+
   const sections = [...new Set(NAV_ITEMS.map(i => i.section))]
   const navSections = sections.map(label => ({ label, items: NAV_ITEMS.filter(i => i.section === label) }))
 
@@ -29,3 +36,4 @@ export default function ScholarLayout() {
     />
   )
 }
+

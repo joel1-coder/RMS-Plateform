@@ -1,439 +1,194 @@
-import { useState, useEffect, useRef } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
-import { apiFetch } from '../utils/api'
-import toast from 'react-hot-toast'
-
-/* -- Design tokens -- */
-const C = {
-  maroon: '#0A2A66',
-  maroonDeep: '#061B44',
-  gold: '#C89B1E',
-  goldLight: '#FFF6D8',
-  paper: '#F3F7FF',
-  paperDeep: '#E8EEF8',
-  ink: '#1E293B',
-  inkSoft: '#64748B',
-  line: '#E2E8F0',
-  error: '#B4232A',
-  good: '#1E7D45',
-}
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../utils/api";
+import toast from "react-hot-toast";
 
 const STEPS = [
-  { id: 'personal',    label: 'Personal Details',    icon: '' },
-  { id: 'address',     label: 'Address',              icon: '' },
-  { id: 'academic',    label: 'Academic Details',     icon: '' },
-  { id: 'research',    label: 'Research Details',     icon: '' },
-  { id: 'supervisor',  label: 'Supervisor Details',   icon: '' },
-  { id: 'review',      label: 'Review & Submit',      icon: '' },
-]
+  { key: "personal", label: "Personal" },
+  { key: "contact", label: "Contact" },
+  { key: "academic", label: "Academic" },
+  { key: "guide", label: "Guide" },
+  { key: "declaration", label: "Declaration" },
+  { key: "review", label: "Review" },
+];
 
-const initialForm = {
-  // Personal
-  name: '', dob: '', gender: '', nationality: 'Indian',
-  email: '', phone: '', aadhaar: '', category: '',
-  // Address
-  address: '', city: '', state: '', pincode: '',
-  permanentAddress: '', sameAsPresent: false,
-  // Academic
-  regNo: '', dept: '', batch: '', qualification: '',
-  institution: '', percentage: '', experience: '',
-  // Research
-  researchTitle: '', area: '', keywords: '', objectives: '',
-  // Supervisor (read-only from account data)
-  supervisorName: '', coSupervisor: '',
-}
+const RELIGIONS = ["Christian", "Hindu", "Muslim", "Others"];
+const COMMUNITIES = ["SC", "ST", "BC", "MBC", "OBC", "OC"];
+const PROGRAMMES = ["UG", "PG", "M.Phil", "Diploma"];
 
-function Field({ label, required, children, error }) {
+const emptyQualRow = () => ({
+  id: Math.random().toString(36).slice(2),
+  programme: "",
+  subject: "",
+  university: "",
+  regNo: "",
+  year: "",
+  cls: "",
+});
+
+function Field({ label, required, children, hint, error }) {
   return (
-    <div style={{ marginBottom: 16 }}>
-      <label style={{
-        display: 'block', fontSize: 12, fontWeight: 700,
-        color: C.inkSoft, textTransform: 'uppercase', letterSpacing: '0.5px',
-        marginBottom: 6,
-      }}>
-        {label}{required && <span style={{ color: C.error }}> *</span>}
-      </label>
+    <label className="block mb-6">
+      <span className="flex items-baseline gap-1 mb-1.5 text-sm" style={{ color: "var(--ink)", fontWeight: 500 }}>
+        {label}
+        {required && <span style={{ color: "var(--oxblood)" }}>*</span>}
+      </span>
       {children}
-      {error && <p style={{ color: C.error, fontSize: 11, marginTop: 4 }}>{error}</p>}
-    </div>
-  )
-}
-
-function Input({ value, onChange, placeholder, type = 'text', disabled, ...rest }) {
-  return (
-    <input
-      type={type}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      disabled={disabled}
-      {...rest}
-      style={{
-        width: '100%', padding: '10px 14px',
-        border: `1.5px solid ${C.line}`,
-        borderRadius: 8, background: disabled ? C.paperDeep : '#fff',
-        color: C.ink, fontSize: 14, outline: 'none',
-        boxSizing: 'border-box',
-        transition: 'border-color 0.2s',
-        ...(rest.style || {}),
-      }}
-      onFocus={e => { if (!disabled) e.target.style.borderColor = C.maroon }}
-      onBlur={e => { e.target.style.borderColor = C.line }}
-    />
-  )
-}
-
-function Select({ value, onChange, children, disabled }) {
-  return (
-    <select
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
-      style={{
-        width: '100%', padding: '10px 14px',
-        border: `1.5px solid ${C.line}`,
-        borderRadius: 8, background: disabled ? C.paperDeep : '#fff',
-        color: value ? C.ink : C.inkSoft, fontSize: 14, outline: 'none',
-        boxSizing: 'border-box', cursor: disabled ? 'not-allowed' : 'pointer',
-      }}
-    >
-      {children}
-    </select>
-  )
-}
-
-function Textarea({ value, onChange, placeholder, rows = 3 }) {
-  return (
-    <textarea
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      rows={rows}
-      style={{
-        width: '100%', padding: '10px 14px',
-        border: `1.5px solid ${C.line}`,
-        borderRadius: 8, background: '#fff', color: C.ink,
-        fontSize: 14, outline: 'none', resize: 'vertical',
-        boxSizing: 'border-box', fontFamily: 'inherit',
-        transition: 'border-color 0.2s',
-      }}
-      onFocus={e => { e.target.style.borderColor = C.maroon }}
-      onBlur={e => { e.target.style.borderColor = C.line }}
-    />
-  )
-}
-
-function Grid({ children }) {
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
-      {children}
-    </div>
-  )
-}
-
-function SectionHeading({ children }) {
-  return (
-    <div style={{
-      fontSize: 15, fontWeight: 700, color: C.maroon,
-      borderBottom: `2px solid ${C.gold}`,
-      paddingBottom: 8, marginBottom: 20,
-    }}>
-      {children}
-    </div>
-  )
-}
-
-/* -- Step Panels -- */
-function StepPersonal({ form, setForm }) {
-  const u = (k, v) => setForm(f => ({ ...f, [k]: v }))
-  return (
-    <>
-      <SectionHeading> Personal Information</SectionHeading>
-      <Grid>
-        <Field label="Full Name" required>
-          <Input value={form.name} onChange={e => u('name', e.target.value)} placeholder="As per official documents" />
-        </Field>
-        <Field label="Date of Birth" required>
-          <Input type="date" value={form.dob} onChange={e => u('dob', e.target.value)} />
-        </Field>
-        <Field label="Gender" required>
-          <Select value={form.gender} onChange={e => u('gender', e.target.value)}>
-            <option value="">Select Gender</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Transgender</option>
-            <option>Prefer not to say</option>
-          </Select>
-        </Field>
-        <Field label="Nationality" required>
-          <Input value={form.nationality} onChange={e => u('nationality', e.target.value)} placeholder="e.g. Indian" />
-        </Field>
-        <Field label="Email Address" required>
-          <Input type="email" value={form.email} onChange={e => u('email', e.target.value)} placeholder="Official email" />
-        </Field>
-        <Field label="Phone Number" required>
-          <Input type="tel" value={form.phone} onChange={e => u('phone', e.target.value)} placeholder="10-digit mobile number" />
-        </Field>
-        <Field label="Aadhaar Number">
-          <Input value={form.aadhaar} onChange={e => u('aadhaar', e.target.value)} placeholder="12-digit Aadhaar" />
-        </Field>
-        <Field label="Category" required>
-          <Select value={form.category} onChange={e => u('category', e.target.value)}>
-            <option value="">Select Category</option>
-            <option>General</option>
-            <option>OBC</option>
-            <option>SC</option>
-            <option>ST</option>
-            <option>EWS</option>
-            <option>PWD</option>
-          </Select>
-        </Field>
-      </Grid>
-    </>
-  )
-}
-
-function StepAddress({ form, setForm }) {
-  const u = (k, v) => setForm(f => ({ ...f, [k]: v }))
-
-  const handleSameCheck = (checked) => {
-    setForm(f => ({
-      ...f,
-      sameAsPresent: checked,
-      permanentAddress: checked ? f.address : f.permanentAddress,
-    }))
-  }
-
-  return (
-    <>
-      <SectionHeading> Address Details</SectionHeading>
-      <Field label="Present Address" required>
-        <Textarea value={form.address} onChange={e => u('address', e.target.value)} placeholder="Door No, Street, Area" rows={2} />
-      </Field>
-      <Grid>
-        <Field label="City / Town" required>
-          <Input value={form.city} onChange={e => u('city', e.target.value)} placeholder="City" />
-        </Field>
-        <Field label="State" required>
-          <Select value={form.state} onChange={e => u('state', e.target.value)}>
-            <option value="">Select State</option>
-            {['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Jammu & Kashmir','Ladakh','Puducherry','Chandigarh'].map(s => <option key={s}>{s}</option>)}
-          </Select>
-        </Field>
-        <Field label="PIN Code" required>
-          <Input value={form.pincode} onChange={e => u('pincode', e.target.value)} placeholder="6-digit PIN" />
-        </Field>
-      </Grid>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '8px 0 14px' }}>
-        <input
-          type="checkbox"
-          id="same-addr"
-          checked={form.sameAsPresent}
-          onChange={e => handleSameCheck(e.target.checked)}
-          style={{ accentColor: C.maroon, width: 16, height: 16 }}
-        />
-        <label htmlFor="same-addr" style={{ fontSize: 13, color: C.inkSoft, cursor: 'pointer' }}>
-          Permanent address is same as present address
-        </label>
-      </div>
-
-      <Field label="Permanent Address" required>
-        <Textarea
-          value={form.sameAsPresent ? form.address : form.permanentAddress}
-          onChange={e => u('permanentAddress', e.target.value)}
-          placeholder="Permanent Address"
-          rows={2}
-        />
-      </Field>
-    </>
-  )
-}
-
-function StepAcademic({ form, setForm }) {
-  const u = (k, v) => setForm(f => ({ ...f, [k]: v }))
-  return (
-    <>
-      <SectionHeading> Academic Details</SectionHeading>
-      <Grid>
-        <Field label="Registration Number" required>
-          <Input value={form.regNo} onChange={e => u('regNo', e.target.value)} placeholder="e.g. CS/2024/001" />
-        </Field>
-        <Field label="Department" required>
-          <Input value={form.dept} onChange={e => u('dept', e.target.value)} placeholder="e.g. Computer Science" />
-        </Field>
-        <Field label="Batch Year" required>
-          <Select value={form.batch} onChange={e => u('batch', e.target.value)}>
-            <option value="">Select Batch</option>
-            {[2020,2021,2022,2023,2024,2025,2026].map(y => <option key={y}>{y}</option>)}
-          </Select>
-        </Field>
-        <Field label="Highest Qualification" required>
-          <Select value={form.qualification} onChange={e => u('qualification', e.target.value)}>
-            <option value="">Select Qualification</option>
-            <option>B.E / B.Tech</option>
-            <option>M.E / M.Tech</option>
-            <option>M.Sc</option>
-            <option>M.Phil</option>
-            <option>MBA</option>
-            <option>MCA</option>
-            <option>Other PG</option>
-          </Select>
-        </Field>
-        <Field label="Institution" required>
-          <Input value={form.institution} onChange={e => u('institution', e.target.value)} placeholder="Name of Institution / University" />
-        </Field>
-        <Field label="Percentage / CGPA" required>
-          <Input value={form.percentage} onChange={e => u('percentage', e.target.value)} placeholder="e.g. 85% or 8.5 CGPA" />
-        </Field>
-      </Grid>
-      <Field label="Prior Research / Work Experience">
-        <Textarea value={form.experience} onChange={e => u('experience', e.target.value)} placeholder="Briefly describe any prior research, work, or academic experience" rows={3} />
-      </Field>
-    </>
-  )
-}
-
-function StepResearch({ form, setForm }) {
-  const u = (k, v) => setForm(f => ({ ...f, [k]: v }))
-  return (
-    <>
-      <SectionHeading> Research Details</SectionHeading>
-      <Field label="Proposed Research Title" required>
-        <Input value={form.researchTitle} onChange={e => u('researchTitle', e.target.value)} placeholder="Title of your proposed research" />
-      </Field>
-      <Grid>
-        <Field label="Research Area / Domain" required>
-          <Input value={form.area} onChange={e => u('area', e.target.value)} placeholder="e.g. Machine Learning, VLSI, Bioinformatics" />
-        </Field>
-        <Field label="Keywords">
-          <Input value={form.keywords} onChange={e => u('keywords', e.target.value)} placeholder="Comma-separated keywords" />
-        </Field>
-      </Grid>
-      <Field label="Research Objectives / Problem Statement">
-        <Textarea value={form.objectives} onChange={e => u('objectives', e.target.value)} placeholder="Briefly describe your research objectives or problem statement" rows={4} />
-      </Field>
-    </>
-  )
-}
-
-function StepSupervisor({ form, setForm, user }) {
-  const u = (k, v) => setForm(f => ({ ...f, [k]: v }))
-  return (
-    <>
-      <SectionHeading> Supervisor Details</SectionHeading>
-      <Grid>
-        <Field label="Assigned Supervisor">
-          <Input
-            value={user?.assignedSupervisor || form.supervisorName || ''}
-            onChange={e => u('supervisorName', e.target.value)}
-            placeholder="Supervisor Name"
-            disabled={!!user?.assignedSupervisor}
-          />
-        </Field>
-        <Field label="Co-Supervisor (if any)">
-          <Input value={form.coSupervisor} onChange={e => u('coSupervisor', e.target.value)} placeholder="Co-Supervisor Name (optional)" />
-        </Field>
-      </Grid>
-      {user?.assignedSupervisor && (
-        <div style={{
-          background: '#E7F4EC', border: '1px solid #B8DFC6',
-          borderRadius: 8, padding: '10px 14px', fontSize: 13,
-          color: '#166A3A', marginTop: 8,
-        }}>
-          Info Your supervisor has been auto-filled based on your account allocation.
-        </div>
+      {hint && !error && (
+        <span className="block mt-1 text-xs" style={{ color: "#8A8375" }}>{hint}</span>
       )}
-    </>
-  )
+      {error && (
+        <span className="block mt-1 text-xs" style={{ color: "var(--rust)" }}>{error}</span>
+      )}
+    </label>
+  );
 }
 
-/* -- Review Step -- */
-function ReviewItem({ label, value }) {
+function TextInput(props) {
+  return <input {...props} className={"field-underline " + (props.className || "")} />;
+}
+
+function Segmented({ options, value, onChange }) {
   return (
-    <div style={{ display: 'flex', gap: 10, marginBottom: 8, fontSize: 13 }}>
-      <span style={{ color: C.inkSoft, fontWeight: 600, minWidth: 160 }}>{label}:</span>
-      <span style={{ color: C.ink }}>{value || <span style={{ color: '#aaa' }}>-</span>}</span>
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => {
+        const active = value === opt;
+        return (
+          <button
+            type="button"
+            key={opt}
+            onClick={() => onChange(opt)}
+            className="segmented-btn"
+            style={
+              active
+                ? { background: "var(--oxblood)", color: "#FBF3E7", borderColor: "var(--oxblood)" }
+                : {}
+            }
+          >
+            {opt}
+          </button>
+        );
+      })}
     </div>
-  )
+  );
 }
 
-function StepReview({ form, user }) {
+function SignaturePad({ label, value, onChange }) {
+  const canvasRef = useRef(null);
+  const drawing = useRef(false);
+
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    ctx.lineWidth = 1.6;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#2B2418";
+    if (value) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0);
+      img.src = value;
+    }
+  }, []);
+
+  const pos = (e, c) => {
+    const rect = c.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  };
+
+  const start = (e) => {
+    drawing.current = true;
+    const c = canvasRef.current;
+    const ctx = c.getContext("2d");
+    const { x, y } = pos(e, c);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+  const move = (e) => {
+    if (!drawing.current) return;
+    e.preventDefault();
+    const c = canvasRef.current;
+    const ctx = c.getContext("2d");
+    const { x, y } = pos(e, c);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+  const end = () => {
+    if (!drawing.current) return;
+    drawing.current = false;
+    onChange(canvasRef.current.toDataURL());
+  };
+  const clear = () => {
+    const c = canvasRef.current;
+    const ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, c.width, c.height);
+    onChange(null);
+  };
+
   return (
-    <>
-      <SectionHeading> Review Your Submission</SectionHeading>
-      <p style={{ fontSize: 13, color: C.inkSoft, marginBottom: 20 }}>
-        Please review all the information below before submitting. Once submitted, the Admin will review and approve your registration.
-      </p>
-
-      <div style={{ background: C.paper, borderRadius: 10, padding: '16px 20px', marginBottom: 14 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.maroon, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Personal</div>
-        <ReviewItem label="Full Name" value={form.name} />
-        <ReviewItem label="Date of Birth" value={form.dob} />
-        <ReviewItem label="Gender" value={form.gender} />
-        <ReviewItem label="Email" value={form.email} />
-        <ReviewItem label="Phone" value={form.phone} />
-        <ReviewItem label="Category" value={form.category} />
+    <div>
+      <div className="flex items-center justify-between mb-1.5" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span className="text-sm" style={{ color: "var(--ink)", fontWeight: 500 }}>{label}</span>
+        <button type="button" onClick={clear} className="text-xs underline" style={{ color: "#8A8375", background: 'none', border: 'none', cursor: 'pointer' }}>
+          clear
+        </button>
       </div>
-
-      <div style={{ background: C.paper, borderRadius: 10, padding: '16px 20px', marginBottom: 14 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.maroon, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Address</div>
-        <ReviewItem label="Present Address" value={`${form.address}, ${form.city}, ${form.state} - ${form.pincode}`} />
-        <ReviewItem label="Permanent Address" value={form.sameAsPresent ? 'Same as present' : form.permanentAddress} />
-      </div>
-
-      <div style={{ background: C.paper, borderRadius: 10, padding: '16px 20px', marginBottom: 14 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.maroon, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Academic</div>
-        <ReviewItem label="Registration No." value={form.regNo} />
-        <ReviewItem label="Department" value={form.dept} />
-        <ReviewItem label="Batch" value={form.batch} />
-        <ReviewItem label="Qualification" value={form.qualification} />
-        <ReviewItem label="Institution" value={form.institution} />
-      </div>
-
-      <div style={{ background: C.paper, borderRadius: 10, padding: '16px 20px', marginBottom: 14 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.maroon, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Research</div>
-        <ReviewItem label="Research Title" value={form.researchTitle} />
-        <ReviewItem label="Research Area" value={form.area} />
-        <ReviewItem label="Keywords" value={form.keywords} />
-      </div>
-
-      <div style={{ background: C.paper, borderRadius: 10, padding: '16px 20px' }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.maroon, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Supervisor</div>
-        <ReviewItem label="Supervisor" value={user?.assignedSupervisor || form.supervisorName} />
-        <ReviewItem label="Co-Supervisor" value={form.coSupervisor} />
-      </div>
-    </>
-  )
+      <canvas
+        ref={canvasRef}
+        width={420}
+        height={110}
+        onMouseDown={start}
+        onMouseMove={move}
+        onMouseUp={end}
+        onMouseLeave={end}
+        onTouchStart={start}
+        onTouchMove={move}
+        onTouchEnd={end}
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          height: 110,
+          background: "#FFFDF7",
+          border: "1px solid var(--parchment-line)",
+          borderRadius: 2,
+          touchAction: "none",
+          cursor: "crosshair",
+        }}
+      />
+      <div className="text-xs mt-1" style={{ color: "#8A8375" }}>sign above with mouse or finger</div>
+    </div>
+  );
 }
 
 /* -- Status Screen (after submission) -- */
 function StatusScreen({ status, rejectionReason, onLogout }) {
   if (status === 'Pending') return (
     <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-      <div style={{ fontSize: 64, marginBottom: 16 }}></div>
-      <h2 style={{ color: C.maroon, margin: '0 0 10px' }}>Registration Submitted!</h2>
-      <p style={{ color: C.inkSoft, maxWidth: 420, margin: '0 auto 30px', lineHeight: 1.6 }}>
-        Your registration form has been sent to the Admin for review. You will be notified once it is approved.
+      <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+      <h2 style={{ color: "#6B1F2A", margin: '0 0 10px', fontFamily: "Georgia, serif" }}>Registration Submitted!</h2>
+      <p style={{ color: "#8A8375", maxWidth: 420, margin: '0 auto 30px', lineHeight: 1.6 }}>
+        Your PhD application has been sent to the Admin for review. You will be notified once it is approved.
       </p>
       <div style={{
-        background: '#FFF6D8', border: '1px solid #F6D860',
-        borderRadius: 10, padding: '14px 20px',
+        background: '#FFFDF7', border: '1px solid #E4DAC2',
+        borderRadius: 8, padding: '16px 20px',
         display: 'inline-block', textAlign: 'left', marginBottom: 30,
       }}>
-        <div style={{ fontSize: 13, color: '#936C00', fontWeight: 600, marginBottom: 4 }}>What happens next?</div>
-        <ul style={{ margin: 0, padding: '0 0 0 18px', fontSize: 13, color: '#936C00', lineHeight: 2 }}>
-          <li>Admin reviews your submission</li>
-          <li>Admin approves and generates your admission letter</li>
-          <li>You receive your official scholar account credentials</li>
+        <div style={{ fontSize: 13, color: '#A9823E', fontWeight: 600, marginBottom: 6 }}>Next Steps:</div>
+        <ul style={{ margin: 0, padding: '0 0 0 18px', fontSize: 13, color: '#232323', lineHeight: 1.8 }}>
+          <li>Admin reviews your application and details</li>
+          <li>Upon approval, your official scholar account is activated</li>
+          <li>You can print your approved application copy</li>
         </ul>
       </div>
       <br />
       <button onClick={onLogout} style={{
-        padding: '10px 28px', background: C.maroon,
-        color: '#fff', border: 'none', borderRadius: 8,
-        fontWeight: 600, fontSize: 14, cursor: 'pointer',
+        padding: '10px 28px', background: '#6B1F2A',
+        color: '#FBF3E7', border: 'none', borderRadius: 4,
+        fontWeight: 500, fontSize: 14, cursor: 'pointer',
       }}>
         Logout
       </button>
@@ -442,15 +197,15 @@ function StatusScreen({ status, rejectionReason, onLogout }) {
 
   if (status === 'Approved') return (
     <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-      <div style={{ fontSize: 64, marginBottom: 16 }}></div>
-      <h2 style={{ color: C.good, margin: '0 0 10px' }}>Registration Approved!</h2>
-      <p style={{ color: C.inkSoft, maxWidth: 420, margin: '0 auto 24px', lineHeight: 1.6 }}>
-        Congratulations! Your PhD registration has been officially approved. You can now download your admission document.
+      <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+      <h2 style={{ color: "#4C6B58", margin: '0 0 10px', fontFamily: "Georgia, serif" }}>Registration Approved!</h2>
+      <p style={{ color: "#8A8375", maxWidth: 420, margin: '0 auto 24px', lineHeight: 1.6 }}>
+        Congratulations! Your PhD registration has been officially approved by the Academic Administration.
       </p>
       <button onClick={onLogout} style={{
-        padding: '10px 28px', background: C.inkSoft,
-        color: '#fff', border: 'none', borderRadius: 8,
-        fontWeight: 600, fontSize: 14, cursor: 'pointer', marginRight: 10,
+        padding: '10px 28px', background: '#6B1F2A',
+        color: '#FBF3E7', border: 'none', borderRadius: 4,
+        fontWeight: 500, fontSize: 14, cursor: 'pointer',
       }}>
         Logout
       </button>
@@ -459,23 +214,23 @@ function StatusScreen({ status, rejectionReason, onLogout }) {
 
   if (status === 'Rejected') return (
     <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-      <div style={{ fontSize: 64, marginBottom: 16 }}></div>
-      <h2 style={{ color: C.error, margin: '0 0 10px' }}>Registration Not Accepted</h2>
+      <div style={{ fontSize: 48, marginBottom: 16 }}>❌</div>
+      <h2 style={{ color: "#A34A28", margin: '0 0 10px', fontFamily: "Georgia, serif" }}>Registration Not Accepted</h2>
       {rejectionReason && (
         <div style={{
-          background: '#F9E6E8', border: '1px solid #F0B9BD',
-          borderRadius: 10, padding: '14px 20px', maxWidth: 420,
+          background: '#FFFDF7', border: '1px solid #A34A28',
+          borderRadius: 8, padding: '14px 20px', maxWidth: 420,
           margin: '0 auto 20px', textAlign: 'left',
         }}>
-          <div style={{ fontWeight: 600, color: '#9F1E24', marginBottom: 4 }}>Reason:</div>
-          <div style={{ color: '#9F1E24', fontSize: 14 }}>{rejectionReason}</div>
+          <div style={{ fontWeight: 600, color: '#A34A28', marginBottom: 4 }}>Reason:</div>
+          <div style={{ color: '#232323', fontSize: 14 }}>{rejectionReason}</div>
         </div>
       )}
-      <p style={{ color: C.inkSoft, marginBottom: 20 }}>Please contact the Admin for further assistance.</p>
+      <p style={{ color: "#8A8375", marginBottom: 20 }}>Please contact the Admin for further assistance.</p>
       <button onClick={onLogout} style={{
-        padding: '10px 28px', background: C.maroon,
-        color: '#fff', border: 'none', borderRadius: 8,
-        fontWeight: 600, fontSize: 14, cursor: 'pointer',
+        padding: '10px 28px', background: '#6B1F2A',
+        color: '#FBF3E7', border: 'none', borderRadius: 4,
+        fontWeight: 500, fontSize: 14, cursor: 'pointer',
       }}>
         Logout
       </button>
@@ -485,105 +240,143 @@ function StatusScreen({ status, rejectionReason, onLogout }) {
   return null
 }
 
-/* -- Main Component -- */
 export default function ScholarRegistration() {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
-  const [step, setStep] = useState(0)
-  const [form, setForm] = useState(initialForm)
-  const [submitting, setSubmitting] = useState(false)
-  const [submissionStatus, setSubmissionStatus] = useState(null) // null | 'Pending' | 'Approved' | 'Rejected'
-  const [rejectionReason, setRejectionReason] = useState('')
-  const [loading, setLoading] = useState(true)
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [step, setStep] = useState(0);
+  const [savedAt, setSavedAt] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [data, setData] = useState({
+    subject: "",
+    fullName: "",
+    gender: "",
+    dob: "",
+    religion: "",
+    christianDenom: "",
+    christianCluster: "",
+    community: "",
+    email: "",
+    mobile1: "",
+    mobile2: "",
+    street: "",
+    city: "",
+    district: "",
+    state: "",
+    pincode: "",
+    lastCollege: "",
+    lastUniversity: "",
+    working: false,
+    institutionName: "",
+    guide: "",
+    coGuide: "",
+    declarationAccepted: false,
+  });
+
+  const [quals, setQuals] = useState([emptyQualRow()]);
+  const [signature, setSignature] = useState(null);
 
   // If not a test account user, redirect to login
   useEffect(() => {
     if (!user) {
-      navigate('/login', { replace: true })
-      return
+      navigate('/login', { replace: true });
+      return;
     }
     if (!user.isTestAccount) {
-      // Not a test account - send to their actual portal
-      navigate(`/${user.role?.toLowerCase() || 'login'}`, { replace: true })
-      return
+      navigate(`/${user.role?.toLowerCase() || 'login'}`, { replace: true });
+      return;
     }
 
-    // Pre-fill from user context
-    setForm(f => ({
-      ...f,
-      name: user.name || '',
-      email: user.email || '',
-      dept: user.dept || '',
-      supervisorName: user.assignedSupervisor || '',
-    }))
+    // Pre-fill user data
+    setData(d => ({
+      ...d,
+      fullName: user.name || d.fullName,
+      email: user.email || d.email,
+    }));
 
-    // Fetch existing submission if any
-    fetchMyRegistration()
-  }, [user])
+    fetchMyRegistration();
+  }, [user]);
 
   const fetchMyRegistration = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = localStorage.getItem('rms_token');
       const res = await apiFetch('/api/test-accounts/my-registration', {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      if (data?.data) {
-        setSubmissionStatus(data.data.status)
-        setRejectionReason(data.data.rejectionReason || '')
-        if (data.data.formData) {
-          setForm(f => ({ ...f, ...data.data.formData }))
+      });
+      const resData = await res.json();
+      if (resData?.data) {
+        setSubmissionStatus(resData.data.status);
+        setRejectionReason(resData.data.rejectionReason || '');
+        if (resData.data.formData) {
+          setData(d => ({ ...d, ...resData.data.formData }));
+          if (resData.data.formData.quals) setQuals(resData.data.formData.quals);
+          if (resData.data.formData.signature) setSignature(resData.data.formData.signature);
         }
       }
     } catch {
       // No submission yet
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login', { replace: true })
-  }
+  const set = (key) => (e) => {
+    const val = e && e.target ? (e.target.type === "checkbox" ? e.target.checked : e.target.value) : e;
+    setData((d) => ({ ...d, [key]: val }));
+  };
 
-  const validateStep = () => {
+  const updateQual = (id, key, val) => {
+    setQuals((rows) => rows.map((r) => (r.id === id ? { ...r, [key]: val } : r)));
+  };
+  const addQual = () => setQuals((rows) => [...rows, emptyQualRow()]);
+  const removeQual = (id) => setQuals((rows) => (rows.length > 1 ? rows.filter((r) => r.id !== id) : rows));
+
+  // autosave simulation
+  useEffect(() => {
+    const t = setTimeout(() => setSavedAt(new Date()), 700);
+    return () => clearTimeout(t);
+  }, [data, quals]);
+
+  const validateStep = useCallback(() => {
+    const e = {};
     if (step === 0) {
-      if (!form.name || !form.dob || !form.gender || !form.email || !form.phone || !form.category) {
-        toast.error('Please fill all required fields in Personal Details')
-        return false
-      }
+      if (!data.fullName) e.fullName = "Enter your full name";
+      if (!data.subject) e.subject = "Enter research subject";
+      if (!data.dob) e.dob = "Enter date of birth";
+      if (!data.gender) e.gender = "Select sex";
+      if (!data.religion) e.religion = "Select religion";
+      if (!data.community) e.community = "Select community";
     }
     if (step === 1) {
-      if (!form.address || !form.city || !form.state || !form.pincode) {
-        toast.error('Please fill all required address fields')
-        return false
-      }
+      if (!data.email) e.email = "Enter email";
+      if (!data.mobile1) e.mobile1 = "Enter a mobile number";
+      if (!data.street || !data.city) e.street = "Enter address for communication";
     }
-    if (step === 2) {
-      if (!form.regNo || !form.dept || !form.batch || !form.qualification || !form.institution || !form.percentage) {
-        toast.error('Please fill all required academic fields')
-        return false
-      }
+    if (step === 4) {
+      if (!data.declarationAccepted) e.declarationAccepted = "You must accept the declaration";
+      if (!signature) e.signature = "Signature required";
     }
-    if (step === 3) {
-      if (!form.researchTitle || !form.area) {
-        toast.error('Please fill in at least the Research Title and Area')
-        return false
-      }
-    }
-    return true
-  }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }, [step, data, signature]);
 
-  const handleNext = () => {
-    if (validateStep()) setStep(s => s + 1)
-  }
+  const goNext = () => {
+    if (!validateStep()) return;
+    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  };
+  const goBack = () => setStep((s) => Math.max(s - 1, 0));
 
   const handleSubmit = async () => {
-    setSubmitting(true)
+    if (!validateStep()) return;
+    setSubmitting(true);
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = localStorage.getItem('rms_token');
       const res = await apiFetch('/api/test-accounts/submit-registration', {
         method: 'POST',
         headers: {
@@ -591,219 +384,480 @@ export default function ScholarRegistration() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          testAccountId: user.testAccountId,
+          testAccountId: user.testAccountId || user.id,
           formData: {
-            ...form,
-            supervisorName: user.assignedSupervisor || form.supervisorName,
+            ...data,
+            name: data.fullName,
+            address: `${data.street}, ${data.city}, ${data.district}, ${data.state} - ${data.pincode}`,
+            quals,
+            signature,
           },
         }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Submission failed')
-      toast.success('Registration submitted successfully!')
-      setSubmissionStatus('Pending')
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.message || 'Submission failed');
+      toast.success('Application submitted successfully!');
+      setSubmissionStatus('Pending');
     } catch (err) {
-      toast.error(err.message)
+      toast.error(err.message);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
+  const progressPct = Math.round(((step + 1) / STEPS.length) * 100);
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: C.paper,
-      }}>
-        <div style={{ fontSize: 14, color: C.inkSoft }}>Loading your registration...</div>
+      <div style={{ minHeight: "100vh", background: "#FAF6EC", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontSize: 14, color: "#8A8375" }}>Loading your registration...</div>
       </div>
-    )
+    );
   }
 
   return (
-    <div style={{
-      minHeight: '100vh', background: `linear-gradient(135deg, ${C.maroonDeep} 0%, ${C.maroon} 62%, #174EA6 100%)`,
-      display: 'flex', flexDirection: 'column',
-    }}>
-      {/* Top Bar */}
-      <div style={{
-        background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(8px)',
-        borderBottom: `1px solid rgba(255,255,255,0.1)`,
-        padding: '14px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: C.gold, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18, fontWeight: 800, color: '#fff',
-          }}>R</div>
-          <div>
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>Research Management System</div>
-            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11 }}>PhD Scholar Registration</div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {user && (
-            <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13 }}>
-               {user.name}
-            </div>
-          )}
-          <button onClick={handleLogout} style={{
-            padding: '7px 16px', background: 'rgba(255,255,255,0.1)',
-            border: '1px solid rgba(255,255,255,0.25)',
-            borderRadius: 8, color: '#fff', fontSize: 13,
-            cursor: 'pointer', transition: 'background 0.2s',
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+    <div style={{ background: "var(--parchment)", minHeight: "100vh", fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+      <style>{`
+        :root {
+          --ink: #232323;
+          --oxblood: #6B1F2A;
+          --oxblood-deep: #4E1620;
+          --parchment: #FAF6EC;
+          --parchment-line: #E4DAC2;
+          --brass: #A9823E;
+          --sage: #4C6B58;
+          --rust: #A34A28;
+          --font-display: Georgia, 'Times New Roman', serif;
+          --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          --font-mono: 'Courier New', ui-monospace, monospace;
+        }
+        .field-underline {
+          display: block;
+          width: 100%;
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid #C9BFA3;
+          padding: 6px 2px;
+          font-size: 14.5px;
+          color: var(--ink);
+          font-family: var(--font-body);
+          outline: none;
+          transition: border-color .15s;
+          box-sizing: border-box;
+        }
+        .field-underline:focus { border-bottom: 1.5px solid var(--oxblood); }
+        .field-underline::placeholder { color: #B4AC98; }
+        .segmented-btn {
+          padding: 6px 14px;
+          font-size: 13px;
+          border: 1px solid #C9BFA3;
+          background: transparent;
+          color: var(--ink);
+          border-radius: 999px;
+          cursor: pointer;
+          transition: all .15s;
+        }
+        .segmented-btn:hover { border-color: var(--oxblood); }
+        .tab-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 16px 12px 18px;
+          cursor: pointer;
+          border-left: 3px solid transparent;
+          color: #8A8375;
+          font-size: 13.5px;
+          transition: all .15s;
+        }
+        .tab-item.active {
+          border-left: 3px solid var(--oxblood);
+          background: #FFFDF7;
+          color: var(--oxblood-deep);
+          font-weight: 600;
+        }
+        .tab-item.done { color: var(--sage); }
+        .ruled {
+          background-image: repeating-linear-gradient(
+            to bottom,
+            transparent,
+            transparent 34px,
+            var(--parchment-line) 34px,
+            var(--parchment-line) 35px
+          );
+        }
+        .btn-primary {
+          background: var(--oxblood);
+          color: #FBF3E7;
+          border: none;
+          padding: 10px 22px;
+          font-size: 14px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-weight: 500;
+        }
+        .btn-primary:hover { background: var(--oxblood-deep); }
+        .btn-ghost {
+          background: transparent;
+          color: var(--ink);
+          border: 1px solid #C9BFA3;
+          padding: 10px 20px;
+          font-size: 14px;
+          border-radius: 3px;
+          cursor: pointer;
+        }
+        .btn-ghost:hover { border-color: var(--oxblood); }
+        .grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0 24px;
+        }
+        @media (max-width: 640px) {
+          .grid-2 { grid-template-columns: 1fr; }
+        }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ borderBottom: "1px solid var(--parchment-line)", background: "#FFFDF7" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "16px 24px", display: "flex", alignItems: "center", gap: 16 }}>
+          <div
+            style={{
+              width: 46,
+              height: 46,
+              borderRadius: "50%",
+              border: "1.5px solid var(--brass)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "var(--font-display)",
+              color: "var(--brass)",
+              fontSize: 15,
+              letterSpacing: 1,
+              flexShrink: 0,
+            }}
           >
-            Logout
-          </button>
+            SJC
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 19, color: "var(--oxblood-deep)", fontWeight: "bold" }}>
+              PhD Admission &amp; Registration
+            </div>
+            <div style={{ fontSize: 12.5, color: "#8A8375" }}>
+              St. Joseph's College (Autonomous), Tiruchirappalli — Full-Time / Part-Time Programme
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 11.5, color: "#8A8375", fontFamily: "var(--font-mono)", marginBottom: 4 }}>
+              {savedAt ? `draft saved ${savedAt.toLocaleTimeString()}` : "saving..."}
+            </div>
+            <button onClick={handleLogout} style={{
+              background: 'none', border: '1px solid #C9BFA3', borderRadius: 4,
+              padding: '3px 10px', fontSize: 12, color: 'var(--oxblood)', cursor: 'pointer'
+            }}>
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div style={{
-        flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-        padding: '32px 16px 48px',
-      }}>
-        <div style={{ width: '100%', maxWidth: 760 }}>
-
-          {/* If already submitted, show status screen */}
-          {submissionStatus ? (
-            <div style={{
-              background: '#fff', borderRadius: 20, boxShadow: '0 24px 60px rgba(0,0,0,0.3)',
-              overflow: 'hidden',
-            }}>
-              <StatusScreen
-                status={submissionStatus}
-                rejectionReason={rejectionReason}
-                onLogout={handleLogout}
-              />
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "24px 16px", display: "flex", gap: 24 }}>
+        {/* Left index-tab stepper */}
+        <div style={{ width: 180, flexShrink: 0 }}>
+          <div style={{ position: "sticky", top: 24 }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "50%",
+                border: "3px solid var(--parchment-line)",
+                borderTopColor: "var(--brass)",
+                transform: `rotate(${progressPct * 3.6}deg)`,
+                margin: "0 0 16px 18px",
+                position: "relative",
+              }}
+              aria-hidden="true"
+            />
+            <div style={{ fontSize: 11, color: "#8A8375", marginLeft: 18, marginTop: -10, marginBottom: 14 }}>
+              {progressPct}% complete
             </div>
-          ) : (
-            <>
-              {/* Step Progress */}
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700, fontSize: 22, marginBottom: 6 }}>
-                  PhD Scholar Registration Form
-                </div>
-                <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, marginBottom: 20 }}>
-                  Fill in all details carefully. These will be reviewed by the Admin.
-                </div>
-
-                {/* Step Indicators */}
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {STEPS.map((s, i) => (
-                    <div key={s.id} style={{
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      padding: '6px 12px', borderRadius: 20,
-                      background: i === step
-                        ? C.gold
-                        : i < step
-                        ? 'rgba(255,255,255,0.2)'
-                        : 'rgba(255,255,255,0.08)',
-                      color: i === step ? '#fff' : i < step ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.45)',
-                      fontSize: 12, fontWeight: i === step ? 700 : 500,
-                      transition: 'all 0.3s',
-                      cursor: i < step ? 'pointer' : 'default',
-                    }}
-                    onClick={() => { if (i < step) setStep(i) }}
-                    >
-                      <span>{i < step ? '' : s.icon}</span>
-                      <span style={{ display: window.innerWidth < 500 ? 'none' : 'inline' }}>{s.label}</span>
-                    </div>
-                  ))}
-                </div>
+            {STEPS.map((s, i) => (
+              <div
+                key={s.key}
+                className={"tab-item" + (i === step ? " active" : i < step ? " done" : "")}
+                onClick={() => { if (i <= step || submissionStatus) setStep(i); }}
+              >
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {s.label}
               </div>
+            ))}
+          </div>
+        </div>
 
-              {/* Form Card */}
-              <div style={{
-                background: '#fff', borderRadius: 20,
-                boxShadow: '0 24px 60px rgba(0,0,0,0.3)', overflow: 'hidden',
-              }}>
-                <div style={{
-                  background: C.paper, borderBottom: `1px solid ${C.line}`,
-                  padding: '18px 28px',
-                }}>
-                  <div style={{ fontSize: 12, color: C.inkSoft }}>Step {step + 1} of {STEPS.length}</div>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: C.maroon }}>
-                    {STEPS[step].icon} {STEPS[step].label}
+        {/* Form panel or Status Screen */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ruled" style={{ background: "#FFFDF7", border: "1px solid var(--parchment-line)", borderRadius: 2, padding: "28px 32px" }}>
+            {submissionStatus ? (
+              <StatusScreen status={submissionStatus} rejectionReason={rejectionReason} onLogout={handleLogout} />
+            ) : (
+              <>
+                {step === 0 && (
+                  <div>
+                    <Field label="Research subject" required error={errors.subject}>
+                      <TextInput placeholder="e.g. Computer Science" value={data.subject} onChange={set("subject")} />
+                    </Field>
+                    <Field label="Name" required error={errors.fullName}>
+                      <TextInput placeholder="Full name as per certificates" value={data.fullName} onChange={set("fullName")} />
+                    </Field>
+                    <div className="grid-2">
+                      <Field label="Sex" required error={errors.gender}>
+                        <Segmented options={["Male", "Female", "Other"]} value={data.gender} onChange={set("gender")} />
+                      </Field>
+                      <Field label="Date of birth" required error={errors.dob}>
+                        <TextInput type="date" value={data.dob} onChange={set("dob")} />
+                      </Field>
+                    </div>
+                    <Field label="Religion" required error={errors.religion}>
+                      <Segmented options={RELIGIONS} value={data.religion} onChange={set("religion")} />
+                    </Field>
+                    {data.religion === "Christian" && (
+                      <div className="grid-2">
+                        <Field label="If Christian">
+                          <Segmented options={["Catholic", "Non-Catholic"]} value={data.christianDenom} onChange={set("christianDenom")} />
+                        </Field>
+                        <Field label="Christian cluster">
+                          <Segmented options={["Dalit", "Non-Dalit"]} value={data.christianCluster} onChange={set("christianCluster")} />
+                        </Field>
+                      </div>
+                    )}
+                    <Field label="Community" required error={errors.community}>
+                      <Segmented options={COMMUNITIES} value={data.community} onChange={set("community")} />
+                    </Field>
                   </div>
-                </div>
+                )}
 
-                <div style={{ padding: '28px 28px 10px' }}>
-                  {step === 0 && <StepPersonal form={form} setForm={setForm} />}
-                  {step === 1 && <StepAddress form={form} setForm={setForm} />}
-                  {step === 2 && <StepAcademic form={form} setForm={setForm} />}
-                  {step === 3 && <StepResearch form={form} setForm={setForm} />}
-                  {step === 4 && <StepSupervisor form={form} setForm={setForm} user={user} />}
-                  {step === 5 && <StepReview form={form} user={user} />}
-                </div>
-
-                {/* Navigation */}
-                <div style={{
-                  padding: '18px 28px 28px',
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  borderTop: `1px solid ${C.line}`,
-                }}>
-                  <button
-                    onClick={() => setStep(s => s - 1)}
-                    disabled={step === 0}
-                    style={{
-                      padding: '10px 22px', borderRadius: 8,
-                      border: `1.5px solid ${C.line}`, background: 'transparent',
-                      color: step === 0 ? '#ccc' : C.ink, fontWeight: 600,
-                      fontSize: 14, cursor: step === 0 ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                     Previous
-                  </button>
-
-                  {/* Progress bar */}
-                  <div style={{ flex: 1, margin: '0 20px', height: 5, background: C.line, borderRadius: 9 }}>
-                    <div style={{
-                      height: '100%', borderRadius: 9,
-                      background: `linear-gradient(90deg, ${C.maroon}, ${C.gold})`,
-                      width: `${((step + 1) / STEPS.length) * 100}%`,
-                      transition: 'width 0.3s ease',
-                    }} />
+                {step === 1 && (
+                  <div>
+                    <Field label="Mail ID" required error={errors.email}>
+                      <TextInput type="email" placeholder="name@example.com" value={data.email} onChange={set("email")} />
+                    </Field>
+                    <div className="grid-2">
+                      <Field label="Mobile number" required error={errors.mobile1}>
+                        <TextInput placeholder="10-digit number" value={data.mobile1} onChange={set("mobile1")} />
+                      </Field>
+                      <Field label="Mobile number (alt.)">
+                        <TextInput placeholder="optional" value={data.mobile2} onChange={set("mobile2")} />
+                      </Field>
+                    </div>
+                    <Field label="Address for communication" required error={errors.street}>
+                      <TextInput placeholder="Street / door no." value={data.street} onChange={set("street")} />
+                    </Field>
+                    <div className="grid-2">
+                      <Field label="City">
+                        <TextInput value={data.city} onChange={set("city")} />
+                      </Field>
+                      <Field label="District">
+                        <TextInput value={data.district} onChange={set("district")} />
+                      </Field>
+                      <Field label="State">
+                        <TextInput value={data.state} onChange={set("state")} />
+                      </Field>
+                      <Field label="Pincode">
+                        <TextInput value={data.pincode} onChange={set("pincode")} />
+                      </Field>
+                    </div>
                   </div>
+                )}
 
-                  {step < STEPS.length - 1 ? (
-                    <button
-                      onClick={handleNext}
+                {step === 2 && (
+                  <div>
+                    <div className="grid-2">
+                      <Field label="Name of the college last attended">
+                        <TextInput value={data.lastCollege} onChange={set("lastCollege")} />
+                      </Field>
+                      <Field label="Name of the university last studied">
+                        <TextInput value={data.lastUniversity} onChange={set("lastUniversity")} />
+                      </Field>
+                    </div>
+
+                    <div style={{ marginTop: 16, marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span className="text-sm" style={{ fontWeight: 500 }}>Details of qualifications from graduate</span>
+                      <button type="button" onClick={addQual} className="text-xs" style={{ color: "var(--oxblood)", background: "none", border: "none", cursor: "pointer" }}>
+                        + add row
+                      </button>
+                    </div>
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                        <thead>
+                          <tr style={{ borderBottom: "1px solid var(--parchment-line)", color: "#8A8375" }}>
+                            <th style={{ textAlign: "left", padding: "6px 4px", fontWeight: 500 }}>Programme</th>
+                            <th style={{ textAlign: "left", padding: "6px 4px", fontWeight: 500 }}>Subject</th>
+                            <th style={{ textAlign: "left", padding: "6px 4px", fontWeight: 500 }}>University</th>
+                            <th style={{ textAlign: "left", padding: "6px 4px", fontWeight: 500 }}>Reg no.</th>
+                            <th style={{ textAlign: "left", padding: "6px 4px", fontWeight: 500 }}>Year</th>
+                            <th style={{ textAlign: "left", padding: "6px 4px", fontWeight: 500 }}>Class</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {quals.map((row) => (
+                            <tr key={row.id} style={{ borderBottom: "1px solid var(--parchment-line)" }}>
+                              <td style={{ padding: "6px 4px", minWidth: 100 }}>
+                                <select
+                                  value={row.programme}
+                                  onChange={(e) => updateQual(row.id, "programme", e.target.value)}
+                                  className="field-underline"
+                                >
+                                  <option value="">select</option>
+                                  {PROGRAMMES.map((p) => (
+                                    <option key={p} value={p}>{p}</option>
+                                  ))}
+                                </select>
+                              </td>
+                              <td style={{ padding: "6px 4px" }}>
+                                <TextInput value={row.subject} onChange={(e) => updateQual(row.id, "subject", e.target.value)} />
+                              </td>
+                              <td style={{ padding: "6px 4px" }}>
+                                <TextInput value={row.university} onChange={(e) => updateQual(row.id, "university", e.target.value)} />
+                              </td>
+                              <td style={{ padding: "6px 4px" }}>
+                                <TextInput value={row.regNo} onChange={(e) => updateQual(row.id, "regNo", e.target.value)} />
+                              </td>
+                              <td style={{ padding: "6px 4px", width: 80 }}>
+                                <TextInput value={row.year} onChange={(e) => updateQual(row.id, "year", e.target.value)} />
+                              </td>
+                              <td style={{ padding: "6px 4px", width: 80 }}>
+                                <TextInput value={row.cls} onChange={(e) => updateQual(row.id, "cls", e.target.value)} />
+                              </td>
+                              <td style={{ padding: "6px 4px" }}>
+                                <button type="button" onClick={() => removeQual(row.id)} className="text-xs" style={{ color: "var(--rust)", background: "none", border: "none", cursor: "pointer" }}>
+                                  remove
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div style={{ marginTop: 24 }}>
+                      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "var(--ink)", marginBottom: 16 }}>
+                        <input type="checkbox" checked={data.working} onChange={set("working")} />
+                        Currently working
+                      </label>
+                      {data.working && (
+                        <Field label="Name of the college / institution currently working at">
+                          <TextInput value={data.institutionName} onChange={set("institutionName")} />
+                        </Field>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div>
+                    <Field label="Guide (supervisor)" hint="Selected from approved guide list — populated by admin">
+                      <TextInput placeholder="Search guide by name / department" value={data.guide} onChange={set("guide")} />
+                    </Field>
+                    <Field label="Co-guide" hint="Optional">
+                      <TextInput placeholder="Search co-guide by name / department" value={data.coGuide} onChange={set("coGuide")} />
+                    </Field>
+                    <div style={{ fontSize: 12.5, color: "#8A8375", marginTop: 8 }}>
+                      Guide consent status: <span style={{ color: "var(--brass)" }}>pending</span> — the guide verifies and signs your application at the review stage.
+                    </div>
+                  </div>
+                )}
+
+                {step === 4 && (
+                  <div>
+                    <div
                       style={{
-                        padding: '10px 22px', borderRadius: 8,
-                        border: 'none',
-                        background: `linear-gradient(135deg, ${C.maroon}, ${C.maroonDeep})`,
-                        color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                        border: "1px solid var(--parchment-line)",
+                        padding: "16px 18px",
+                        fontSize: 13.5,
+                        lineHeight: 1.7,
+                        color: "var(--ink)",
+                        marginBottom: 16,
+                        fontFamily: "var(--font-display)",
+                        fontStyle: "italic",
                       }}
                     >
-                      Next 
+                      I declare that all the particulars furnished above are correct and I submit that I will abide by the rules and regulations of the college.
+                    </div>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, marginBottom: 4 }}>
+                      <input type="checkbox" checked={data.declarationAccepted} onChange={set("declarationAccepted")} />
+                      I accept the declaration above
+                    </label>
+                    {errors.declarationAccepted && (
+                      <div style={{ color: "var(--rust)", fontSize: 12, marginBottom: 16 }}>{errors.declarationAccepted}</div>
+                    )}
+                    <div style={{ marginTop: 24 }}>
+                      <SignaturePad label="Scholar's signature" value={signature} onChange={setSignature} />
+                      {errors.signature && (
+                        <div style={{ color: "var(--rust)", fontSize: 12, marginTop: 8 }}>{errors.signature}</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {step === 5 && (
+                  <div>
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: 16, color: "var(--oxblood-deep)", marginBottom: 14, fontWeight: "bold" }}>
+                      Review before submitting
+                    </div>
+                    {[
+                      ["Subject", data.subject],
+                      ["Name", data.fullName],
+                      ["Sex", data.gender],
+                      ["Date of birth", data.dob],
+                      ["Religion", data.religion],
+                      ["Community", data.community],
+                      ["Email", data.email],
+                      ["Mobile", data.mobile1],
+                      ["Address", [data.street, data.city, data.district, data.state, data.pincode].filter(Boolean).join(", ")],
+                      ["Last college", data.lastCollege],
+                      ["Last university", data.lastUniversity],
+                      ["Qualifications", `${quals.filter((q) => q.programme).length} row(s) entered`],
+                      ["Guide", data.guide || "not selected"],
+                      ["Co-guide", data.coGuide || "—"],
+                      ["Signature", signature ? "captured" : "missing"],
+                    ].map(([k, v]) => (
+                      <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--parchment-line)", fontSize: 13.5 }}>
+                        <span style={{ color: "#8A8375" }}>{k}</span>
+                        <span style={{ color: "var(--ink)", fontWeight: 500, textAlign: "right", maxWidth: "60%" }}>{v || "—"}</span>
+                      </div>
+                    ))}
+                    <div style={{ marginTop: 18, fontSize: 12.5, color: "var(--sage)" }}>
+                      Once submitted, an admin will review your application and assign a guide.
+                    </div>
+                  </div>
+                )}
+
+                {/* Nav */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--parchment-line)" }}>
+                  <button type="button" className="btn-ghost" onClick={goBack} disabled={step === 0} style={step === 0 ? { opacity: 0.4, cursor: "default" } : {}}>
+                    Back
+                  </button>
+                  {step < STEPS.length - 1 ? (
+                    <button type="button" className="btn-primary" onClick={goNext}>
+                      Continue
                     </button>
                   ) : (
-                    <button
-                      onClick={handleSubmit}
-                      disabled={submitting}
-                      style={{
-                        padding: '10px 24px', borderRadius: 8,
-                        border: 'none',
-                        background: submitting ? '#aaa' : `linear-gradient(135deg, ${C.good}, #166A3A)`,
-                        color: '#fff', fontWeight: 700, fontSize: 14,
-                        cursor: submitting ? 'not-allowed' : 'pointer',
-                        display: 'flex', alignItems: 'center', gap: 8,
-                      }}
-                    >
-                      {submitting ? 'Submitting...' : ' Submit Registration'}
+                    <button type="button" className="btn-primary" onClick={handleSubmit} disabled={submitting}>
+                      {submitting ? "Submitting..." : "Submit application"}
                     </button>
                   )}
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

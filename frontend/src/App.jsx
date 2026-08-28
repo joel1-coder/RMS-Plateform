@@ -96,12 +96,12 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={
         isAuthenticated && user?.role && ['admin', 'scholar', 'supervisor', 'hod', 'drc'].includes(user.role.toLowerCase()) 
-          ? <Navigate to={`/${user.role.toLowerCase()}`} replace /> 
+          ? <Navigate to={user?.isTestAccount ? "/register" : `/${user.role.toLowerCase()}`} replace /> 
           : <LoginPage />
       } />
       <Route path="/" element={
         isAuthenticated && user?.role && ['admin', 'scholar', 'supervisor', 'hod', 'drc'].includes(user.role.toLowerCase()) 
-          ? <Navigate to={`/${user.role.toLowerCase()}`} replace /> 
+          ? <Navigate to={user?.isTestAccount ? "/register" : `/${user.role.toLowerCase()}`} replace /> 
           : <LandingPage />
       } />
 
