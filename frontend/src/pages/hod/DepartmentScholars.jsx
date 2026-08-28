@@ -1,34 +1,57 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
+import { useAuth } from '../../context/AuthContext'
+import { Link } from 'react-router-dom'
 
-const scholars = [
-  { id: 'REG-2023-001', name: 'Ethan Sterling', email: 'e.sterling@university.edu', area: 'Quantum Computing', supervisor: 'Dr. Alan Turing Jr.', status: 'Active' },
-  { id: 'REG-2023-014', name: 'Sarah Jenkins', email: 's.jenkins@university.edu', area: 'Machine Learning', supervisor: null, status: 'On Hold' },
-  { id: 'REG-2021-088', name: 'Marcus Thorne', email: 'm.thorne@university.edu', area: 'Biotechnology', supervisor: 'Dr. Linda Gray', status: 'Completed' },
-  { id: 'REG-2023-042', name: 'Ananya Gupta', email: 'a.gupta@university.edu', area: 'Renewable Energy', supervisor: 'Dr. Robert Chen', status: 'Active' },
-  { id: 'REG-2022-055', name: 'Liam Chen', email: 'l.chen@university.edu', area: 'Cybersecurity', supervisor: 'Dr. Wei Zhang', status: 'Active' },
-  { id: 'REG-2022-031', name: 'Priya Nair', email: 'p.nair@university.edu', area: 'Data Science', supervisor: null, status: 'On Hold' },
-]
-
-const STATUS_COLORS = { Active: 'badge-success', Completed: 'badge-info', 'On Hold': 'badge-warning' }
+const STATUS_COLORS = { Active: 'badge-success', Completed: 'badge-info', 'On Hold': 'badge-warning', Inactive: 'badge-danger' }
 const AREA_COLORS = { 'Quantum Computing': '#174EA6', 'Machine Learning': '#174EA6', 'Biotechnology': '#1E7D45', 'Renewable Energy': '#C89B1E', 'Cybersecurity': '#B4232A', 'Data Science': '#B4232A' }
 
 export default function DepartmentScholars() {
+  const { user } = useAuth()
+  const [scholars, setScholars] = useState([])
+  const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('All')
   const [areaFilter, setAreaFilter] = useState('All Areas')
   const [search, setSearch] = useState('')
-  const [selected, setSelected] = useState(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('rms_token')
+        const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
+        const res = await fetch(`/api/users?role=scholar${deptFilter}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (!res.ok) throw new Error('Failed to fetch scholars')
+        const data = await res.json()
+        setScholars(data)
+      } catch (err) {
+        toast.error('Failed to load department scholars')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [user?.dept])
 
   const filtered = scholars.filter(s => {
     const matchStatus = statusFilter === 'All' || s.status === statusFilter
-    const matchArea = areaFilter === 'All Areas' || s.area === areaFilter
-    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.id.toLowerCase().includes(search.toLowerCase())
+    const sArea = s.profile?.area || 'N/A'
+    const matchArea = areaFilter === 'All Areas' || sArea === areaFilter
+    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || 
+                        (s.profile?.regNo || '').toLowerCase().includes(search.toLowerCase())
     return matchStatus && matchArea && matchSearch
   })
 
   const total = scholars.length
-  const unassigned = scholars.filter(s => !s.supervisor).length
+  const unassigned = scholars.filter(s => !s.assignedSupervisorId).length
   const completed = scholars.filter(s => s.status === 'Completed').length
+
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div className="spinner" style={{ borderColor: 'rgba(23,78,166,0.18)', borderTopColor: '#174EA6' }} />
+    </div>
+  )
 
   return (
     <div className="animate-fade">
@@ -58,7 +81,7 @@ export default function DepartmentScholars() {
           </div>
           <select className="form-control form-select" style={{ width: '160px' }} value={areaFilter} onChange={e => setAreaFilter(e.target.value)}>
             <option value="All Areas">All Areas</option>
-            {[...new Set(scholars.map(s => s.area))].map(a => <option key={a} value={a}>{a}</option>)}
+            {[...new Set(scholars.map(s => s.profile?.area).filter(Boolean))].map(a => <option key={a} value={a}>{a}</option>)}
           </select>
           <button className="btn btn-ghost btn-sm">More Filters</button>
           <button className="btn btn-ghost btn-sm"> Export CSV</button>
@@ -82,36 +105,40 @@ export default function DepartmentScholars() {
                   <tr key={s.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div className="avatar avatar-sm" style={{ background: AREA_COLORS[s.area] || '#174EA6' }}>{s.name.charAt(0)}</div>
+                        <div className="avatar avatar-sm" style={{ background: AREA_COLORS[s.profile?.area] || '#174EA6' }}>{s.name.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{s.name}</div>
                           <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td style={{ fontSize: '12.5px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{s.id}</td>
+                    <td style={{ fontSize: '12.5px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{s.profile?.regNo || 'N/A'}</td>
                     <td>
-                      <span style={{ padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: 700, background: `${AREA_COLORS[s.area]}18`, color: AREA_COLORS[s.area] }}>
-                        {s.area}
+                      <span style={{ padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: 700, background: `${AREA_COLORS[s.profile?.area] || '#64748b'}18`, color: AREA_COLORS[s.profile?.area] || '#64748b' }}>
+                        {s.profile?.area || 'N/A'}
                       </span>
                     </td>
                     <td>
-                      {s.supervisor ? (
-                        <span style={{ fontSize: '12.5px', fontWeight: 600 }}>{s.supervisor}</span>
+                      {s.assignedSupervisor ? (
+                        <span style={{ fontSize: '12.5px', fontWeight: 600 }}>{s.assignedSupervisor}</span>
                       ) : (
-                        <button className="btn btn-warning btn-sm" style={{ fontSize: '11px', padding: '3px 10px', background: '#FFF6D8', color: '#936C00', border: '1px solid #FCD34D' }}>
-                          Assign Supervisor
-                        </button>
+                        <Link to="/hod/allocations" style={{ textDecoration: 'none' }}>
+                          <button className="btn btn-warning btn-sm" style={{ fontSize: '11px', padding: '3px 10px', background: '#FFF6D8', color: '#936C00', border: '1px solid #FCD34D' }}>
+                            Assign Supervisor
+                          </button>
+                        </Link>
                       )}
                     </td>
                     <td>
-                      <span className={`badge ${STATUS_COLORS[s.status]}`}>{s.status}</span>
+                      <span className={`badge ${STATUS_COLORS[s.status] || 'badge-secondary'}`}>{s.status}</span>
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '4px' }}>
                         <button className="btn btn-ghost btn-sm" title="View"></button>
                         <button className="btn btn-ghost btn-sm" title="Edit"></button>
-                        <button className="btn btn-ghost btn-sm" title="Reassign"></button>
+                        {s.assignedSupervisorId && (
+                          <button className="btn btn-ghost btn-sm" title="Reassign" onClick={() => toast('Go to Allocations tab to reassign')}></button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -123,9 +150,9 @@ export default function DepartmentScholars() {
           {/* Summary Row */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', padding: '16px 20px', borderTop: '1px solid var(--border)', background: '#FAFBFF' }}>
             {[
-              { label: 'TOTAL SCHOLARS', value: total, sub: '+10% this semester', icon: '', color: '#174EA6' },
+              { label: 'TOTAL SCHOLARS', value: total, sub: 'In Department', icon: '', color: '#174EA6' },
               { label: 'UNASSIGNED', value: unassigned, sub: 'Requires attention', icon: '', color: '#B4232A' },
-              { label: 'COMPLETED YTD', value: completed, sub: 'On track for annual target', icon: '', color: '#1E7D45' },
+              { label: 'COMPLETED', value: completed, sub: 'Successfully defended', icon: '', color: '#1E7D45' },
             ].map((s, i) => (
               <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '10px', borderRadius: 'var(--radius-md)', background: '#fff', boxShadow: 'var(--shadow-sm)' }}>
                 <span style={{ fontSize: '22px' }}>{s.icon}</span>
