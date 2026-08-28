@@ -159,6 +159,70 @@ const getAdminDashboardStats = asyncHandler(async (req, res) => {
   });
 });
 
+const getHodDashboardStats = asyncHandler(async (req, res) => {
+  const dept = req.user.dept;
+  if (!dept) {
+    throw new AppError('Department not found for user', 400);
+  }
+
+  const [
+    totalScholars,
+    supervisors,
+    fullTimeScholars,
+    partTimeScholars,
+    activeResearch,
+    completedResearch,
+    recentUsers,
+    recentProjects
+  ] = await Promise.all([
+    User.countDocuments({ role: 'scholar', dept }),
+    User.countDocuments({ role: 'supervisor', dept }),
+    User.countDocuments({ role: 'scholar', dept, 'profile.category': 'Full Time' }),
+    User.countDocuments({ role: 'scholar', dept, 'profile.category': 'Part Time' }),
+    ResearchProject.countDocuments({ department: dept, status: 'Active' }),
+    ResearchProject.countDocuments({ department: dept, status: 'Completed' }),
+    User.find({ dept }).sort({ _id: -1 }).limit(3),
+    ResearchProject.find({ department: dept }).sort({ _id: -1 }).limit(3)
+  ]);
+
+  const deptSummary = [
+    { name: 'Full Time', value: fullTimeScholars || 0, fill: '#174EA6' },
+    { name: 'Part Time', value: partTimeScholars || 0, fill: '#174EA6' },
+    { name: 'Research\nCompleted', value: completedResearch || 0, fill: '#1E7D45' },
+    { name: 'Projects\nOn Hold', value: await ResearchProject.countDocuments({ department: dept, status: 'On Hold' }) || 0, fill: '#C89B1E' }
+  ];
+
+  const recentActivities = [];
+  recentUsers.forEach(u => {
+    recentActivities.push({
+      id: `u-${u._id}`,
+      text: `New ${u.role}: ${u.name} joined the department.`,
+      time: 'Recent - HR Update',
+      color: '#174EA6'
+    });
+  });
+
+  recentProjects.forEach(p => {
+    recentActivities.push({
+      id: `p-${p._id}`,
+      text: `Research Update: ${p.title} status changed to ${p.status}.`,
+      time: 'Recent - Project Update',
+      color: p.status === 'Completed' ? '#1E7D45' : '#C89B1E'
+    });
+  });
+
+  res.json({
+    stats: {
+      totalScholars,
+      supervisors,
+      activeResearch,
+      completedResearch
+    },
+    deptSummary,
+    recentActivities: recentActivities.slice(0, 4)
+  });
+});
+
 const scholarReport = asyncHandler(async (req, res) => {
   // TODO: VERIFY_INFERENCE Route is present in route-map.json but absent from api-spec.json.
   const name = new RegExp(req.query.name, 'i');
@@ -189,4 +253,4 @@ const generateReport = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { getAdminDashboardStats, scholarReport, generateReport };
+module.exports = { getAdminDashboardStats, getHodDashboardStats, scholarReport, generateReport };

@@ -1,34 +1,83 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-
-const unassignedScholars = [
-  { id: 'REG-2023-091', name: 'Alex Mercer', area: 'Quantum Computing', tags: ['MACHINE LEARNING', 'EMBEDDED SYSTEMS'], topic: 'Optimization of Superconducting Qubits using AI', color: '#174EA6' },
-  { id: 'REG-2023-014', name: 'Elena Rodriguez', area: 'Quantum Computing', tags: ['QUANTUM COMPUTING'], topic: 'Find-Short Protocols for Quantum Data', color: '#174EA6' },
-  { id: 'REG-2022-077', name: 'Chen Wei', area: 'Cybersecurity', tags: ['CYBERSECURITY', 'BLOCKCHAIN'], topic: 'Distributed Speciality System in Wei', color: '#B4232A' },
-  { id: 'REG-2023-119', name: 'Jordan Smith', area: 'Data Science', tags: ['NLP', 'AI/ML'], topic: 'Transformer Models for Real-time Translation', color: '#1E7D45' },
-]
-
-const facultyPool = [
-  { id: 'FAC-001', name: 'Dr. Sarah Jenkins', dept: 'Senior Scientist - Computer Science', available: true, tags: ['MACHINE LEARNING', 'EMBEDDED SYSTEMS'], scholars: 4, maxScholars: 8, color: '#174EA6' },
-  { id: 'FAC-002', name: 'Prof. Liam Vance', dept: 'Lead Researcher - 1 Quarter', available: false, tags: ['QUANTUM COMPUTING'], scholars: 7, maxScholars: 8, color: '#174EA6' },
-  { id: 'FAC-003', name: 'Dr. Maria Santos', dept: 'Asst. Professor - Information Technology', available: true, tags: ['risk', 'blockchain'], scholars: 2, maxScholars: 5, color: '#1E7D45' },
-]
+import { useAuth } from '../../context/AuthContext'
 
 export default function HODAllocations() {
-  const [scholars, setScholars] = useState(unassignedScholars)
-  const [faculty, setFaculty] = useState(facultyPool)
+  const { user } = useAuth()
+  const [scholars, setScholars] = useState([])
+  const [faculty, setFaculty] = useState([])
   const [selectedScholar, setSelectedScholar] = useState(null)
   const [selectedFaculty, setSelectedFaculty] = useState(null)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  const handleConfirm = () => {
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem('rms_token')
+      const headers = { Authorization: `Bearer ${token}` }
+      const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
+
+      const [scholarsRes, facultyRes] = await Promise.all([
+        fetch(`/api/users?role=scholar${deptFilter}`, { headers }),
+        fetch(`/api/users?role=supervisor${deptFilter}`, { headers })
+      ])
+
+      const scholarsData = await scholarsRes.json()
+      const facultyData = await facultyRes.json()
+
+      const unassigned = scholarsData.filter(s => !s.assignedSupervisorId)
+      
+      const facultyWithWorkload = facultyData.map(f => {
+        const scholarsCount = scholarsData.filter(s => s.assignedSupervisorId === (f.id || f._id)).length
+        return {
+          id: f.id || f._id,
+          name: f.name,
+          dept: f.dept,
+          available: scholarsCount < 8,
+          tags: f.profile?.area ? [f.profile.area] : [],
+          scholars: scholarsCount,
+          maxScholars: 8,
+          color: '#174EA6'
+        }
+      })
+
+      setScholars(unassigned)
+      setFaculty(facultyWithWorkload)
+    } catch (err) {
+      toast.error('Failed to load allocation data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [user?.dept])
+
+  const handleConfirm = async () => {
     if (!selectedScholar || !selectedFaculty) { toast.error('Please select both a scholar and a faculty member'); return }
-    toast.success(`${selectedScholar.name} assigned to ${selectedFaculty.name}!`)
-    setScholars(prev => prev.filter(s => s.id !== selectedScholar.id))
-    setFaculty(prev => prev.map(f => f.id === selectedFaculty.id ? { ...f, scholars: f.scholars + 1 } : f))
-    setSelectedScholar(null)
-    setSelectedFaculty(null)
-    setShowConfirmModal(false)
+    
+    try {
+      const token = localStorage.getItem('rms_token')
+      const res = await fetch(`/api/users/${selectedScholar.id || selectedScholar._id}/assign-supervisor`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ supervisorId: selectedFaculty.id })
+      })
+
+      if (!res.ok) throw new Error('Failed to assign supervisor')
+
+      toast.success(`${selectedScholar.name} assigned to ${selectedFaculty.name}!`)
+      fetchData() // Refresh data
+      setSelectedScholar(null)
+      setSelectedFaculty(null)
+      setShowConfirmModal(false)
+    } catch (err) {
+      toast.error(err.message || 'Error assigning supervisor')
+    }
   }
 
   return (

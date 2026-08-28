@@ -1,18 +1,8 @@
+import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-
-const deptSummary = [
-  { name: 'Full Time', value: 210, fill: '#174EA6' },
-  { name: 'Part Time', value: 85, fill: '#174EA6' },
-  { name: 'Research\nCompleted', value: 125, fill: '#1E7D45' },
-  { name: 'Projects\nOn Hold', value: 42, fill: '#C89B1E' },
-]
-
-const recentActivity = [
-  { icon: '', text: 'Thesis Submission: Arjun Mehta uploaded Phase II documentation.', time: '2 hours ago - Machine Learning', color: '#174EA6' },
-  { icon: '', text: 'Grant Approved: Quantum Computing Lab secured $45k funding.', time: '5 hours ago - Department News', color: '#1E7D45' },
-  { icon: '', text: 'New Supervisor: Dr. Sarah Chen joined the AI research wing.', time: 'Yesterday - HR Update', color: '#174EA6' },
-  { icon: '', text: 'Deadline Alert: Annual Progress Reports due in 3 days.', time: 'Yesterday - Administration', color: '#C89B1E' },
-]
+import toast from 'react-hot-toast'
+import { useAuth } from '../../context/AuthContext'
+import { Link } from 'react-router-dom'
 
 const milestones = [
   { icon: '', label: 'PROGRESS REVIEW', title: 'Ph.D. Batch 2021', sub: 'Status: In Preparation', date: 'Oct 25', urgent: false },
@@ -21,6 +11,36 @@ const milestones = [
 ]
 
 export default function HODDashboard() {
+  const { user } = useAuth()
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('rms_token')
+        const res = await fetch('/api/reports/hod-dashboard', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (!res.ok) throw new Error('Failed to fetch dashboard data')
+        const result = await res.json()
+        setData(result)
+      } catch (err) {
+        toast.error('Failed to load dashboard statistics')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  if (loading || !data) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div className="spinner" style={{ borderColor: 'rgba(23,78,166,0.18)', borderTopColor: '#174EA6' }} />
+    </div>
+  )
+
+  const { stats, deptSummary, recentActivities } = data
   return (
     <div className="animate-fade">
       {/* Topbar */}
@@ -53,31 +73,33 @@ export default function HODDashboard() {
             <button className="btn btn-ghost btn-sm" style={{ color: '#E8EEF8', borderColor: 'rgba(232,238,248,0.3)' }}>
                Export Report
             </button>
-            <button style={{
-              padding: '9px 18px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
-              background: 'linear-gradient(90deg, #174EA6, #0A2A66)', color: '#fff',
-              fontSize: '13px', fontWeight: 700, boxShadow: '0 4px 12px rgba(23,78,166,0.28)',
-            }}>
-              + New Allocation
-            </button>
+            <Link to="/hod/allocations" style={{ textDecoration: 'none' }}>
+              <button style={{
+                padding: '9px 18px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
+                background: 'linear-gradient(90deg, #174EA6, #0A2A66)', color: '#fff',
+                fontSize: '13px', fontWeight: 700, boxShadow: '0 4px 12px rgba(23,78,166,0.28)',
+              }}>
+                + New Allocation
+              </button>
+            </Link>
           </div>
         </div>
 
         {/* KPI Cards */}
         <div className="stat-cards-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '24px' }}>
           {[
-            { label: 'Total Scholars', value: '420', sub: '+15% QoQ', icon: '', color: 'blue', trend: 'up' },
-            { label: 'Supervisors', value: '35', sub: 'Stable', icon: '', color: 'green', trend: 'neutral' },
-            { label: 'Ongoing Research', value: '385', sub: 'Active', icon: '', color: 'blue', trend: 'up' },
-            { label: 'Completed Research', value: '125', sub: '+12 Months', icon: '', color: 'orange', trend: 'up' },
+            { label: 'Total Scholars', value: stats.totalScholars, sub: 'In Department', icon: '', color: 'blue', trend: 'neutral' },
+            { label: 'Supervisors', value: stats.supervisors, sub: 'Active', icon: '', color: 'green', trend: 'neutral' },
+            { label: 'Ongoing Research', value: stats.activeResearch, sub: 'In Progress', icon: '', color: 'blue', trend: 'neutral' },
+            { label: 'Completed Research', value: stats.completedResearch, sub: 'Successfully Defended', icon: '', color: 'orange', trend: 'neutral' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
               <div className="stat-info">
                 <div className="stat-value">{s.value}</div>
                 <div className="stat-label">{s.label}</div>
-                <div style={{ fontSize: '11px', marginTop: '3px', color: s.sub === 'Stable' ? '#1E7D45' : s.sub === 'Active' ? '#174EA6' : '#C89B1E', fontWeight: 600 }}>
-                  {s.trend === 'up' ? 'Up' : 'Status'} {s.sub}
+                <div style={{ fontSize: '11px', marginTop: '3px', color: s.sub === 'Active' ? '#1E7D45' : '#174EA6', fontWeight: 600 }}>
+                  {s.sub}
                 </div>
               </div>
             </div>
@@ -121,15 +143,15 @@ export default function HODDashboard() {
               <span style={{ color: '#174EA6', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>View All</span>
             </div>
             <div style={{ padding: '4px 0' }}>
-              {recentActivity.map((act, i) => (
-                <div key={i} style={{ padding: '10px 20px', borderBottom: i < recentActivity.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: act.color, marginTop: '5px', flexShrink: 0 }} />
+              {recentActivities.length > 0 ? recentActivities.map((act, i) => (
+                <div key={i} style={{ padding: '10px 20px', borderBottom: i < recentActivities.length - 1 ? '1px solid var(--border)' : 'none', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: act.color || '#174EA6', marginTop: '5px', flexShrink: 0 }} />
                   <div>
                     <div style={{ fontSize: '12.5px', color: 'var(--text-primary)', lineHeight: 1.4, marginBottom: '2px' }}>{act.text}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{act.time}</div>
                   </div>
                 </div>
-              ))}
+              )) : <div style={{ padding: '20px', textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)' }}>No recent activity found.</div>}
             </div>
 
             {/* Next Milestone */}

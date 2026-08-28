@@ -11,6 +11,7 @@ const listUsers = asyncHandler(async (req, res) => {
   const filters = {};
   if (req.query.role) filters.role = req.query.role.toLowerCase();
   if (req.query.status) filters.status = req.query.status;
+  if (req.query.dept) filters.dept = req.query.dept;
   if (req.query.search) {
     const s = new RegExp(req.query.search, 'i');
     filters.$or = [{ name: s }, { email: s }];
