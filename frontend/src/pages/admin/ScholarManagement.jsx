@@ -1,499 +1,336 @@
-import React, { useState, useMemo } from "react";
-import { Plus, Trash2, Pencil, Save, X, Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
+import './ScholarManagement.css';
 
-// ---------------------------------------------------------------------------
-// CONCEPT: "constants outside the component"
-// Things that never change while the app is running (dropdown choices, column
-// definitions) are kept outside the component function. This way React does
-// not recreate them on every re-render - it's a small performance habit.
-// ---------------------------------------------------------------------------
-const DEPARTMENTS = [
-  "Computer Science",
-  "Physics",
-  "Chemistry",
-  "Mathematics",
-  "Commerce",
-  "English",
-  "Zoology",
-  "Botany",
-];
+const ROMAN_DC = ["I", "II", "III"];
+const ROMAN_EXT = ["I", "II"];
+const ROMAN_YEARS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 
-const REVIEW_STATUS = ["Pending", "In Review", "Approved", "Revision Needed"];
-const COMPLETION_STATUS = ["Ongoing", "Submitted", "Viva Completed", "Awarded"];
-
-// Every column the register needs. Keeping this as one list means the header
-// row and every data row can be built by looping over the SAME array -
-// so header and body can never drift out of sync.
 const COLUMNS = [
-  { key: "sno", label: "S.No", width: 60, type: "text", sticky: "left" },
-  { key: "registerNo", label: "Register No.", width: 130, type: "text" },
-  { key: "dateOfRegistration", label: "Date of Registration", width: 150, type: "date" },
-  { key: "scholarName", label: "Name of Scholar", width: 180, type: "text" },
-  { key: "dob", label: "Date of Birth", width: 130, type: "date" },
-  { key: "department", label: "Department", width: 160, type: "select", options: DEPARTMENTS },
-  { key: "title", label: "Title of Research", width: 240, type: "text" },
-  { key: "guideName", label: "Guide Name", width: 160, type: "text" },
-  { key: "coGuideName", label: "Co-Guide Name", width: 160, type: "text" },
-  { key: "address", label: "Residential Address", width: 220, type: "text" },
-  { key: "provisionalRegDate", label: "Date of Provisional Reg.", width: 170, type: "date" },
-  { key: "extension", label: "Extension", width: 110, type: "text" },
-  { key: "progressRemarks", label: "Progress Remarks", width: 200, type: "text" },
-  { key: "reviewStatus", label: "Review Status", width: 150, type: "select", options: REVIEW_STATUS },
-  { key: "vivaDate", label: "Date of Viva Voce", width: 150, type: "date" },
-  { key: "completionStatus", label: "Completion Status", width: 160, type: "select", options: COMPLETION_STATUS },
+  { key: "sNo", label: "S.No", group: null, type: "number", width: 50, sticky: true },
+  { key: "department", label: "Department", group: null, type: "select", width: 130, sticky: true, options: ["Biotechnology", "Chemistry", "Physics", "Computer Science", "Zoology", "Botany"] },
+  { key: "guideName", label: "Guide Name", group: null, type: "text", width: 140, sticky: true },
+  { key: "scholarName", label: "Name of the Scholar", group: null, type: "text", width: 170, sticky: true },
+  { key: "regNo", label: "Reg. No.", group: null, type: "text", width: 100 },
+  { key: "gender", label: "Gender", group: null, type: "select", width: 80, options: ["Male", "Female", "Other"] },
+  { key: "fullPartTime", label: "Full / Part Time", group: null, type: "select", width: 100, options: ["Full Time", "Part Time"] },
+  { key: "residentialAddress", label: "Residential Address", group: null, type: "text", width: 240 },
+  { key: "nationalityState", label: "Nationality & State", group: null, type: "text", width: 140 },
+  { key: "religionCommunity", label: "Religion & Community", group: null, type: "text", width: 140 },
+  { key: "dateOfBirth", label: "Date of Birth", group: null, type: "date", width: 110 },
+  { key: "mobileNo", label: "Mobile No.", group: null, type: "text", width: 110 },
+  { key: "universityRefNoWithYear", label: "University Ref. No. with Year of admission", group: null, type: "text", width: 210 },
+  ...ROMAN_DC.map((r) => ({ key: `dateOfDcMeeting.${r}`, parentKey: "dateOfDcMeeting", subKey: r, label: r, group: "Date of DC meeting", type: "date", width: 95 })),
+  ...ROMAN_EXT.map((r) => ({ key: `extension.${r}`, parentKey: "extension", subKey: r, label: r, group: "Extension", type: "dateOrMonths", width: 95 })),
+  ...ROMAN_YEARS.map((r) => ({ key: `feesPaymentDates.${r}`, parentKey: "feesPaymentDates", subKey: r, label: r, group: "Date of Fees Payment", type: "date", width: 95 })),
+  { key: "synopsisSubmittedOn", label: "Synopsis Submitted on", group: null, type: "date", width: 125 },
+  { key: "publicVivaOn", label: "Public Viva Voce on", group: null, type: "date", width: 125 },
+  { key: "remarks", label: "Remarks", group: null, type: "text", width: 170 },
 ];
 
-// A little starting data so the register isn't empty on first load.
-const INITIAL_DATA = [
-  {
-    id: 1,
-    sno: 1,
-    registerNo: "PHD/CS/001",
-    dateOfRegistration: "2022-06-14",
-    scholarName: "A. Karthikeyan",
-    dob: "1994-03-11",
-    department: "Computer Science",
-    title: "Energy-Aware Routing in Wireless Sensor Networks",
-    guideName: "Dr. R. Anand",
-    coGuideName: "",
-    address: "12 Gandhi Nagar, Trichy",
-    provisionalRegDate: "2022-07-01",
-    extension: "-",
-    progressRemarks: "Chapter 3 completed",
-    reviewStatus: "In Review",
-    vivaDate: "",
-    completionStatus: "Ongoing",
-  },
-  {
-    id: 2,
-    sno: 2,
-    registerNo: "PHD/PHY/014",
-    dateOfRegistration: "2021-01-20",
-    scholarName: "S. Meena",
-    dob: "1992-11-02",
-    department: "Physics",
-    title: "Thin Film Semiconductor Characterization",
-    guideName: "Dr. V. Prakash",
-    coGuideName: "Dr. N. Suresh",
-    address: "45 Bharathi Street, Thanjavur",
-    provisionalRegDate: "2021-02-05",
-    extension: "6 months",
-    progressRemarks: "Awaiting viva scheduling",
-    reviewStatus: "Approved",
-    vivaDate: "2026-09-10",
-    completionStatus: "Submitted",
-  },
-  {
-    id: 3,
-    sno: 3,
-    registerNo: "PHD/CHE/007",
-    dateOfRegistration: "2020-08-09",
-    scholarName: "R. Lakshmi Priya",
-    dob: "1991-05-27",
-    department: "Chemistry",
-    title: "Green Synthesis of Nanoparticles",
-    guideName: "Dr. K. Devi",
-    coGuideName: "",
-    address: "8 Kamaraj Road, Madurai",
-    provisionalRegDate: "2020-09-01",
-    extension: "-",
-    progressRemarks: "Awarded degree",
-    reviewStatus: "Approved",
-    vivaDate: "2025-12-18",
-    completionStatus: "Awarded",
-  },
-];
-
-// A blank row template used whenever "Add Scholar" is clicked.
-const emptyRow = (nextSno) =>
-  COLUMNS.reduce(
-    (row, col) => ({ ...row, [col.key]: "" }),
-    { id: Date.now(), sno: nextSno }
-  );
-
-const PAGE_SIZE = 8;
-
-export default function ScholarManagement() {
-  // ---------------------------------------------------------------------
-  // CONCEPT: "state"
-  // useState gives a component memory. `data` holds every row of the
-  // register. Whenever we call setData(...), React re-renders the table
-  // with the new array - that's the whole trick behind "live" UI.
-  // ---------------------------------------------------------------------
-  const [data, setData] = useState(INITIAL_DATA);
-
-  // Which row is currently being edited (its id), or null if none.
-  const [editingId, setEditingId] = useState(null);
-  // A scratch copy of the row being edited, so typing doesn't change the
-  // real table until "Save" is pressed.
-  const [draftRow, setDraftRow] = useState(null);
-
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-
-  // -----------------------------------------------------------------------
-  // CONCEPT: "derived state" with useMemo
-  // Instead of storing a separate "filteredData" in useState, we CALCULATE
-  // it from `data` and `search` every render. useMemo just avoids redoing
-  // that calculation unless data/search actually changed. This keeps the
-  // filtered list always correct - there's no way for it to go stale.
-  // -----------------------------------------------------------------------
-  const filteredData = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return data;
-    return data.filter(
-      (row) =>
-        (row.scholarName || "").toLowerCase().includes(q) ||
-        (row.registerNo || "").toLowerCase().includes(q) ||
-        (row.guideName || "").toLowerCase().includes(q)
-    );
-  }, [data, search]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
-  const pageData = filteredData.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  // ---- Row actions --------------------------------------------------------
-
-  function handleAddRow() {
-    const nextSno = data.length ? Math.max(...data.map((r) => r.sno)) + 1 : 1;
-    const newRow = emptyRow(nextSno);
-    setData((prev) => [...prev, newRow]);
-    setEditingId(newRow.id);
-    setDraftRow(newRow);
-    // Jump to the last page so the new row is visible immediately.
-    setPage(Math.ceil((filteredData.length + 1) / PAGE_SIZE));
+function getGroupedHeaderRows(columns) {
+  const topRow = [];
+  const bottomRow = [];
+  let i = 0;
+  while (i < columns.length) {
+    const col = columns[i];
+    if (col.group) {
+      let span = 0, j = i;
+      while (j < columns.length && columns[j].group === col.group) {
+        bottomRow.push({ label: columns[j].label, colKey: columns[j].key });
+        span++; j++;
+      }
+      topRow.push({ label: col.group, span, key: col.group });
+      i = j;
+    } else {
+      topRow.push({ label: col.label, span: 1, key: col.key, single: true });
+      bottomRow.push({ label: "", colKey: col.key, blank: true });
+      i++;
+    }
   }
-
-  function startEdit(row) {
-    setEditingId(row.id);
-    setDraftRow({ ...row }); // copy, so cancelling doesn't lose the original
-  }
-
-  function cancelEdit() {
-    setEditingId(null);
-    setDraftRow(null);
-  }
-
-  function saveEdit() {
-    setData((prev) => prev.map((r) => (r.id === draftRow.id ? draftRow : r)));
-    setEditingId(null);
-    setDraftRow(null);
-  }
-
-  function deleteRow(id) {
-    if (!window.confirm("Delete this scholar's record?")) return;
-    setData((prev) => prev.filter((r) => r.id !== id));
-  }
-
-  function updateDraft(key, value) {
-    setDraftRow((prev) => ({ ...prev, [key]: value }));
-  }
-
-  // ---- Export to CSV -------------------------------------------------------
-  // CONCEPT: A CSV file is just plain text with commas between values and a
-  // newline between rows. We build that text ourselves, wrap it in a Blob
-  // (an in-memory "file"), then trigger a browser download of it.
-  function exportCSV() {
-    const header = COLUMNS.map((c) => c.label).join(",");
-    const rows = filteredData.map((row) =>
-      COLUMNS.map((c) => `"${String(row[c.key] ?? "").replace(/"/g, '""')}"`).join(",")
-    );
-    const csvContent = [header, ...rows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "phd_scholar_register.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
-  return (
-    <div style={{ background: "#f7f6f3", minHeight: "100%", padding: "24px" }}>
-      <div style={{ maxWidth: "100%", margin: "0 auto" }}>
-        {/* ---------------- Header ---------------- */}
-        <div style={{ marginBottom: "16px" }}>
-          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#1f2937", fontFamily: "Georgia, serif" }}>
-            PhD Scholar Register
-          </h1>
-          <p style={{ fontSize: "13px", color: "#6b7280", marginTop: "2px" }}>
-            Digital record of scholar registration, progress and viva status
-          </p>
-        </div>
-
-        {/* ---------------- Toolbar ---------------- */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "10px",
-            alignItems: "center",
-            marginBottom: "10px",
-            padding: "10px 12px",
-            background: "#ffffff",
-            border: "1px solid #d1d5db",
-          }}
-        >
-          <div style={{ position: "relative", flex: "1 1 220px" }}>
-            <Search
-              size={15}
-              style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}
-            />
-            <input
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Search by name, register no., or guide"
-              style={{
-                width: "100%",
-                padding: "7px 8px 7px 28px",
-                border: "1px solid #d1d5db",
-                fontSize: "13px",
-                outline: "none",
-              }}
-            />
-          </div>
-
-          <button onClick={handleAddRow} style={btnStyle("#1f2937")}>
-            <Plus size={14} /> Add Scholar
-          </button>
-
-          <button onClick={exportCSV} style={btnStyle("#374151")}>
-            <Download size={14} /> Export CSV
-          </button>
-
-          <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "auto" }}>
-            {filteredData.length} record{filteredData.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-
-        {/* ---------------- Table ---------------- */}
-        <div
-          style={{
-            overflow: "auto",
-            maxHeight: "560px",
-            border: "1px solid #d1d5db",
-            background: "#ffffff",
-          }}
-        >
-          <table style={{ borderCollapse: "collapse", fontSize: "12.5px", width: "max-content" }}>
-            <thead>
-              <tr>
-                {COLUMNS.map((col) => (
-                  <th
-                    key={col.key}
-                    style={{
-                      position: "sticky",
-                      top: 0,
-                      left: col.sticky === "left" ? 0 : undefined,
-                      zIndex: col.sticky === "left" ? 3 : 2,
-                      minWidth: col.width,
-                      background: "#eef1f5",
-                      borderBottom: "2px solid #9ca3af",
-                      borderRight: "1px solid #d1d5db",
-                      padding: "8px 6px",
-                      textAlign: "left",
-                      fontWeight: 700,
-                      color: "#1f2937",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {col.label}
-                  </th>
-                ))}
-                <th
-                  style={{
-                    position: "sticky",
-                    top: 0,
-                    right: 0,
-                    zIndex: 3,
-                    minWidth: 90,
-                    background: "#eef1f5",
-                    borderBottom: "2px solid #9ca3af",
-                    borderLeft: "1px solid #d1d5db",
-                    padding: "8px 6px",
-                    textAlign: "center",
-                    fontWeight: 700,
-                    color: "#1f2937",
-                  }}
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {pageData.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={COLUMNS.length + 1}
-                    style={{ padding: "24px", textAlign: "center", color: "#9ca3af" }}
-                  >
-                    No matching records. Try a different search, or add a new scholar.
-                  </td>
-                </tr>
-              )}
-              {pageData.map((row, rowIdx) => {
-                const isEditing = editingId === row.id;
-                const activeRow = isEditing ? draftRow : row;
-                return (
-                  <tr key={row.id} style={{ background: rowIdx % 2 === 0 ? "#ffffff" : "#fafafa" }}>
-                    {COLUMNS.map((col) => (
-                      <td
-                        key={col.key}
-                        style={{
-                          position: col.sticky === "left" ? "sticky" : undefined,
-                          left: col.sticky === "left" ? 0 : undefined,
-                          zIndex: col.sticky === "left" ? 1 : undefined,
-                          background: col.sticky === "left" ? (rowIdx % 2 === 0 ? "#ffffff" : "#fafafa") : undefined,
-                          borderBottom: "1px solid #e5e7eb",
-                          borderRight: "1px solid #e5e7eb",
-                          padding: "5px 6px",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {isEditing && col.key !== "sno" ? (
-                          <EditableField col={col} value={activeRow[col.key]} onChange={updateDraft} />
-                        ) : (
-                          <span style={{ color: col.key === "sno" ? "#6b7280" : "#111827" }}>
-                            {activeRow[col.key] || "-"}
-                          </span>
-                        )}
-                      </td>
-                    ))}
-                    <td
-                      style={{
-                        position: "sticky",
-                        right: 0,
-                        background: rowIdx % 2 === 0 ? "#ffffff" : "#fafafa",
-                        borderBottom: "1px solid #e5e7eb",
-                        borderLeft: "1px solid #e5e7eb",
-                        padding: "5px 6px",
-                        textAlign: "center",
-                      }}
-                    >
-                      {isEditing ? (
-                        <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
-                          <button onClick={saveEdit} title="Save" style={iconBtnStyle("#15803d")}>
-                            <Save size={14} />
-                          </button>
-                          <button onClick={cancelEdit} title="Cancel" style={iconBtnStyle("#6b7280")}>
-                            <X size={14} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
-                          <button onClick={() => startEdit(row)} title="Edit" style={iconBtnStyle("#1f2937")}>
-                            <Pencil size={14} />
-                          </button>
-                          <button onClick={() => deleteRow(row.id)} title="Delete" style={iconBtnStyle("#b91c1c")}>
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ---------------- Pagination ---------------- */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginTop: "10px" }}>
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            style={iconBtnStyle("#1f2937", page === 1)}
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <span style={{ fontSize: "12.5px", color: "#374151" }}>
-            Page {page} of {totalPages}
-          </span>
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-            style={iconBtnStyle("#1f2937", page === totalPages)}
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return { topRow, bottomRow };
 }
 
-function EditableField({ col, value, onChange }) {
-  const baseStyle = {
-    width: "100%",
-    minWidth: col.width - 16,
-    padding: "4px 5px",
-    border: "1px solid #9ca3af",
-    fontSize: "12.5px",
-    outline: "none",
+function computeStickyOffsets(columns) {
+  const offsets = {};
+  let running = 0;
+  for (const col of columns) {
+    if (col.sticky) { offsets[col.key] = running; running += col.width; }
+  }
+  return offsets;
+}
+
+function getValue(row, key) {
+  if (!key.includes(".")) return row[key];
+  const [p, s] = key.split(".");
+  return (row[p] && row[p][s]) || "";
+}
+function setValue(row, key, value) {
+  const next = { ...row };
+  if (!key.includes(".")) { next[key] = value; }
+  else { const [p, s] = key.split("."); next[p] = { ...next[p], [s]: value }; }
+  return next;
+}
+
+const seed = [
+  {
+    sNo: 1, department: "Biotechnology", guideName: "Dr. A. Edward", scholarName: "Tisha Liza Tomy",
+    regNo: "2018BT101", gender: "Female", fullPartTime: "Part Time",
+    residentialAddress: "Nagercoil Villa House, Aranattukara - Eithuruth Road, Near Pipe Bus Stop, Laloor, Kerala - 680011",
+    nationalityState: "Indian, Kerala", religionCommunity: "RC & OC", dateOfBirth: "1988-12-04",
+    mobileNo: "9539722214", universityRefNoWithYear: "BDU/2103737/9371 & 26/08/2021",
+    dateOfDcMeeting: { I: "2022-01-14", II: "", III: "" }, extension: { I: "", II: "" },
+    feesPaymentDates: { I: "2022-01-09", II: "2022-10-28", III: "2023-11-01", IV: "", V: "", VI: "", VII: "", VIII: "" },
+    synopsisSubmittedOn: "", publicVivaOn: "", remarks: "",
+  },
+  { sNo: 2, department: "Biotechnology", guideName: "Dr. A. Edward", scholarName: "", regNo: "", gender: "", fullPartTime: "", residentialAddress: "", nationalityState: "", religionCommunity: "", dateOfBirth: "", mobileNo: "", universityRefNoWithYear: "", dateOfDcMeeting: { I: "", II: "", III: "" }, extension: { I: "", II: "" }, feesPaymentDates: { I: "", II: "", III: "", IV: "", V: "", VI: "", VII: "", VIII: "" }, synopsisSubmittedOn: "", publicVivaOn: "", remarks: "" },
+  { sNo: 3, department: "Biotechnology", guideName: "Dr. A. Edward", scholarName: "", regNo: "", gender: "", fullPartTime: "", residentialAddress: "", nationalityState: "", religionCommunity: "", dateOfBirth: "", mobileNo: "", universityRefNoWithYear: "", dateOfDcMeeting: { I: "", II: "", III: "" }, extension: { I: "", II: "" }, feesPaymentDates: { I: "", II: "", III: "", IV: "", V: "", VI: "", VII: "", VIII: "" }, synopsisSubmittedOn: "", publicVivaOn: "", remarks: "" },
+];
+
+function EditableCell({ row, col, isEditing, onStartEdit, onCancel, onCommit }) {
+  const value = getValue(row, col.key);
+  const [draft, setDraft] = useState(value ?? "");
+  const inputRef = useRef(null);
+
+  useEffect(() => { setDraft(value ?? ""); }, [value, isEditing]);
+  useEffect(() => { if (isEditing && inputRef.current) inputRef.current.focus(); }, [isEditing]);
+
+  const commit = (v) => onCommit(col.key, v);
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") commit(draft);
+    else if (e.key === "Escape") onCancel();
+  };
+
+  if (!isEditing) {
+    if (col.type === "date" && value) {
+      return (
+        <div onDoubleClick={onStartEdit} className="editable-date">
+          <span className={`dot ${col.group === "Date of Fees Payment" ? "dot-green" : "dot-gray"}`} />
+          <span>{value}</span>
+        </div>
+      );
+    }
+    if (col.group === "Date of Fees Payment" && !value) {
+      return (
+        <div onDoubleClick={onStartEdit} className="editable-date">
+          <span className="dot dot-red" />
+          <span className="text-red">Pending</span>
+        </div>
+      );
+    }
+    return (
+      <div onDoubleClick={onStartEdit} className="editable-cell-wrapper" title={value || "Double-click to edit"}>
+        {value || <span style={{ color: "#cbd5e1" }}>—</span>}
+      </div>
+    );
+  }
+
+  const common = {
+    ref: inputRef, value: draft, onChange: (e) => setDraft(e.target.value),
+    onKeyDown: handleKeyDown, onBlur: () => commit(draft),
+    className: "editable-input",
   };
 
   if (col.type === "select") {
     return (
-      <select value={value || ""} onChange={(e) => onChange(col.key, e.target.value)} style={baseStyle}>
-        <option value="">-</option>
-        {col.options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
+      <select {...common}>
+        <option value="">—</option>
+        {col.options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
     );
   }
-
-  if (col.type === "date") {
+  if (col.type === "date") return <input type="date" {...common} />;
+  if (col.type === "dateOrMonths") {
     return (
-      <input
-        type="date"
-        value={value || ""}
-        onChange={(e) => onChange(col.key, e.target.value)}
-        style={baseStyle}
-      />
+      <div className="flex-inputs">
+        <input type="date" {...common} />
+        <input type="number" placeholder="mo." value={draft && isNaN(Date.parse(draft)) ? draft : ""}
+          onChange={(e) => setDraft(e.target.value)} onKeyDown={handleKeyDown} onBlur={() => commit(draft)}
+          className="editable-input" />
+      </div>
     );
   }
+  if (col.type === "number") return <input type="number" {...common} />;
+  return <input type="text" {...common} />;
+}
 
+function LedgerHeader({ columns, stickyOffsets }) {
+  const { topRow, bottomRow } = getGroupedHeaderRows(columns);
   return (
-    <input
-      type="text"
-      value={value || ""}
-      onChange={(e) => onChange(col.key, e.target.value)}
-      style={baseStyle}
-    />
+    <thead>
+      <tr>
+        {topRow.map((h) => {
+          const firstCol = columns.find((c) => (h.single ? c.key === h.key : c.group === h.key));
+          const isSticky = firstCol && firstCol.sticky;
+          const stickyLeft = isSticky ? stickyOffsets[firstCol.key] : undefined;
+          return (
+            <th key={h.key} colSpan={h.span} rowSpan={h.single ? 2 : 1}
+              className={`ledger-th-top ${isSticky ? 'ledger-th-sticky-left' : ''}`}
+              style={stickyLeft !== undefined ? { left: stickyLeft } : undefined}>
+              {h.label}
+            </th>
+          );
+        })}
+        <th rowSpan={2} className="ledger-th-top ledger-th-sticky-right">Actions</th>
+      </tr>
+      <tr>
+        {bottomRow.filter((b) => !b.blank).map((b) => (
+          <th key={b.colKey} className="ledger-th-bottom">{b.label}</th>
+        ))}
+      </tr>
+    </thead>
   );
 }
 
-function btnStyle(bg) {
-  return {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    padding: "7px 12px",
-    background: bg,
-    color: "#ffffff",
-    border: "none",
-    fontSize: "12.5px",
-    fontWeight: 600,
-    cursor: "pointer",
-  };
-}
+export default function ScholarManagement() {
+  const [rows, setRows] = useState(seed);
+  const [editingCell, setEditingCell] = useState(null);
+  const [search, setSearch] = useState("");
+  const [department, setDepartment] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState("");
+  const [dcFilter, setDcFilter] = useState("");
 
-function iconBtnStyle(color, disabled) {
-  return {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "26px",
-    height: "26px",
-    background: "transparent",
-    border: `1px solid ${disabled ? "#e5e7eb" : color}`,
-    color: disabled ? "#d1d5db" : color,
-    cursor: disabled ? "not-allowed" : "pointer",
+  const stickyOffsets = useMemo(() => computeStickyOffsets(COLUMNS), []);
+  const departments = useMemo(() => [...new Set(rows.map((r) => r.department).filter(Boolean))], [rows]);
+
+  const filteredRows = useMemo(() => {
+    return rows.filter((row) => {
+      if (department && row.department !== department) return false;
+      if (paymentFilter) {
+        const years = Object.values(row.feesPaymentDates || {});
+        const anyPaid = years.some((v) => !!v);
+        if (paymentFilter === "paid" && !anyPaid) return false;
+        if (paymentFilter === "pending" && anyPaid && years.every((v) => !!v)) return false;
+      }
+      if (dcFilter) {
+        const dc = Object.values(row.dateOfDcMeeting || {});
+        const anyDone = dc.some((v) => !!v);
+        if (dcFilter === "completed" && !anyDone) return false;
+        if (dcFilter === "none" && anyDone) return false;
+      }
+      if (search) {
+        const q = search.toLowerCase();
+        const hay = [row.scholarName, row.regNo, row.guideName, row.remarks].join(" ").toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [rows, department, paymentFilter, dcFilter, search]);
+
+  const updateRow = (visibleIndex, nextRow) => {
+    const targetRow = filteredRows[visibleIndex];
+    const realIndex = rows.indexOf(targetRow);
+    setRows((prev) => { const copy = [...prev]; copy[realIndex] = nextRow; return copy; });
   };
+  const deleteRow = (visibleIndex) => {
+    const targetRow = filteredRows[visibleIndex];
+    setRows((prev) => prev.filter((r) => r !== targetRow));
+  };
+  const addRow = () => {
+    setRows((prev) => [...prev, {
+      sNo: prev.length + 1, department: "", guideName: "", scholarName: "", regNo: "", gender: "",
+      fullPartTime: "", residentialAddress: "", nationalityState: "", religionCommunity: "",
+      dateOfBirth: "", mobileNo: "", universityRefNoWithYear: "",
+      dateOfDcMeeting: { I: "", II: "", III: "" }, extension: { I: "", II: "" },
+      feesPaymentDates: { I: "", II: "", III: "", IV: "", V: "", VI: "", VII: "", VIII: "" },
+      synopsisSubmittedOn: "", publicVivaOn: "", remarks: "", _tempId: Math.random(),
+    }]);
+  };
+
+  const exportCsv = () => {
+    const flat = filteredRows.map((row) => {
+      const out = {};
+      for (const col of COLUMNS) {
+        if (col.key.includes(".")) {
+          const [p, s] = col.key.split(".");
+          out[`${col.group} ${s}`] = (row[p] && row[p][s]) || "";
+        } else out[col.label] = row[col.key] ?? "";
+      }
+      return out;
+    });
+    const headers = Object.keys(flat[0] || {});
+    const esc = (v) => { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+    const csv = [headers.map(esc).join(","), ...flat.map((r) => headers.map((h) => esc(r[h])).join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "phd_ledger.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="ledger-container">
+      <h1 className="ledger-title">
+        PhD Scholar Register
+      </h1>
+
+      <div className="ledger-toolbar">
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search scholar, reg. no., guide, remarks…"
+          className="search-input" />
+        <select value={department} onChange={(e) => setDepartment(e.target.value)}>
+          <option value="">All Departments</option>
+          {departments.map((d) => <option key={d} value={d}>{d}</option>)}
+        </select>
+        <select value={paymentFilter} onChange={(e) => setPaymentFilter(e.target.value)}>
+          <option value="">Payment: Any</option>
+          <option value="paid">Any Year Paid</option>
+          <option value="pending">Any Year Pending</option>
+        </select>
+        <select value={dcFilter} onChange={(e) => setDcFilter(e.target.value)}>
+          <option value="">DC Meeting: Any</option>
+          <option value="completed">At Least One Completed</option>
+          <option value="none">None Completed</option>
+        </select>
+        <div style={{ flex: 1 }} />
+        <button onClick={addRow} className="ledger-btn ledger-btn-primary">+ Add Row</button>
+        <button onClick={exportCsv} className="ledger-btn ledger-btn-secondary">Export CSV</button>
+        <button onClick={() => window.print()} className="ledger-btn ledger-btn-secondary">Download as Ledger PDF</button>
+      </div>
+
+      <div className="ledger-table-wrapper">
+        <table className="ledger-table">
+          <LedgerHeader columns={COLUMNS} stickyOffsets={stickyOffsets} />
+          <tbody>
+            {filteredRows.map((row, idx) => {
+              const rowClass = idx % 2 === 0 ? "ledger-tr-even" : "ledger-tr-odd";
+              return (
+                <tr key={row.regNo || row._tempId || idx} className={rowClass}>
+                  {COLUMNS.map((col) => {
+                    const cellId = `${idx}:${col.key}`;
+                    const isEditing = editingCell === cellId;
+                    const isSticky = col.sticky;
+                    return (
+                      <td key={col.key}
+                        style={{ 
+                          width: col.width, 
+                          minWidth: col.width, 
+                          left: isSticky ? stickyOffsets[col.key] : undefined,
+                          backgroundColor: isSticky ? (idx % 2 === 0 ? "#ffffff" : "#f8fafc") : undefined
+                        }}
+                        className={`ledger-td ${isSticky ? 'ledger-td-sticky-left' : ''}`}>
+                        <EditableCell row={row} col={col} isEditing={isEditing}
+                          onStartEdit={() => setEditingCell(cellId)}
+                          onCancel={() => setEditingCell(null)}
+                          onCommit={(key, value) => { updateRow(idx, setValue(row, key, value)); setEditingCell(null); }} />
+                      </td>
+                    );
+                  })}
+                  <td className={`ledger-td ledger-td-sticky-right`} style={{ backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f8fafc", textAlign: "center" }}>
+                    <button onClick={() => deleteRow(idx)} className="delete-btn">Delete</button>
+                  </td>
+                </tr>
+              );
+            })}
+            <tr>
+              <td colSpan={COLUMNS.length + 1} style={{ padding: 0 }}>
+                <button onClick={addRow} className="add-row-btn">+ Add Row</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div className="ledger-footer-text">
+        Showing {filteredRows.length} of {rows.length} scholars. Double-click any cell to edit, Enter to save, Esc to cancel. Use "+ Add Row" (top toolbar or bottom of table) to add a new blank scholar entry.
+      </div>
+    </div>
+  );
 }

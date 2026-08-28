@@ -1,0 +1,242 @@
+.ledger-container {
+  min-height: 100%;
+  background-color: #f1f5f9;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.ledger-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.ledger-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1px solid #cbd5e1;
+  border-bottom: 0;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.ledger-toolbar input,
+.ledger-toolbar select {
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  outline: none;
+}
+
+.ledger-toolbar input:focus,
+.ledger-toolbar select:focus {
+  border-color: #94a3b8;
+}
+
+.search-input {
+  width: 256px;
+}
+
+.ledger-btn {
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ledger-btn-primary {
+  background-color: #1e293b;
+  color: white;
+  font-weight: 600;
+  border: none;
+}
+.ledger-btn-primary:hover {
+  background-color: #334155;
+}
+
+.ledger-btn-secondary {
+  background-color: white;
+  border: 1px solid #94a3b8;
+  color: #334155;
+}
+.ledger-btn-secondary:hover {
+  background-color: #f1f5f9;
+}
+
+.ledger-table-wrapper {
+  border: 1px solid #cbd5e1;
+  overflow: auto;
+  max-height: calc(100vh - 200px); /* Adjust to not overflow dashboard */
+  background-color: white;
+}
+
+.ledger-table {
+  border-collapse: collapse;
+  width: max-content;
+}
+
+.ledger-th-top {
+  position: sticky;
+  top: 0;
+  background-color: #e2e8f0;
+  color: #334155;
+  border: 1px solid #94a3b8;
+  padding: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+
+.ledger-th-bottom {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #94a3b8;
+  padding: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Base sticky header rules */
+.ledger-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.ledger-th-sticky-left {
+  position: sticky;
+  z-index: 30;
+  left: 0;
+  background-color: #e2e8f0;
+}
+
+.ledger-th-sticky-right {
+  position: sticky;
+  z-index: 20;
+  right: 0;
+  background-color: #e2e8f0;
+}
+
+.ledger-tr-even {
+  background-color: #ffffff;
+}
+
+.ledger-tr-odd {
+  background-color: #f8fafc;
+}
+
+.ledger-td {
+  border: 1px solid #cbd5e1;
+  font-size: 11px;
+  height: 28px;
+  vertical-align: middle;
+  padding: 0; /* padding handled inside cell wrappers */
+}
+
+.ledger-td-sticky-left {
+  position: sticky;
+  z-index: 10;
+  /* background color will be applied inline to match row */
+}
+
+.ledger-td-sticky-right {
+  position: sticky;
+  right: 0;
+  z-index: 10;
+  background-color: inherit; /* will inherit row background */
+}
+
+.editable-cell-wrapper {
+  height: 100%;
+  width: 100%;
+  padding: 4px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: text;
+  box-sizing: border-box;
+}
+
+.editable-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  width: 100%;
+  cursor: text;
+}
+
+.dot {
+  display: inline-block;
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+}
+.dot-green { background-color: #10b981; }
+.dot-gray { background-color: #94a3b8; }
+.dot-red { background-color: #f87171; }
+.text-red { color: #f87171; font-size: 10px; }
+
+.editable-input {
+  width: 100%;
+  height: 100%;
+  padding: 2px 4px;
+  font-size: 11px;
+  border: 0;
+  outline: 1px solid #38bdf8;
+  background-color: #f0f9ff;
+  box-sizing: border-box;
+}
+
+.flex-inputs {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+.flex-inputs input {
+  width: 50%;
+}
+
+.delete-btn {
+  color: #ef4444;
+  background: none;
+  border: none;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.delete-btn:hover {
+  color: #b91c1c;
+  text-decoration: underline;
+}
+
+.add-row-btn {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #64748b;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.add-row-btn:hover {
+  color: #1e293b;
+  background-color: #f1f5f9;
+}
+
+.ledger-footer-text {
+  font-size: 11px;
+  color: #64748b;
+  padding: 8px 4px;
+}
