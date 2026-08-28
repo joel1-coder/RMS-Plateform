@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { useAuth } from '../../context/AuthContext'
 
 const pieData = [
   { name: 'AI/ML (40%)', value: 57, color: '#174EA6' },
@@ -19,11 +20,13 @@ const lineData = [
 ]
 
 const scholars = [
-  { id: 'REG-2023-034', name: 'Aravind Sharma', status: 'Active', statusClass: 'badge-success', supervisor: 'Dr. Robert Chen', area: 'Machine Learning' },
-  { id: 'REG-2021-089', name: 'Elena Rodriguez', status: 'Completed', statusClass: 'badge-info', supervisor: 'Prof. Sarah Jenkins', area: 'Artificial Intelligence' },
-  { id: 'REG-2022-112', name: 'Michael Kim', status: 'Under Review', statusClass: 'badge-warning', supervisor: 'Dr. Alan Turing', area: 'Cybersecurity' },
-  { id: 'REG-2023-002', name: 'Linda Wu', status: 'On Hold', statusClass: 'badge-danger', supervisor: 'Dr. Gregory House', area: 'Data Science' },
-  { id: 'REG-2023-045', name: 'James Wilson', status: 'Active', statusClass: 'badge-success', supervisor: 'Prof. Lisa Cuddy', area: 'Machine Learning' },
+  { id: 'REG-2023-034', name: 'Aravind Sharma', status: 'Active', statusClass: 'badge-success', supervisor: 'Dr. Robert Chen', area: 'Machine Learning', dept: 'Computer Science' },
+  { id: 'REG-2021-089', name: 'Elena Rodriguez', status: 'Completed', statusClass: 'badge-info', supervisor: 'Prof. Sarah Jenkins', area: 'Artificial Intelligence', dept: 'Computer Science' },
+  { id: 'REG-2022-112', name: 'Michael Kim', status: 'Under Review', statusClass: 'badge-warning', supervisor: 'Dr. Alan Turing', area: 'Cybersecurity', dept: 'Information Technology' },
+  { id: 'REG-2023-002', name: 'Linda Wu', status: 'On Hold', statusClass: 'badge-danger', supervisor: 'Dr. Gregory House', area: 'Data Science', dept: 'Mathematics' },
+  { id: 'REG-2023-045', name: 'James Wilson', status: 'Active', statusClass: 'badge-success', supervisor: 'Prof. Lisa Cuddy', area: 'Machine Learning', dept: 'Computer Science' },
+  { id: 'REG-2024-010', name: 'Priya Patel', status: 'Under Review', statusClass: 'badge-warning', supervisor: 'Dr. Robert Chen', area: 'Data Science', dept: 'Computer Science' },
+  { id: 'REG-2022-055', name: 'Rahul Desai', status: 'Active', statusClass: 'badge-success', supervisor: 'Prof. Lisa Cuddy', area: 'Robotics', dept: 'Mechanical' },
 ]
 
 const bottomKPIs = [
@@ -33,7 +36,12 @@ const bottomKPIs = [
 ]
 
 export default function HODReports() {
+  const { user } = useAuth()
   const [chartMode, setChartMode] = useState('Annual')
+
+  const filteredScholars = user?.dept && user.dept !== 'All'
+    ? scholars.filter(s => s.dept === user.dept)
+    : scholars
 
   return (
     <div className="animate-fade">
@@ -115,7 +123,7 @@ export default function HODReports() {
         <div className="card">
           <div className="card-header">
             <div className="card-title">Scholar Performance Summary</div>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Showing 1-10 of 143 scholars </span>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Showing {filteredScholars.length} scholars in {user?.dept || 'All'} Department </span>
           </div>
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
             <table className="table">
@@ -129,7 +137,7 @@ export default function HODReports() {
                 </tr>
               </thead>
               <tbody>
-                {scholars.map((s, i) => (
+                {filteredScholars.map((s, i) => (
                   <tr key={i}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
