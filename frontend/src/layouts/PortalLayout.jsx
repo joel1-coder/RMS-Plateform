@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
@@ -14,6 +15,7 @@ export default function PortalLayout({
 }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -21,11 +23,41 @@ export default function PortalLayout({
     navigate('/login')
   }
 
+  const closeMobile = () => setMobileOpen(false)
+
   return (
     <div className="app-layout">
-      <aside className="sidebar">
+      {/* Mobile Top Navigation Bar */}
+      <div className="mobile-header">
+        <button
+          onClick={() => setMobileOpen(prev => !prev)}
+          className="mobile-menu-btn"
+          aria-label="Toggle navigation menu"
+        >
+          <AppIcon name="menu" size={22} />
+        </button>
+        <div className="mobile-brand">
+          <InstitutionBrand title={title} subtitle={subtitle} size="sm" />
+        </div>
+        <div className="avatar avatar-sm">
+          {user?.name?.charAt(0) || userFallback}
+        </div>
+      </div>
+
+      {/* Backdrop overlay for mobile drawer */}
+      {mobileOpen && (
+        <div
+          className="mobile-overlay"
+          onClick={closeMobile}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar Navigation */}
+      <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
           <InstitutionBrand title={title} subtitle={subtitle} size="sm" />
+          <button className="mobile-close-btn" onClick={closeMobile}>✕</button>
         </div>
 
         {notice && (
@@ -47,6 +79,7 @@ export default function PortalLayout({
                   key={item.to}
                   to={item.to}
                   end={item.exact}
+                  onClick={closeMobile}
                   className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
                 >
                   <span className="nav-icon"><AppIcon name={item.icon} size={18} /></span>
