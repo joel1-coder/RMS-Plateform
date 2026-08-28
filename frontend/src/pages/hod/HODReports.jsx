@@ -1,59 +1,180 @@
-import { useState } from 'react'
-import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { useState, useEffect, useMemo } from 'react'
+import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useAuth } from '../../context/AuthContext'
+import { apiFetch } from '../../utils/api'
+import toast from 'react-hot-toast'
 
-const pieData = [
-  { name: 'AI/ML (40%)', value: 57, color: '#174EA6' },
-  { name: 'ML (25%)', value: 36, color: '#174EA6' },
-  { name: 'Data Sci (10%)', value: 14, color: '#C89B1E' },
-  { name: 'Cyber (9%)', value: 13, color: '#1E7D45' },
-  { name: 'Other (16%)', value: 22, color: '#E5E7EB' },
-]
+const COLOR_PALETTE = ['#174EA6', '#1E7D45', '#C89B1E', '#B4232A', '#6B1F2A', '#0A2A66', '#4C6B58']
 
 const lineData = [
-  { year: '2018', rate: 68 },
-  { year: '2019', rate: 72 },
-  { year: '2020', rate: 76 },
-  { year: '2021', rate: 81 },
-  { year: '2022', rate: 88 },
-  { year: '2023', rate: 94.2 },
-]
-
-const scholars = [
-  { id: 'REG-2023-034', name: 'Aravind Sharma', status: 'Active', statusClass: 'badge-success', supervisor: 'Dr. Robert Chen', area: 'Machine Learning', dept: 'Computer Science' },
-  { id: 'REG-2021-089', name: 'Elena Rodriguez', status: 'Completed', statusClass: 'badge-info', supervisor: 'Prof. Sarah Jenkins', area: 'Artificial Intelligence', dept: 'Computer Science' },
-  { id: 'REG-2022-112', name: 'Michael Kim', status: 'Under Review', statusClass: 'badge-warning', supervisor: 'Dr. Alan Turing', area: 'Cybersecurity', dept: 'Information Technology' },
-  { id: 'REG-2023-002', name: 'Linda Wu', status: 'On Hold', statusClass: 'badge-danger', supervisor: 'Dr. Gregory House', area: 'Data Science', dept: 'Mathematics' },
-  { id: 'REG-2023-045', name: 'James Wilson', status: 'Active', statusClass: 'badge-success', supervisor: 'Prof. Lisa Cuddy', area: 'Machine Learning', dept: 'Computer Science' },
-  { id: 'REG-2024-010', name: 'Priya Patel', status: 'Under Review', statusClass: 'badge-warning', supervisor: 'Dr. Robert Chen', area: 'Data Science', dept: 'Computer Science' },
-  { id: 'REG-2022-055', name: 'Rahul Desai', status: 'Active', statusClass: 'badge-success', supervisor: 'Prof. Lisa Cuddy', area: 'Robotics', dept: 'Mechanical' },
-]
-
-const bottomKPIs = [
-  { label: 'Yearly Projection', value: '+12.4%', sub: 'vs last year', icon: '', bg: '#F3F7FF', color: '#0A2A66' },
-  { label: 'Approval Rate', value: '94.2%', sub: 'High Efficiency', icon: '', bg: '#E7F4EC', color: '#166A3A' },
-  { label: 'Pending Reviews', value: '18', sub: 'Require attention', icon: '', bg: '#FFF6D8', color: '#936C00' },
+  { year: '2021', rate: 76 },
+  { year: '2022', rate: 82 },
+  { year: '2023', rate: 88 },
+  { year: '2024', rate: 91 },
+  { year: '2025', rate: 94.2 },
 ]
 
 export default function HODReports() {
   const { user } = useAuth()
+  const [scholars, setScholars] = useState([])
+  const [loading, setLoading] = useState(true)
   const [chartMode, setChartMode] = useState('Annual')
 
-  const filteredScholars = user?.dept && user.dept !== 'All'
-    ? scholars.filter(s => s.dept === user.dept)
-    : scholars
+  useEffect(() => {
+    fetchReportsData()
+  }, [user?.dept])
+
+  const fetchReportsData = async () => {
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('rms_token')
+      const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
+      const res = await apiFetch(`/api/users?role=scholar${deptFilter}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (!res.ok) throw new Error('Failed to load reports data')
+      const data = await res.json()
+      setScholars(Array.isArray(data) ? data : [])
+    } catch {
+      toast.error('Failed to load department report data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Dynamic pie chart generation based on research area breakdown
+  const pieData = useMemo(() => {
+    if (!scholars.length) {
+      return [{ name: 'No Scholars', value: 1, color: '#E5E7EB' }]
+    }
+    const counts = {}
+    scholars.forEach(s => {
+      const area = s.profile?.area || s.area || 'General Research'
+      counts[area] = (counts[area] || 0) + 1
+    })
+
+    const keys = Object.keys(counts)
+    return keys.map((key, index) => {
+      const pct = Math.round((counts[key] / scholars.length) * 100)
+      return {
+        name: `${key} (${pct}%)`,
+        value: counts[key],
+        color: COLOR_PALETTE[index % COLOR_PALETTE.length]
+      }
+    })
+  }, [scholars])
+
+  const activeCount = scholars.filter(s => s.status === 'Active').length
+  const completedCount = scholars.filter(s => s.status === 'Completed').length
+  const pendingCount = scholars.filter(s => !s.assignedSupervisorId).length
+
+  const bottomKPIs = [
+    { label: 'Total Scholars', value: scholars.length, sub: 'In Department', icon: '🎓', bg: '#F3F7FF', color: '#0A2A66' },
+    { label: 'Active Research', value: activeCount, sub: 'In Progress', icon: '⚡', bg: '#E7F4EC', color: '#166A3A' },
+    { label: 'Pending Assignment', value: pendingCount, sub: 'Requires Supervisor', icon: '⏳', bg: '#FFF6D8', color: '#936C00' },
+  ]
+
+  const handleExportExcel = () => {
+    if (!scholars.length) return toast.error('No scholar data to export')
+    const headers = ['Reg No', 'Scholar Name', 'Email', 'Department', 'Status', 'Supervisor', 'Research Area']
+    const rows = scholars.map(s => [
+      s.profile?.regNo || s._id || '-',
+      s.name,
+      s.email,
+      s.dept || user?.dept || 'Unknown',
+      s.status || 'Active',
+      s.assignedSupervisor || 'Unassigned',
+      s.profile?.area || 'N/A'
+    ])
+    
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.map(cell => `"${cell}"`).join(','))].join('\n')
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `Department_Scholars_Report_${user?.dept || 'All'}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success('Excel/CSV Report downloaded successfully!')
+  }
+
+  const handleDownloadPDF = () => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return toast.error('Please allow popups to generate PDF')
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Departmental Research Report - ${user?.dept || 'All Departments'}</title>
+        <style>
+          body { font-family: 'Times New Roman', serif; padding: 30px; line-height: 1.5; color: #222; }
+          h1 { color: #174EA6; text-align: center; font-size: 18pt; margin-bottom: 4px; }
+          h3 { text-align: center; color: #555; font-size: 11pt; margin-bottom: 24px; font-weight: normal; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px 10px; font-size: 10pt; text-align: left; }
+          th { background-color: #174EA6; color: white; text-transform: uppercase; font-size: 9pt; }
+          .kpi-container { display: flex; justify-content: space-between; margin-bottom: 24px; }
+          .kpi-box { width: 30%; border: 1px solid #174EA6; padding: 12px; text-align: center; border-radius: 6px; }
+          .kpi-num { font-size: 18pt; font-weight: bold; color: #174EA6; }
+          .kpi-lbl { font-size: 9pt; color: #555; text-transform: uppercase; }
+        </style>
+      </head>
+      <body onload="window.print();">
+        <h1>Research Management System - Departmental Report</h1>
+        <h3>Department of ${user?.dept || 'All Departments'} &nbsp;|&nbsp; Generated on: ${new Date().toLocaleDateString()}</h3>
+        
+        <div class="kpi-container">
+          <div class="kpi-box"><div class="kpi-num">${scholars.length}</div><div class="kpi-lbl">Total Scholars</div></div>
+          <div class="kpi-box"><div class="kpi-num">${activeCount}</div><div class="kpi-lbl">Active Research</div></div>
+          <div class="kpi-box"><div class="kpi-num">${completedCount}</div><div class="kpi-lbl">Completed</div></div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Reg No</th>
+              <th>Scholar Name</th>
+              <th>Status</th>
+              <th>Supervisor Name</th>
+              <th>Research Area</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${scholars.map(s => `
+              <tr>
+                <td>${s.profile?.regNo || s._id?.slice(-6) || '-'}</td>
+                <td><strong>${s.name}</strong><br/><span style="color:#666;font-size:8pt;">${s.email}</span></td>
+                <td>${s.status || 'Active'}</td>
+                <td>${s.assignedSupervisor || 'Unassigned'}</td>
+                <td>${s.profile?.area || 'General Research'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `)
+    printWindow.document.close()
+  }
+
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div className="spinner" style={{ borderColor: 'rgba(23,78,166,0.18)', borderTopColor: '#174EA6' }} />
+    </div>
+  )
 
   return (
     <div className="animate-fade">
       {/* Topbar */}
       <div className="topbar">
         <div>
-          <div style={{ fontWeight: 800, fontSize: '18px' }}>Research Management System</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Reports & Analytics - Departmental performance and research distribution overview</div>
+          <div style={{ fontWeight: 800, fontSize: '18px' }}>Departmental Research Reports</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Real-time analytics and research distribution overview for {user?.dept || 'Department'}</div>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm"> Export Excel</button>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}> Download PDF</button>
+          <button onClick={handleExportExcel} className="btn btn-ghost btn-sm">📊 Export Excel</button>
+          <button onClick={handleDownloadPDF} className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#174EA6,#0A2A66)' }}>📄 Download PDF</button>
         </div>
       </div>
 
@@ -63,7 +184,7 @@ export default function HODReports() {
           {/* Pie chart */}
           <div className="card">
             <div className="card-header">
-              <div className="card-title">Scholars by Research Area Info</div>
+              <div className="card-title">Scholars by Research Area</div>
             </div>
             <div className="card-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: '240px' }}>
               <div style={{ position: 'relative', width: '150px', height: '150px' }}>
@@ -75,11 +196,11 @@ export default function HODReports() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '26px', fontWeight: 800 }}>142</div>
+                  <div style={{ fontSize: '26px', fontWeight: 800 }}>{scholars.length}</div>
                   <div style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>TOTAL</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
                 {pieData.map((p, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: p.color, flexShrink: 0 }} />
@@ -104,7 +225,7 @@ export default function HODReports() {
                 ))}
               </div>
             </div>
-            <div style={{ padding: '0 16px 16px', fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '-4px' }}>Historical progression over the last 5 years</div>
+            <div style={{ padding: '0 16px 16px', fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '-4px' }}>Historical progression over recent batches</div>
             <div className="card-body" style={{ height: '200px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={lineData}>
@@ -123,7 +244,7 @@ export default function HODReports() {
         <div className="card">
           <div className="card-header">
             <div className="card-title">Scholar Performance Summary</div>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Showing {filteredScholars.length} scholars in {user?.dept || 'All'} Department </span>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Showing {scholars.length} scholars in {user?.dept || 'All'} Department </span>
           </div>
           <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
             <table className="table">
@@ -133,29 +254,36 @@ export default function HODReports() {
                   <th>Status</th>
                   <th>Supervisor Name</th>
                   <th>Research Area</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredScholars.map((s, i) => (
-                  <tr key={i}>
+                {scholars.map((s, i) => (
+                  <tr key={s._id || i}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div className="avatar avatar-sm" style={{ background: '#174EA6' }}>{s.name.charAt(0)}</div>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '13px' }}>{s.name}</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.id}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{s.profile?.regNo || s.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td><span className={`badge ${s.statusClass}`}>{s.status}</span></td>
-                    <td style={{ fontSize: '13px', fontWeight: 600 }}>{s.supervisor}</td>
-                    <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{s.area}</td>
                     <td>
-                      <button className="btn btn-ghost btn-sm">More</button>
+                      <span className={`badge ${s.status === 'Completed' ? 'badge-info' : s.status === 'Inactive' ? 'badge-danger' : 'badge-success'}`}>
+                        {s.status || 'Active'}
+                      </span>
                     </td>
+                    <td style={{ fontSize: '13px', fontWeight: 600 }}>{s.assignedSupervisor || 'Unassigned'}</td>
+                    <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{s.profile?.area || 'General Research'}</td>
                   </tr>
                 ))}
+                {scholars.length === 0 && (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                      No scholars found for this department.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -178,3 +306,4 @@ export default function HODReports() {
     </div>
   )
 }
+

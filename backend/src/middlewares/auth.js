@@ -22,13 +22,29 @@ function authenticate() {
       throw new AppError('Invalid or expired token', 401);
     }
 
-    const user = await User.findById(payload.id).select('role status dept name email');
+    let user = await User.findById(payload.id).select('role status dept name email');
+
+    if (!user) {
+      const TestAccount = require('../models/TestAccount.model');
+      const account = await TestAccount.findById(payload.id);
+      if (account && account.status === 'Active') {
+        user = {
+          _id: account._id,
+          role: 'scholar',
+          status: 'Active',
+          dept: 'Unknown',
+          name: account.applicantName,
+          email: account.applicantEmail,
+          isTestAccount: true
+        };
+      }
+    }
 
     if (!user || user.status !== 'Active') {
       throw new AppError('User is not authorized', 401);
     }
 
-    req.user = { id: user._id.toString(), role: user.role, dept: user.dept, name: user.name, email: user.email };
+    req.user = { id: user._id.toString(), role: user.role, dept: user.dept || 'Unknown', name: user.name || '', email: user.email || '', isTestAccount: !!user.isTestAccount };
     next();
   });
 }

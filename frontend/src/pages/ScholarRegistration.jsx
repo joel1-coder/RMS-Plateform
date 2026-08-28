@@ -164,7 +164,86 @@ function SignaturePad({ label, value, onChange }) {
 }
 
 /* -- Status Screen (after submission) -- */
-function StatusScreen({ status, rejectionReason, onLogout }) {
+function StatusScreen({ status, rejectionReason, onLogout, formData }) {
+  const handlePrint = () => {
+    const fd = formData || {}
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return alert('Please allow popups to download/print PDF');
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Approved PhD Registration - ${fd.fullName || fd.name || 'Scholar'}</title>
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          @page { size: A4; margin: 0; }
+          body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt; color: #111; background: #fff;
+            padding: 28px 36px; line-height: 1.55;
+          }
+          .hdr { text-align: center; border-bottom: 3px double #6B1F2A; padding-bottom: 14px; margin-bottom: 18px; }
+          .hdr h1 { font-size: 16pt; font-weight: bold; color: #6B1F2A; }
+          .hdr p { font-size: 10pt; color: #555; margin-top: 2px; }
+          .doc-title {
+            font-size: 12pt; font-weight: bold; text-align: center;
+            letter-spacing: 1px; text-transform: uppercase;
+            background: #6B1F2A; color: #fff; padding: 6px 20px;
+            margin: 0 auto 18px; display: block; width: 100%;
+          }
+          .section { margin-bottom: 14px; }
+          .section-title {
+            font-size: 10pt; font-weight: bold; text-transform: uppercase;
+            color: #6B1F2A; border-bottom: 1.5px solid #A9823E;
+            padding-bottom: 3px; margin-bottom: 8px;
+          }
+          table.info { width: 100%; border-collapse: collapse; }
+          table.info td { padding: 5px 8px; font-size: 11pt; vertical-align: top; }
+          table.info td.label { font-weight: bold; color: #555; width: 35%; }
+          table.info td.value { color: #111; }
+          .approved-stamp {
+            border: 2px solid #4C6B58; color: #4C6B58; border-radius: 4px;
+            padding: 6px 16px; font-weight: bold; font-size: 13pt;
+            letter-spacing: 2px; transform: rotate(-3deg); display: inline-block;
+          }
+        </style>
+      </head>
+      <body onload="window.print();">
+        <div class="hdr">
+          <h1>St. Joseph's College (Autonomous), Tiruchirappalli</h1>
+          <p>Office of the Director (Research) — Official PhD Registration Document</p>
+        </div>
+        <div class="doc-title">Approved PhD Application Form</div>
+        <div class="section">
+          <div class="section-title">I. Personal Information</div>
+          <table class="info">
+            <tr><td class="label">Full Name:</td><td class="value">${fd.fullName || fd.name || '-'}</td></tr>
+            <tr><td class="label">Research Subject:</td><td class="value">${fd.subject || '-'}</td></tr>
+            <tr><td class="label">Gender / DOB:</td><td class="value">${fd.gender || '-'} / ${fd.dob || '-'}</td></tr>
+            <tr><td class="label">Religion / Community:</td><td class="value">${fd.religion || '-'} (${fd.community || '-'})</td></tr>
+            <tr><td class="label">Email / Phone:</td><td class="value">${fd.email || '-'} / ${fd.mobile1 || '-'}</td></tr>
+          </table>
+        </div>
+        <div class="section">
+          <div class="section-title">II. Address</div>
+          <table class="info">
+            <tr><td class="label">Address:</td><td class="value">${fd.street || fd.address || ''}, ${fd.city || ''}, ${fd.state || ''} - ${fd.pincode || ''}</td></tr>
+          </table>
+        </div>
+        <div style="margin-top: 40px; display: flex; justify-content: space-between; align-items: center;">
+          <div class="approved-stamp">✓ OFFICIALLY APPROVED</div>
+          <div style="text-align: right; font-size: 11pt;">
+            <p><strong>Director of Research</strong></p>
+            <p style="color: #666; font-size: 9pt; margin-top: 4px;">St. Joseph's College (Autonomous)</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `)
+    printWindow.document.close()
+  }
+
   if (status === 'Pending') return (
     <div style={{ textAlign: 'center', padding: '40px 20px' }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
@@ -179,9 +258,9 @@ function StatusScreen({ status, rejectionReason, onLogout }) {
       }}>
         <div style={{ fontSize: 13, color: '#A9823E', fontWeight: 600, marginBottom: 6 }}>Next Steps:</div>
         <ul style={{ margin: 0, padding: '0 0 0 18px', fontSize: 13, color: '#232323', lineHeight: 1.8 }}>
-          <li>Admin reviews your application and details</li>
-          <li>Upon approval, your official scholar account is activated</li>
-          <li>You can print your approved application copy</li>
+          <li>Admin reviews your application on the "Accepting Registration" portal</li>
+          <li>Upon approval, your official registration is confirmed</li>
+          <li>You can download and print your official application PDF below once approved</li>
         </ul>
       </div>
       <br />
@@ -202,13 +281,23 @@ function StatusScreen({ status, rejectionReason, onLogout }) {
       <p style={{ color: "#8A8375", maxWidth: 420, margin: '0 auto 24px', lineHeight: 1.6 }}>
         Congratulations! Your PhD registration has been officially approved by the Academic Administration.
       </p>
-      <button onClick={onLogout} style={{
-        padding: '10px 28px', background: '#6B1F2A',
-        color: '#FBF3E7', border: 'none', borderRadius: 4,
-        fontWeight: 500, fontSize: 14, cursor: 'pointer',
-      }}>
-        Logout
-      </button>
+      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+        <button onClick={handlePrint} style={{
+          padding: '10px 24px', background: '#4C6B58',
+          color: '#fff', border: 'none', borderRadius: 4,
+          fontWeight: 600, fontSize: 14, cursor: 'pointer',
+          display: 'inline-flex', alignItems: 'center', gap: 8
+        }}>
+          📄 Download Application PDF
+        </button>
+        <button onClick={onLogout} style={{
+          padding: '10px 24px', background: '#6B1F2A',
+          color: '#FBF3E7', border: 'none', borderRadius: 4,
+          fontWeight: 500, fontSize: 14, cursor: 'pointer',
+        }}>
+          Logout
+        </button>
+      </div>
     </div>
   )
 
@@ -603,7 +692,7 @@ export default function ScholarRegistration() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="ruled" style={{ background: "#FFFDF7", border: "1px solid var(--parchment-line)", borderRadius: 2, padding: "28px 32px" }}>
             {submissionStatus ? (
-              <StatusScreen status={submissionStatus} rejectionReason={rejectionReason} onLogout={handleLogout} />
+              <StatusScreen status={submissionStatus} rejectionReason={rejectionReason} onLogout={handleLogout} formData={data} />
             ) : (
               <>
                 {step === 0 && (
