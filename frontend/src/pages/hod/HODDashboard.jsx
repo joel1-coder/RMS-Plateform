@@ -18,7 +18,7 @@ export default function HODDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const res = await fetch('/api/reports/hod-dashboard', {
           headers: { Authorization: `Bearer ${token}` }
         })

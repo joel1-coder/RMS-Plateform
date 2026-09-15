@@ -115,7 +115,7 @@ function TestAccountsPanel({ scholars }) {
   const fetchAccounts = async () => {
     setLoadingAcc(true)
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const res = await apiFetch('/api/test-accounts', { headers: { 'Authorization': `Bearer ${token}` } })
       const data = await res.json()
       setAccounts(data.data || [])
@@ -133,7 +133,7 @@ function TestAccountsPanel({ scholars }) {
     }
     setCreating(true)
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const res = await apiFetch('/api/test-accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -150,7 +150,7 @@ function TestAccountsPanel({ scholars }) {
   }
 
   const handleRevoke = async (id) => {
-    const token = localStorage.getItem('rms_token')
+    const token = sessionStorage.getItem('rms_token')
     try {
       const res = await apiFetch(`/api/test-accounts/${id}/revoke`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } })
       if (!res.ok) throw new Error('Failed to revoke')
@@ -161,7 +161,7 @@ function TestAccountsPanel({ scholars }) {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this test account permanently?')) return
-    const token = localStorage.getItem('rms_token')
+    const token = sessionStorage.getItem('rms_token')
     try {
       const res = await apiFetch(`/api/test-accounts/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
       if (!res.ok) throw new Error('Failed to delete')
@@ -320,7 +320,7 @@ export default function UserManagement() {
     abortRef.current = new AbortController()
 
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const roleParam = role === 'All' ? '' : role.toLowerCase()
       const statusParam = status === 'All' ? '' : status
       const response = await fetch(
@@ -351,7 +351,7 @@ export default function UserManagement() {
 
   const handleAddOrEdit = async (formData) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const payload = {
         name: formData.name,
         email: formData.email,
@@ -410,7 +410,7 @@ export default function UserManagement() {
 
   const handleToggleStatus = async (user) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const newStatus = user.status === 'Active' ? 'Inactive' : 'Active'
       const response = await apiFetch(`/api/users/${user.id || user._id}`, {
         method: 'PUT',
@@ -431,7 +431,7 @@ export default function UserManagement() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const response = await apiFetch(`/api/users/${id}`, {
           method: 'DELETE',
           headers: {

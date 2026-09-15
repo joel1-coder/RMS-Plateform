@@ -18,7 +18,7 @@ export default function AssignScholar() {
 
   const loadUsers = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch('/api/users', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -61,7 +61,7 @@ export default function AssignScholar() {
     }
 
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch(`/api/users/${selectedScholar}/assign-supervisor`, {
         method: 'PUT',
         headers: {
@@ -89,7 +89,7 @@ export default function AssignScholar() {
   /* --- reassign --- */
   const handleReassign = async (scholarId, newSupId) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch(`/api/users/${scholarId}/assign-supervisor`, {
         method: 'PUT',
         headers: {
@@ -111,7 +111,7 @@ export default function AssignScholar() {
   const handleUnassign = async (scholarId) => {
     if (!window.confirm("Remove this scholar's supervisor assignment?")) return
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch(`/api/users/${scholarId}/unassign-supervisor`, {
         method: 'PUT',
         headers: {

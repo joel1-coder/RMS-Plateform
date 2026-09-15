@@ -17,9 +17,9 @@ export default function ScholarThesis() {
 
   const fetchTheses = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       // Retrieve the current logged-in user profile
-      const storedUser = localStorage.getItem('rms_user')
+      const storedUser = sessionStorage.getItem('rms_user')
       const userObj = storedUser ? JSON.parse(storedUser) : null
       const scholarId = userObj?.id || userObj?._id || ''
 
@@ -50,7 +50,7 @@ export default function ScholarThesis() {
     }
 
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const formData = new FormData()
       formData.append('title', title)
       formData.append('file', file)

@@ -109,7 +109,7 @@ export default function MeetingManagement() {
 
   const fetchMeetings = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch('/api/meetings', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -129,7 +129,7 @@ export default function MeetingManagement() {
 
   const handleSave = async (formData) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const isEdit = !!editingMeeting
       const url = isEdit ? `/api/meetings/${editingMeeting.id || editingMeeting._id}` : '/api/meetings'
       const method = isEdit ? 'PUT' : 'POST'
@@ -160,7 +160,7 @@ export default function MeetingManagement() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this meeting schedule?')) return
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch(`/api/meetings/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }

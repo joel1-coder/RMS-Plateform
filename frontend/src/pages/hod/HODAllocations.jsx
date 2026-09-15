@@ -13,7 +13,7 @@ export default function HODAllocations() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const headers = { Authorization: `Bearer ${token}` }
       const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
 
@@ -58,7 +58,7 @@ export default function HODAllocations() {
     if (!selectedScholar || !selectedFaculty) { toast.error('Please select both a scholar and a faculty member'); return }
     
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const res = await fetch(`/api/users/${selectedScholar.id || selectedScholar._id}/assign-supervisor`, {
         method: 'PUT',
         headers: {

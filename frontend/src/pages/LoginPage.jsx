@@ -251,7 +251,7 @@ export default function LoginPage() {
         throw new Error(data.message || 'Invalid credentials. Check email and password.')
       }
 
-      localStorage.setItem('rms_token', data.token)
+      sessionStorage.setItem('rms_token', data.token)
       login(data.user)
       toast.success(`Welcome back, ${data.user.name.split(' ').pop()}!`)
 
@@ -278,7 +278,7 @@ export default function LoginPage() {
 
   // Called when test login succeeds; always redirect to registration form.
   const handleTestLoginSuccess = (data) => {
-    localStorage.setItem('rms_token', data.token)
+    sessionStorage.setItem('rms_token', data.token)
     login(data.user)
     toast.success(`Welcome, ${data.user.name.split(' ').pop()}! Please fill in your registration details.`)
     setShowTestModal(false)

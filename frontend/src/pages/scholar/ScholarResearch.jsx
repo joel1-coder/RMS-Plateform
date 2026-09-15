@@ -12,7 +12,7 @@ export default function ScholarResearch() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const [resProj, resPubs] = await Promise.all([
         apiFetch('/api/research', { headers: { 'Authorization': `Bearer ${token}` } }),
         apiFetch('/api/publication', { headers: { 'Authorization': `Bearer ${token}` } })

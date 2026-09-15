@@ -119,7 +119,7 @@ export default function PublicationsReview() {
 
   const fetchPublications = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch('/api/publication', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -152,7 +152,7 @@ export default function PublicationsReview() {
 
   const handleAction = async (id, newStatus) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch(`/api/publication/${id}`, {
         method: 'PUT',
         headers: {

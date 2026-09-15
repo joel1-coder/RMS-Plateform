@@ -20,7 +20,7 @@ export default function ScholarDocuments() {
 
   const fetchDocs = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const [subsRes, pubsRes, thesisRes] = await Promise.all([
         apiFetch('/api/submissions', { headers: { 'Authorization': `Bearer ${token}` } }),
         apiFetch('/api/publication', { headers: { 'Authorization': `Bearer ${token}` } }),
@@ -103,7 +103,7 @@ export default function ScholarDocuments() {
 
     try {
       setUploading(true)
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const formData = new FormData()
       formData.append('file', uploadFile)
       formData.append('topic', uploadTitle || uploadFile.name)
@@ -135,7 +135,7 @@ export default function ScholarDocuments() {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0]
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const formData = new FormData()
         formData.append('file', file)
         formData.append('topic', file.name)
@@ -160,7 +160,7 @@ export default function ScholarDocuments() {
   const handleDelete = async (doc) => {
     if (window.confirm('Delete this document?')) {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         if (doc.rawType === 'submission') {
           await apiFetch(`/api/submissions/${doc.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
         } else if (doc.rawType === 'publication') {

@@ -394,7 +394,7 @@ export default function ScholarRegistration() {
   const fetchMyRegistration = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('rms_token');
+      const token = sessionStorage.getItem('rms_token');
       const res = await apiFetch('/api/test-accounts/my-registration', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -465,7 +465,7 @@ export default function ScholarRegistration() {
     if (!validateStep()) return;
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('rms_token');
+      const token = sessionStorage.getItem('rms_token');
       const res = await apiFetch('/api/test-accounts/submit-registration', {
         method: 'POST',
         headers: {

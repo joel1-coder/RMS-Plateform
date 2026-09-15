@@ -13,7 +13,7 @@ export default function SynopsisReview() {
   const fetchSubmissions = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const res = await apiFetch('/api/submissions?type=synopsis', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -34,7 +34,7 @@ export default function SynopsisReview() {
   const handleAction = async (id, newStatus, defaultRemark) => {
     try {
       setActionLoading(true)
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const finalRemarks = remarks || defaultRemark
 
       const res = await apiFetch(`/api/submissions/synopsis/${id}/status`, {

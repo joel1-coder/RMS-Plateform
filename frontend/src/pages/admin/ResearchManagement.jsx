@@ -133,7 +133,7 @@ export default function ResearchManagement() {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch('/api/users', { headers: { 'Authorization': `Bearer ${token}` } })
       if (response.ok) {
         setUsers(await response.json())
@@ -145,7 +145,7 @@ export default function ResearchManagement() {
 
   const fetchProjects = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const statusParam = filterStatus === 'All' ? '' : filterStatus
       const stageParam = filterStage === 'All' ? '' : filterStage
       const response = await apiFetch(`/api/research?status=${statusParam}&stage=${stageParam}`, {
@@ -173,7 +173,7 @@ export default function ResearchManagement() {
 
   const handleSave = async (formData) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       if (editingProject) {
         // Edit mode
         const response = await apiFetch(`/api/research/${editingProject.id || editingProject._id}`, {
@@ -215,7 +215,7 @@ export default function ResearchManagement() {
   const handleDelete = async (id) => {
     if (window.confirm('Delete this research project?')) {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const response = await apiFetch(`/api/research/${id}`, {
           method: 'DELETE',
           headers: {

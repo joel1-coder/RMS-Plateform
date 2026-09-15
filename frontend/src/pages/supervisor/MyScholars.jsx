@@ -16,7 +16,7 @@ export default function MyScholars() {
   const fetchMyScholars = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const headers = { 'Authorization': `Bearer ${token}` }
 
       const [usersRes, researchRes] = await Promise.all([

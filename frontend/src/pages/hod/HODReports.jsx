@@ -27,7 +27,7 @@ export default function HODReports() {
   const fetchReportsData = async () => {
     setLoading(true)
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
       const res = await apiFetch(`/api/users?role=scholar${deptFilter}`, {
         headers: { Authorization: `Bearer ${token}` }

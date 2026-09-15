@@ -143,7 +143,7 @@ export default function VivaVoce() {
     if (vivaAbortRef.current) vivaAbortRef.current.abort()
     vivaAbortRef.current = new AbortController()
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const statusParam = status === 'All' ? '' : status
       const response = await apiFetch(`/api/viva-voce?status=${statusParam}`, {
         headers: { 'Authorization': `Bearer ${token}` },
@@ -164,7 +164,7 @@ export default function VivaVoce() {
     if (scholarAbortRef.current) scholarAbortRef.current.abort()
     scholarAbortRef.current = new AbortController()
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch('/api/users?role=scholar', {
         headers: { 'Authorization': `Bearer ${token}` },
         signal: scholarAbortRef.current.signal
@@ -190,7 +190,7 @@ export default function VivaVoce() {
 
   const handleSave = async (formData) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       if (editingViva) {
         // Edit mode
         const response = await apiFetch(`/api/viva-voce/${editingViva.id || editingViva._id}`, {
@@ -229,7 +229,7 @@ export default function VivaVoce() {
   const handleDelete = async (id) => {
     if (window.confirm('Delete this scheduled viva voce examination?')) {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const response = await apiFetch(`/api/viva-voce/${id}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
@@ -245,7 +245,7 @@ export default function VivaVoce() {
 
   const handleToggleStatus = async (viva, newStatus) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch(`/api/viva-voce/${viva.id || viva._id}`, {
         method: 'PUT',
         headers: {

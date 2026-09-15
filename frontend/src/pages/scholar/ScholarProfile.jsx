@@ -30,7 +30,7 @@ export default function ScholarProfile() {
   const fetchSubmissionStatus = async () => {
     try {
       const res = await apiFetch('/api/test-accounts/my-registration', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('rms_token')}` }
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('rms_token')}` }
       })
       if (res.ok) {
         const d = await res.json()
@@ -42,7 +42,7 @@ export default function ScholarProfile() {
   const fetchProfile = async () => {
     try {
       const res = await apiFetch('/api/users/me', { 
-        headers: { Authorization: `Bearer ${localStorage.getItem('rms_token')}` } 
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('rms_token')}` } 
       })
       if (res.ok) {
         const data = await res.json()
@@ -93,7 +93,7 @@ export default function ScholarProfile() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('rms_token')}`
+          Authorization: `Bearer ${sessionStorage.getItem('rms_token')}`
         },
         body: JSON.stringify(form)
       })
@@ -114,7 +114,7 @@ export default function ScholarProfile() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('rms_token')}`
+          Authorization: `Bearer ${sessionStorage.getItem('rms_token')}`
         },
         body: JSON.stringify({
           testAccountId: user.testAccountId,

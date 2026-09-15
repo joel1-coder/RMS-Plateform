@@ -17,7 +17,7 @@ export default function DepartmentScholars() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
         const res = await fetch(`/api/users?role=scholar${deptFilter}`, {
           headers: { Authorization: `Bearer ${token}` }

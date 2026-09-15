@@ -55,7 +55,7 @@ export default function DCMembersManagement() {
     async function loadScholars() {
       try {
         setLoading(true)
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const res = await apiFetch('/api/users?role=scholar', {
           headers: { 'Authorization': `Bearer ${token}` }
         })

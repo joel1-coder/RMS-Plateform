@@ -126,7 +126,7 @@ export default function ThesisReview() {
 
   const fetchSubmissions = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch('/api/thesis', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -142,7 +142,7 @@ export default function ThesisReview() {
 
   const fetchScholars = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch('/api/users?role=scholar', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -162,7 +162,7 @@ export default function ThesisReview() {
   const handleAction = async (id, newStatus) => {
     try {
       setActionLoading(true)
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await apiFetch(`/api/thesis/${id}`, {
         method: 'PUT',
         headers: {
@@ -188,7 +188,7 @@ export default function ThesisReview() {
 
   const handleUpload = async (newSubmission) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const formData = new FormData()
       formData.append('title', newSubmission.title)
       formData.append('scholarId', newSubmission.scholarId)

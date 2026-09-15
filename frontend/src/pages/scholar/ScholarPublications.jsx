@@ -446,8 +446,8 @@ export default function ScholarPublications() {
 
   const fetchPublications = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
-      const storedUser = localStorage.getItem('rms_user')
+      const token = sessionStorage.getItem('rms_token')
+      const storedUser = sessionStorage.getItem('rms_user')
       const userObj = storedUser ? JSON.parse(storedUser) : null
       const scholarId = userObj?.id || userObj?._id || ''
 
@@ -485,7 +485,7 @@ export default function ScholarPublications() {
 
   const handleSave = async (form) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const payload = {
         title: form.title,
         journal: form.journalName || form.conferenceName || form.bookTitle || form.bookAuthoredTitle || form.bookEditedTitle || form.patentOffice || form.copyrightOffice || '-',
@@ -515,7 +515,7 @@ export default function ScholarPublications() {
 
   const handleUpdate = async (id, changes) => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const payload = {
         title: changes.title,
         journal: changes.venue || changes.journal || changes.journalName || changes.conferenceName,
@@ -545,7 +545,7 @@ export default function ScholarPublications() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this publication?')) {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const response = await apiFetch(`/api/publication/${id}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }

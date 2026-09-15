@@ -36,7 +36,7 @@ export default function AdminDashboard() {
   const [error, setError]             = useState(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('rms_token')
+    const token = sessionStorage.getItem('rms_token')
 
     apiFetch('/api/reports/admin-dashboard', {
       headers: token ? { Authorization: `Bearer ${token}` } : {}

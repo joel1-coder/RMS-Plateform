@@ -19,7 +19,7 @@ export default function ScholarSynopsis() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const [subsRes, projRes] = await Promise.all([
         apiFetch('/api/submissions?type=synopsis', { headers: { 'Authorization': `Bearer ${token}` } }),
         apiFetch('/api/research', { headers: { 'Authorization': `Bearer ${token}` } })
@@ -80,7 +80,7 @@ export default function ScholarSynopsis() {
     const synopsisTitle = title.trim() || project?.topic || 'Research Synopsis'
     try {
       setSubmitting(true)
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const formData = new FormData()
       formData.append('file', file)
       formData.append('topic', synopsisTitle)

@@ -18,7 +18,7 @@ export default function SupervisorDashboard() {
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const headers = { 'Authorization': `Bearer ${token}` }
 
         const [usersRes, synRes, thRes, resRes, pubRes] = await Promise.all([

@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const stored = localStorage.getItem('rms_user')
+    const stored = sessionStorage.getItem('rms_user')
     if (stored) {
       try {
         const parsed = JSON.parse(stored)
@@ -24,13 +24,13 @@ export function AuthProvider({ children }) {
   const login = (userData) => {
     setUser(userData)
     setIsAuthenticated(true)
-    localStorage.setItem('rms_user', JSON.stringify(userData))
+    sessionStorage.setItem('rms_user', JSON.stringify(userData))
   }
 
   const updateUser = (newUserData) => {
     setUser(prev => {
       const updated = { ...prev, ...newUserData };
-      localStorage.setItem('rms_user', JSON.stringify(updated));
+      sessionStorage.setItem('rms_user', JSON.stringify(updated));
       return updated;
     });
   };
@@ -38,8 +38,8 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null)
     setIsAuthenticated(false)
-    localStorage.removeItem('rms_user')
-    localStorage.removeItem('rms_token')
+    sessionStorage.removeItem('rms_user')
+    sessionStorage.removeItem('rms_token')
   }
 
   if (loading) return (

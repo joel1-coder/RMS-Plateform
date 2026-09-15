@@ -44,7 +44,7 @@ export default function ScheduleDCMeeting() {
   useEffect(() => {
     async function loadScholars() {
       try {
-        const token = localStorage.getItem('rms_token')
+        const token = sessionStorage.getItem('rms_token')
         const res = await apiFetch('/api/users?role=scholar', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
@@ -101,7 +101,7 @@ export default function ScheduleDCMeeting() {
 
     setSubmitting(true)
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const finalVenue = form.venue.trim() || (form.mode === 'online' ? 'Online / Virtual Meeting' : 'Department Conference Room')
 
       const response = await apiFetch('/api/meetings', {

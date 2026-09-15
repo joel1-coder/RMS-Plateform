@@ -17,7 +17,7 @@ export default function AcceptingRegistration() {
   const fetchRegistrations = async () => {
     setLoading(true)
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const res = await apiFetch('/api/test-accounts/registrations', {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -33,7 +33,7 @@ export default function AcceptingRegistration() {
   const handleApprove = async (id) => {
     if (!window.confirm('Approve this scholar registration?')) return
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const res = await apiFetch(`/api/test-accounts/registrations/${id}/approve`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
@@ -53,7 +53,7 @@ export default function AcceptingRegistration() {
       return
     }
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const res = await apiFetch(`/api/test-accounts/registrations/${id}/reject`, {
         method: 'PATCH',
         headers: {
@@ -320,13 +320,13 @@ export default function AcceptingRegistration() {
                   {selectedSub.status}
                 </span>
               </div>
-              <button onClick={() => setSelectedSub(null)} style={{ border: 'none', background: 'none', fontSize: '18px', cursor: 'pointer', color: '#6B7280' }}></button>
+              <button onClick={() => setSelectedSub(null)} style={{ border: 'none', background: 'none', fontSize: '18px', cursor: 'pointer', color: '#6B7280' }}>✕</button>
             </div>
 
             {/* Modal Body */}
             <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
-              {/* Print Template Wrapper (invisible/style-scoped) */}
-              <div ref={printAreaRef}>
+              {/* Print Template Wrapper */}
+              <div>
                 <div className="header">
                   <h1>University of Excellence</h1>
                   <p>Office of the Director (Research) - PhD Registration Details</p>

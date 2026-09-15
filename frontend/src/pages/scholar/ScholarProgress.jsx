@@ -15,7 +15,7 @@ export default function ScholarProgress() {
 
   const fetchReports = async () => {
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const res = await apiFetch('/api/submissions?type=progress_report', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -42,7 +42,7 @@ export default function ScholarProgress() {
 
     try {
       setSubmitting(true)
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const formData = new FormData()
       formData.append('file', file)
       formData.append('topic', `Bi-Annual Progress Report (${period})`)

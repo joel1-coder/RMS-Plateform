@@ -20,7 +20,7 @@ export default function AuditLog() {
     if (abortRef.current) abortRef.current.abort()
     abortRef.current = new AbortController()
     try {
-      const token = localStorage.getItem('rms_token')
+      const token = sessionStorage.getItem('rms_token')
       const response = await fetch(
         `/api/audit?severity=${severity === 'All' ? '' : severity}&search=${searchTerm}`,
         { headers: { 'Authorization': `Bearer ${token}` }, signal: abortRef.current.signal }
