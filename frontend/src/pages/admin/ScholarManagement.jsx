@@ -183,7 +183,22 @@ function LedgerHeader({ columns, stickyOffsets }) {
 }
 
 export default function ScholarManagement() {
-  const [rows, setRows] = useState(seed);
+  const [rows, setRows] = useState(() => {
+    const saved = localStorage.getItem("scholar_rows_v1");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return seed;
+      }
+    }
+    return seed;
+  });
+  
+  useEffect(() => {
+    localStorage.setItem("scholar_rows_v1", JSON.stringify(rows));
+  }, [rows]);
+
   const [editingCell, setEditingCell] = useState(null);
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
