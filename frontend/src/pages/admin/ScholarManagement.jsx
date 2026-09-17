@@ -25,6 +25,7 @@ const COLUMNS = [
   { key: "synopsisSubmittedOn", label: "Synopsis Submitted on", group: null, type: "date", width: 125 },
   { key: "publicVivaOn", label: "Public Viva Voce on", group: null, type: "date", width: 125 },
   { key: "remarks", label: "Remarks", group: null, type: "text", width: 170 },
+  { key: "status", label: "Status", group: null, type: "select", width: 120, options: ["Continue", "Discontinue"] },
 ];
 
 function getGroupedHeaderRows(columns) {
@@ -80,10 +81,10 @@ const seed = [
     mobileNo: "9539722214", universityRefNoWithYear: "BDU/2103737/9371 & 26/08/2021",
     dateOfDcMeeting: { I: "2022-01-14", II: "", III: "" }, extension: { I: "", II: "" },
     feesPaymentDates: { I: "2022-01-09", II: "2022-10-28", III: "2023-11-01", IV: "", V: "", VI: "", VII: "", VIII: "" },
-    synopsisSubmittedOn: "", publicVivaOn: "", remarks: "",
+    synopsisSubmittedOn: "", publicVivaOn: "", remarks: "", status: "Continue",
   },
-  { sNo: 2, department: "Biotechnology", guideName: "Dr. A. Edward", scholarName: "", regNo: "", gender: "", fullPartTime: "", residentialAddress: "", nationalityState: "", religionCommunity: "", dateOfBirth: "", mobileNo: "", universityRefNoWithYear: "", dateOfDcMeeting: { I: "", II: "", III: "" }, extension: { I: "", II: "" }, feesPaymentDates: { I: "", II: "", III: "", IV: "", V: "", VI: "", VII: "", VIII: "" }, synopsisSubmittedOn: "", publicVivaOn: "", remarks: "" },
-  { sNo: 3, department: "Biotechnology", guideName: "Dr. A. Edward", scholarName: "", regNo: "", gender: "", fullPartTime: "", residentialAddress: "", nationalityState: "", religionCommunity: "", dateOfBirth: "", mobileNo: "", universityRefNoWithYear: "", dateOfDcMeeting: { I: "", II: "", III: "" }, extension: { I: "", II: "" }, feesPaymentDates: { I: "", II: "", III: "", IV: "", V: "", VI: "", VII: "", VIII: "" }, synopsisSubmittedOn: "", publicVivaOn: "", remarks: "" },
+  { sNo: 2, department: "Biotechnology", guideName: "Dr. A. Edward", scholarName: "", regNo: "", gender: "", fullPartTime: "", residentialAddress: "", nationalityState: "", religionCommunity: "", dateOfBirth: "", mobileNo: "", universityRefNoWithYear: "", dateOfDcMeeting: { I: "", II: "", III: "" }, extension: { I: "", II: "" }, feesPaymentDates: { I: "", II: "", III: "", IV: "", V: "", VI: "", VII: "", VIII: "" }, synopsisSubmittedOn: "", publicVivaOn: "", remarks: "", status: "" },
+  { sNo: 3, department: "Biotechnology", guideName: "Dr. A. Edward", scholarName: "", regNo: "", gender: "", fullPartTime: "", residentialAddress: "", nationalityState: "", religionCommunity: "", dateOfBirth: "", mobileNo: "", universityRefNoWithYear: "", dateOfDcMeeting: { I: "", II: "", III: "" }, extension: { I: "", II: "" }, feesPaymentDates: { I: "", II: "", III: "", IV: "", V: "", VI: "", VII: "", VIII: "" }, synopsisSubmittedOn: "", publicVivaOn: "", remarks: "", status: "" },
 ];
 
 function EditableCell({ row, col, isEditing, onStartEdit, onCancel, onCommit }) {
@@ -232,7 +233,7 @@ export default function ScholarManagement() {
       dateOfBirth: "", mobileNo: "", universityRefNoWithYear: "",
       dateOfDcMeeting: { I: "", II: "", III: "" }, extension: { I: "", II: "" },
       feesPaymentDates: { I: "", II: "", III: "", IV: "", V: "", VI: "", VII: "", VIII: "" },
-      synopsisSubmittedOn: "", publicVivaOn: "", remarks: "", _tempId: Math.random(),
+      synopsisSubmittedOn: "", publicVivaOn: "", remarks: "", status: "", _tempId: Math.random(),
     }]);
   };
 
@@ -291,7 +292,10 @@ export default function ScholarManagement() {
           <LedgerHeader columns={COLUMNS} stickyOffsets={stickyOffsets} />
           <tbody>
             {filteredRows.map((row, idx) => {
-              const rowClass = idx % 2 === 0 ? "ledger-tr-even" : "ledger-tr-odd";
+              const isDiscontinued = row.status === "Discontinue";
+              const baseClass = idx % 2 === 0 ? "ledger-tr-even" : "ledger-tr-odd";
+              const rowClass = `${baseClass} ${isDiscontinued ? "row-discontinued" : ""}`;
+              const stickyBg = isDiscontinued ? "#fee2e2" : (idx % 2 === 0 ? "#ffffff" : "#f8fafc");
               return (
                 <tr key={row.regNo || row._tempId || idx} className={rowClass}>
                   {COLUMNS.map((col) => {
@@ -304,7 +308,7 @@ export default function ScholarManagement() {
                           width: col.width, 
                           minWidth: col.width, 
                           left: isSticky ? stickyOffsets[col.key] : undefined,
-                          backgroundColor: isSticky ? (idx % 2 === 0 ? "#ffffff" : "#f8fafc") : undefined
+                          backgroundColor: isSticky ? stickyBg : undefined
                         }}
                         className={`ledger-td ${isSticky ? 'ledger-td-sticky-left' : ''}`}>
                         <EditableCell row={row} col={col} isEditing={isEditing}
@@ -314,7 +318,7 @@ export default function ScholarManagement() {
                       </td>
                     );
                   })}
-                  <td className={`ledger-td ledger-td-sticky-right`} style={{ backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f8fafc", textAlign: "center" }}>
+                  <td className={`ledger-td ledger-td-sticky-right`} style={{ backgroundColor: stickyBg, textAlign: "center" }}>
                     <button onClick={() => deleteRow(idx)} className="delete-btn">Delete</button>
                   </td>
                 </tr>

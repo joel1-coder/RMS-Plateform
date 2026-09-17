@@ -240,3 +240,11 @@
   color: #64748b;
   padding: 8px 4px;
 }
+
+.row-discontinued {
+  background-color: #fee2e2 !important;
+  box-shadow: inset 0 0 8px rgba(239, 68, 68, 0.6);
+}
+.row-discontinued td {
+  border-color: #fca5a5 !important;
+}
