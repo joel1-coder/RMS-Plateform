@@ -91,7 +91,7 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '20px' }}>
+        <div className="dashboard-charts-grid">
           {/* Bar Chart - Monthly Research Activity */}
           <div className="card">
             <div className="card-header">

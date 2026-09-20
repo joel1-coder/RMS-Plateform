@@ -1547,6 +1547,13 @@ ul, ol { list-style: none; }
   margin-top: 4px;
 }
 
+.dashboard-charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
 /* =============================================
    CHARTS / PROGRESS
    ============================================= */
@@ -1630,7 +1637,8 @@ ul, ol { list-style: none; }
    RESPONSIVE MEDIA QUERIES
    ============================================= */
 @media (max-width: 1024px) {
-  .mobile-header { display: flex; }
+  .app-layout { flex-direction: column; }
+  .mobile-header { display: flex; width: 100%; }
   .mobile-close-btn { display: block; }
   .sidebar {
     transform: translateX(-100%);
@@ -1647,6 +1655,7 @@ ul, ol { list-style: none; }
   .login-right { width: 100%; }
   .login-container { width: 100%; max-width: 440px; }
   .stat-cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .dashboard-charts-grid { grid-template-columns: 1fr; }
   .home-header { padding: 0 24px; }
   .home-hero {
     grid-template-columns: 1fr;
