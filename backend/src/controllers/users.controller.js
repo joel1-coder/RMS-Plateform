@@ -7,6 +7,18 @@ function publicUser(user) {
   return user.toPublicJSON ? user.toPublicJSON() : user;
 }
 
+function checkHierarchy(creatorRole, targetRole) {
+  if (creatorRole === 'admin') return;
+  const allowed = {
+    principal: ['hod', 'drc', 'scholar'],
+    hod: ['supervisor', 'scholar'],
+    supervisor: ['scholar']
+  };
+  if (!allowed[creatorRole] || !allowed[creatorRole].includes(targetRole)) {
+    throw new AppError(`You are not authorized to manage ${targetRole || 'these'} users`, 403);
+  }
+}
+
 const listUsers = asyncHandler(async (req, res) => {
   const filters = {};
   if (req.query.role) filters.role = req.query.role.toLowerCase();
@@ -15,6 +27,24 @@ const listUsers = asyncHandler(async (req, res) => {
   if (req.query.search) {
     const s = new RegExp(req.query.search, 'i');
     filters.$or = [{ name: s }, { email: s }];
+  }
+
+  // Apply hierarchy filter for non-admins
+  if (req.user?.role !== 'admin') {
+    const allowed = {
+      principal: ['hod', 'drc', 'scholar'],
+      hod: ['supervisor', 'scholar'],
+      supervisor: ['scholar']
+    };
+    const allowedRoles = allowed[req.user?.role] || [];
+    
+    if (filters.role) {
+      if (!allowedRoles.includes(filters.role)) {
+        return res.json([]); 
+      }
+    } else {
+      filters.role = { $in: allowedRoles };
+    }
   }
 
   // Filter by supervisor if requested or if queried by a supervisor (unless all=true is specified)
@@ -95,6 +125,8 @@ const createUser = asyncHandler(async (req, res) => {
 
   const joined = req.body.joined || new Date().toISOString().slice(0, 10);
   const role = req.body.role?.toLowerCase();
+  checkHierarchy(req.user.role, role);
+
   const user = await User.create({ ...req.body, email, role, joined });
   
   await logAudit({
@@ -119,6 +151,12 @@ const updateUser = asyncHandler(async (req, res) => {
   if (req.body.role) req.body.role = req.body.role.toLowerCase();
   if (req.body.email) req.body.email = req.body.email.toLowerCase();
 
+  // Check hierarchy against both current role and new role (if changing)
+  checkHierarchy(req.user.role, user.role);
+  if (req.body.role && req.body.role !== user.role) {
+    checkHierarchy(req.user.role, req.body.role);
+  }
+
   Object.assign(user, req.body);
   await user.save();
   
@@ -134,10 +172,13 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
-  const user = await User.findByIdAndDelete(req.params.id);
+  const user = await User.findById(req.params.id);
   if (!user) {
     throw new AppError('User not found', 404);
   }
+
+  checkHierarchy(req.user.role, user.role);
+  await user.deleteOne();
 
   await logAudit({
     user: req.user?.name || 'System',

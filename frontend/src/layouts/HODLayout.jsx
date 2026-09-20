@@ -4,6 +4,7 @@ const NAV = [
   { to: '/hod', label: 'Dashboard', icon: 'dashboard', exact: true },
   { to: '/hod/scholars', label: 'Department Scholars', icon: 'graduation' },
   { to: '/hod/supervisors', label: 'Supervisors', icon: 'users' },
+  { to: '/hod/users', label: 'User Management', icon: 'admin' },
   { to: '/hod/allocations', label: 'Allocations', icon: 'link', badge: 10 },
   { to: '/hod/reports', label: 'Reports', icon: 'file' },
   { to: '/hod/notifications', label: 'Notifications', icon: 'bell', badge: 4 },

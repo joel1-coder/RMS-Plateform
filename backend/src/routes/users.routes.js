@@ -9,9 +9,9 @@ router.use(authenticate());
 router.get('/me', users.getMe);
 router.put('/me', users.updateMe);
 router.get('/', authorize(['admin', 'hod', 'supervisor', 'drc']), validate(schemas.listUsers, 'query'), users.listUsers);
-router.post('/', authorize(['admin']), validate(schemas.createUser), users.createUser);
-router.put('/:id', authorize(['admin']), validate(schemas.idParam, 'params'), validate(schemas.updateUser), users.updateUser);
-router.delete('/:id', authorize(['admin']), validate(schemas.idParam, 'params'), users.deleteUser);
+router.post('/', authorize(['admin', 'principal', 'hod', 'supervisor']), validate(schemas.createUser), users.createUser);
+router.put('/:id', authorize(['admin', 'principal', 'hod', 'supervisor']), validate(schemas.idParam, 'params'), validate(schemas.updateUser), users.updateUser);
+router.delete('/:id', authorize(['admin', 'principal', 'hod', 'supervisor']), validate(schemas.idParam, 'params'), users.deleteUser);
 router.put('/:scholarId/assign-supervisor', authorize(['admin', 'hod']), validate(schemas.scholarIdParam, 'params'), validate(schemas.assignSupervisor), users.assignSupervisor);
 router.put('/:scholarId/unassign-supervisor', authorize(['admin', 'hod']), validate(schemas.scholarIdParam, 'params'), users.unassignSupervisor);
 

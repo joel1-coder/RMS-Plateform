@@ -161,6 +161,7 @@ function AppRoutes() {
         <Route path="meetings" element={<MeetingsManagement />} />
         <Route path="progress" element={<ProgressReports />} />
         <Route path="notifications" element={<SupervisorNotifications />} />
+        <Route path="users" element={<UserManagement />} />
         <Route path="profile" element={<SupervisorProfile />} />
         <Route path="dc-members" element={<DCMembersManagement />} />
         <Route path="schedule-dc-meeting" element={<ScheduleDCMeeting />} />
@@ -187,6 +188,7 @@ function AppRoutes() {
         <Route path="supervisors" element={<SupervisorsManagement />} />
         <Route path="allocations" element={<HODAllocations />} />
         <Route path="reports" element={<HODReports />} />
+        <Route path="users" element={<UserManagement />} />
         <Route path="notifications" element={<HODNotifications />} />
       </Route>
 

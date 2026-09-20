@@ -2,6 +2,7 @@ import { apiFetch } from '../../utils/api'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import AppIcon from '../../components/AppIcon'
+import { useAuth } from '../../context/AuthContext'
 
 const ROLES = ['All', 'Admin', 'Supervisor', 'Scholar', 'HOD', 'DRC', 'Principal']
 const STATUSES = ['All', 'Active', 'Inactive']
@@ -10,7 +11,7 @@ const ROLE_COLORS = {
   hod: 'badge-warning', drc: 'badge-success', principal: 'badge-gray',
 }
 
-function UserModal({ onClose, onSave, userToEdit = null }) {
+function UserModal({ onClose, onSave, userToEdit = null, allowedRoles = [] }) {
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -70,7 +71,7 @@ function UserModal({ onClose, onSave, userToEdit = null }) {
               <div className="form-group">
                 <label className="form-label">System Role *</label>
                 <select name="role" className="form-control form-select" value={form.role} onChange={handleChange}>
-                  {ROLES.filter(r => r !== 'All').map(r => <option key={r}>{r}</option>)}
+                  {allowedRoles.map(r => <option key={r}>{r}</option>)}
                 </select>
               </div>
               <div className="form-group">
@@ -303,6 +304,19 @@ function TestAccountsPanel({ scholars }) {
 }
 
 export default function UserManagement() {
+  const { user: currentUser } = useAuth()
+  
+  const allowed = {
+    principal: ['HOD', 'DRC', 'Scholar'],
+    hod: ['Supervisor', 'Scholar'],
+    supervisor: ['Scholar']
+  };
+  const allowedRoles = currentUser?.role?.toLowerCase() === 'admin' 
+    ? ['Admin', 'Supervisor', 'Scholar', 'HOD', 'DRC', 'Principal']
+    : (allowed[currentUser?.role?.toLowerCase()] || []);
+  
+  const filterRoles = ['All', ...allowedRoles];
+
   const [users, setUsers] = useState([])
   const [search, setSearch] = useState('')
   const [filterRole, setFilterRole] = useState('All')
@@ -452,6 +466,7 @@ export default function UserManagement() {
       {(showModal || editingUser) && (
         <UserModal
           userToEdit={editingUser}
+          allowedRoles={allowedRoles}
           onClose={() => {
             setShowModal(false)
             setEditingUser(null)
@@ -539,7 +554,7 @@ export default function UserManagement() {
               value={filterRole}
               onChange={e => setFilterRole(e.target.value)}
             >
-              {ROLES.map(r => <option key={r}>{r}</option>)}
+              {filterRoles.map(r => <option key={r}>{r}</option>)}
             </select>
             <select
               className="form-control form-select"

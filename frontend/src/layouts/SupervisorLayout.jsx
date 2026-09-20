@@ -6,6 +6,7 @@ const NAV_SECTIONS = [
     items: [
       { to: '/supervisor', label: 'Dashboard', icon: 'dashboard', exact: true },
       { to: '/supervisor/scholars', label: 'My Scholars', icon: 'users' },
+      { to: '/supervisor/users', label: 'User Management', icon: 'admin' },
     ],
   },
   {
