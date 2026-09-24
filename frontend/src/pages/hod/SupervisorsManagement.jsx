@@ -1,19 +1,56 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-
-const supervisors = [
-  { id: 'SUP-001', name: 'Dr. Alan Turing Jr.', email: 'a.turing@university.edu', dept: 'Computer Science', specialization: 'Quantum Computing, AI', scholars: 8, maxScholars: 10, status: 'Available', joined: 'Jan 2019' },
-  { id: 'SUP-002', name: 'Dr. Linda Gray', email: 'l.gray@university.edu', dept: 'Biotechnology', specialization: 'Molecular Biology, Genomics', scholars: 10, maxScholars: 10, status: 'At Capacity', joined: 'Mar 2017' },
-  { id: 'SUP-003', name: 'Dr. Robert Chen', email: 'r.chen@university.edu', dept: 'Renewable Energy', specialization: 'Solar Tech, Energy Storage', scholars: 6, maxScholars: 8, status: 'Available', joined: 'Aug 2020' },
-  { id: 'SUP-004', name: 'Dr. Wei Zhang', email: 'w.zhang@university.edu', dept: 'Cybersecurity', specialization: 'Network Security, Cryptography', scholars: 4, maxScholars: 8, status: 'Available', joined: 'Jun 2021' },
-  { id: 'SUP-005', name: 'Prof. Lisa Cuddy', email: 'l.cuddy@university.edu', dept: 'Data Science', specialization: 'Machine Learning, Statistics', scholars: 9, maxScholars: 10, status: 'Near Capacity', joined: 'Feb 2016' },
-]
+import { apiFetch } from '../../utils/api'
+import { useAuth } from '../../context/AuthContext'
 
 export default function SupervisorsManagement() {
+  const { user } = useAuth()
+  const [supervisors, setSupervisors] = useState([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('All')
   const [showAddModal, setShowAddModal] = useState(false)
   const [newSup, setNewSup] = useState({ name: '', email: '', dept: '', specialization: '' })
+
+  const fetchSupervisors = async () => {
+    try {
+      const token = sessionStorage.getItem('rms_token')
+      const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
+      const [supsRes, scholarsRes] = await Promise.all([
+        apiFetch(`/api/users?role=supervisor${deptFilter}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        apiFetch(`/api/users?role=scholar`, { headers: { 'Authorization': `Bearer ${token}` } })
+      ])
+      
+      const sups = await supsRes.json()
+      const scholars = await scholarsRes.json()
+
+      const supsWithStats = sups.map(s => {
+        const scholarsCount = scholars.filter(sch => sch.assignedSupervisorId === s.id).length
+        const maxScholars = 8
+        const status = scholarsCount >= maxScholars ? 'At Capacity' : scholarsCount >= maxScholars - 2 ? 'Near Capacity' : 'Available'
+        return {
+          id: s.id,
+          name: s.name,
+          email: s.email,
+          dept: s.dept,
+          specialization: s.profile?.area || 'General',
+          scholars: scholarsCount,
+          maxScholars,
+          status,
+          joined: new Date(s.joined || s.createdAt).toLocaleDateString()
+        }
+      })
+      setSupervisors(supsWithStats)
+    } catch (err) {
+      toast.error('Failed to load supervisors')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchSupervisors()
+  }, [user?.dept])
 
   const filtered = supervisors.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.dept.toLowerCase().includes(search.toLowerCase())
@@ -21,16 +58,38 @@ export default function SupervisorsManagement() {
     return matchSearch && matchStatus
   })
 
-  const handleAdd = () => {
-    if (!newSup.name || !newSup.email) { toast.error('Please fill required fields'); return }
-    toast.success(`Supervisor ${newSup.name} added successfully!`)
-    setShowAddModal(false)
-    setNewSup({ name: '', email: '', dept: '', specialization: '' })
+  const handleAdd = async () => {
+    if (!newSup.name || !newSup.email || !newSup.dept) { toast.error('Please fill required fields'); return }
+    
+    try {
+      const token = sessionStorage.getItem('rms_token')
+      const res = await apiFetch('/api/users', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...newSup, role: 'supervisor', password: 'password123', status: 'Active' })
+      })
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.message || 'Failed to add supervisor')
+      }
+      toast.success(`Supervisor ${newSup.name} added successfully!`)
+      setShowAddModal(false)
+      setNewSup({ name: '', email: '', dept: '', specialization: '' })
+      fetchSupervisors()
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
   const statusColor = s => s === 'Available' ? 'badge-success' : s === 'At Capacity' ? 'badge-danger' : 'badge-warning'
   const loadPct = (s, max) => Math.round((s / max) * 100)
   const loadColor = pct => pct >= 90 ? '#B4232A' : pct >= 70 ? '#C89B1E' : '#1E7D45'
+
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div className="spinner" style={{ borderColor: 'rgba(23,78,166,0.18)', borderTopColor: '#174EA6' }} />
+    </div>
+  )
 
   return (
     <div className="animate-fade">

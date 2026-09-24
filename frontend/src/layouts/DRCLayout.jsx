@@ -8,7 +8,7 @@ const NAV = [
   { to: '/drc/meetings', label: 'Meeting Management', icon: 'calendar' },
   { to: '/drc/minutes', label: 'Meeting Minutes', icon: 'file' },
   { to: '/drc/reports', label: 'Reports', icon: 'file' },
-  { to: '/drc/notifications', label: 'Notifications', icon: 'bell', badge: 3 },
+  { to: '/drc/notifications', label: 'Notifications', icon: 'bell' },
 ]
 
 export default function DRCLayout() {

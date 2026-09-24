@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { to: '/admin/drc', label: 'Meetings', icon: 'calendar', section: 'MANAGEMENT' },
   { to: '/admin/reports', label: 'Reports', icon: 'file', section: 'ANALYTICS' },
   { to: '/admin/audit', label: 'Audit Log', icon: 'audit', section: 'ANALYTICS' },
-  { to: '/admin/notifications', label: 'Notifications', icon: 'bell', badge: 3, section: 'SYSTEM' },
+  { to: '/admin/notifications', label: 'Notifications', icon: 'bell', section: 'SYSTEM' },
   { to: '/admin/settings', label: 'Settings', icon: 'settings', section: 'SYSTEM' },
 ]
 

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { apiFetch } from '../utils/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 import AppIcon from '../components/AppIcon'
@@ -16,6 +17,26 @@ export default function PortalLayout({
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [unreadNotifs, setUnreadNotifs] = useState(0)
+
+  useEffect(() => {
+    const fetchNotifs = async () => {
+      try {
+        const token = sessionStorage.getItem('rms_token')
+        if (!token) return
+        const res = await apiFetch('/api/notifications', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setUnreadNotifs(data.filter(n => !n.read).length)
+        }
+      } catch (err) {
+        console.error('Failed to fetch notifications', err)
+      }
+    }
+    fetchNotifs()
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -84,7 +105,11 @@ export default function PortalLayout({
                 >
                   <span className="nav-icon"><AppIcon name={item.icon} size={18} /></span>
                   <span>{item.label}</span>
-                  {item.badge && <span className="nav-badge">{item.badge}</span>}
+                  {item.label === 'Notifications' && unreadNotifs > 0 ? (
+                    <span className="nav-badge">{unreadNotifs}</span>
+                  ) : item.label !== 'Notifications' && item.badge ? (
+                    <span className="nav-badge">{item.badge}</span>
+                  ) : null}
                 </NavLink>
               ))}
             </div>

@@ -13,7 +13,7 @@ const NAV_ITEMS = [
   { to: '/scholar/progress', label: 'Progress Report', icon: 'file', section: 'EXAMINATIONS' },
   { to: '/scholar/publications', label: 'Publications', icon: 'pen', section: 'ACADEMIC' },
   { to: '/scholar/schedule', label: 'My Schedule', icon: 'calendar', section: 'ACADEMIC' },
-  { to: '/scholar/notifications', label: 'Notifications', icon: 'bell', badge: 5, section: 'SYSTEM' },
+  { to: '/scholar/notifications', label: 'Notifications', icon: 'bell', section: 'SYSTEM' },
 ]
 
 export default function ScholarLayout() {

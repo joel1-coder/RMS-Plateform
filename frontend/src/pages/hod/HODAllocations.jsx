@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/AuthContext'
+import { apiFetch } from '../../utils/api'
 
 export default function HODAllocations() {
   const { user } = useAuth()
@@ -18,8 +19,8 @@ export default function HODAllocations() {
       const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
 
       const [scholarsRes, facultyRes] = await Promise.all([
-        fetch(`/api/users?role=scholar${deptFilter}`, { headers }),
-        fetch(`/api/users?role=supervisor${deptFilter}`, { headers })
+        apiFetch(`/api/users?role=scholar${deptFilter}`, { headers }),
+        apiFetch(`/api/users?role=supervisor${deptFilter}`, { headers })
       ])
 
       const scholarsData = await scholarsRes.json()
@@ -59,7 +60,7 @@ export default function HODAllocations() {
     
     try {
       const token = sessionStorage.getItem('rms_token')
-      const res = await fetch(`/api/users/${selectedScholar.id || selectedScholar._id}/assign-supervisor`, {
+      const res = await apiFetch(`/api/users/${selectedScholar.id || selectedScholar._id}/assign-supervisor`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

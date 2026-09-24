@@ -10,6 +10,8 @@ const milestones = [
   { icon: '', label: 'AUDIT SUBMISSION', title: 'Institutional Compliance', sub: 'Status: Critical', date: 'Dec 05', urgent: true },
 ]
 
+import { apiFetch } from '../../utils/api'
+
 export default function HODDashboard() {
   const { user } = useAuth()
   const [data, setData] = useState(null)
@@ -19,7 +21,7 @@ export default function HODDashboard() {
     const fetchData = async () => {
       try {
         const token = sessionStorage.getItem('rms_token')
-        const res = await fetch('/api/reports/hod-dashboard', {
+        const res = await apiFetch('/api/reports/hod-dashboard', {
           headers: { Authorization: `Bearer ${token}` }
         })
         if (!res.ok) throw new Error('Failed to fetch dashboard data')

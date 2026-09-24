@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 const STATUS_COLORS = { Active: 'badge-success', Completed: 'badge-info', 'On Hold': 'badge-warning', Inactive: 'badge-danger' }
 const AREA_COLORS = { 'Quantum Computing': '#174EA6', 'Machine Learning': '#174EA6', 'Biotechnology': '#1E7D45', 'Renewable Energy': '#C89B1E', 'Cybersecurity': '#B4232A', 'Data Science': '#B4232A' }
 
+import { apiFetch } from '../../utils/api'
+
 export default function DepartmentScholars() {
   const { user } = useAuth()
   const [scholars, setScholars] = useState([])
@@ -19,7 +21,7 @@ export default function DepartmentScholars() {
       try {
         const token = sessionStorage.getItem('rms_token')
         const deptFilter = user?.dept && user.dept !== 'All' ? `&dept=${user.dept}` : ''
-        const res = await fetch(`/api/users?role=scholar${deptFilter}`, {
+        const res = await apiFetch(`/api/users?role=scholar${deptFilter}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         if (!res.ok) throw new Error('Failed to fetch scholars')
