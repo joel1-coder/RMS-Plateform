@@ -112,7 +112,7 @@ export default function ThesisManagement() {
                     <td><span className={`badge ${STATUS_COLORS[thesis.status]}`}>{thesis.status}</span></td>
                     <td>
                       <div style={{ display: 'flex', gap: '5px' }}>
-                        <button className="btn btn-secondary btn-sm" title="View"></button>
+                        <button className="btn btn-secondary btn-sm" title="View">🛠️ View</button>
                         {thesis.status === 'Under Review' && <>
                           <button className="btn btn-success btn-sm" onClick={() => changeStatus(thesis.id, 'Approved')} title="Approve"></button>
                           <button className="btn btn-danger btn-sm" onClick={() => changeStatus(thesis.id, 'Revision Required')} title="Request Revision"></button>

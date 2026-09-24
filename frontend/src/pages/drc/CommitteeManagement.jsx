@@ -154,7 +154,7 @@ export default function CommitteeManagement() {
                         <button className="btn btn-secondary btn-sm" style={{ fontSize: '11px', padding: '3px 8px' }} onClick={() => toggleStatus(c.id)}>
                           Toggle Status
                         </button>
-                        <button className="btn btn-ghost btn-sm" title="Edit Members"></button>
+                        <button className="btn btn-ghost btn-sm" title="Edit Members">🛠️ Edit Members</button>
                       </div>
                     </td>
                   </tr>

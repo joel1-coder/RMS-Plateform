@@ -359,7 +359,7 @@ export default function ResearchManagement() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '4px' }}>
-                          <button className="btn btn-ghost btn-sm" title="View"></button>
+                          <button className="btn btn-ghost btn-sm" title="View">🛠️ View</button>
                           <button className="btn btn-secondary btn-sm" onClick={() => setEditingProject(r)} title="Edit"></button>
                           <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }} onClick={() => handleDelete(r.id || r._id)} title="Delete"></button>
                         </div>

@@ -274,7 +274,7 @@ export default function SynopsisReview() {
                                 title="Download PDF"
                                 style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
                               >
-                                
+                                📄 Download
                               </a>
                             )}
                           </div>

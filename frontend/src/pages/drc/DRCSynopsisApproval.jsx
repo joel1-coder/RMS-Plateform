@@ -159,7 +159,7 @@ export default function DRCSynopsisApproval() {
                     <td>
                       <div style={{ display: 'flex', gap: '5px' }}>
                         <button className="btn btn-secondary btn-sm" style={{ fontSize: '11px', padding: '4px 8px' }} onClick={() => setSelectedSub(sub)}>Review & Sign</button>
-                        <button className="btn btn-ghost btn-sm" title="View Document File"></button>
+                        <button className="btn btn-ghost btn-sm" title="View Document File">🛠️ View Document File</button>
                       </div>
                     </td>
                   </tr>

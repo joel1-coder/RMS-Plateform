@@ -236,9 +236,7 @@ export default function ScholarProgress() {
                               className="btn btn-secondary btn-sm"
                               title="Download"
                               style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
-                            >
-                              
-                            </a>
+                            >📄 Download</a>
                           )}
                         </div>
                       </td>

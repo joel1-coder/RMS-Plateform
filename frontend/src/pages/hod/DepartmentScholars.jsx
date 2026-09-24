@@ -136,8 +136,8 @@ export default function DepartmentScholars() {
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '4px' }}>
-                        <button className="btn btn-ghost btn-sm" title="View"></button>
-                        <button className="btn btn-ghost btn-sm" title="Edit"></button>
+                        <button className="btn btn-ghost btn-sm" title="View">🛠️ View</button>
+                        <button className="btn btn-ghost btn-sm" title="Edit">🛠️ Edit</button>
                         {s.assignedSupervisorId && (
                           <button className="btn btn-ghost btn-sm" title="Reassign" onClick={() => toast('Go to Allocations tab to reassign')}></button>
                         )}

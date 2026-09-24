@@ -353,9 +353,7 @@ export default function ScholarDocuments() {
                               className="btn btn-secondary btn-sm"
                               title="Download"
                               style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-                            >
-                              
-                            </a>
+                            >📄 Download</a>
                           )}
                           <button className="btn btn-ghost btn-sm" style={{ color: '#B4232A' }} title="Delete" onClick={() => handleDelete(doc)}></button>
                         </div>
