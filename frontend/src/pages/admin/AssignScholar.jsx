@@ -212,11 +212,10 @@ export default function AssignScholar() {
                         placeholder={
                           selectedScholar
                             ? `Search ${scholars.find(s => (s.id || s._id) === selectedScholar)?.dept || ''} supervisor...`
-                            : "Select a scholar first..."
+                            : "Type to search supervisor..."
                         }
                         value={supervisorSearch}
                         onChange={handleSupervisorSearchChange}
-                        disabled={!selectedScholar}
                         required
                       />
                       <datalist id="supervisors-datalist">
