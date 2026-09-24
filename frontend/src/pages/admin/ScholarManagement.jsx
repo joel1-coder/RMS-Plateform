@@ -93,7 +93,18 @@ function EditableCell({ row, col, isEditing, onStartEdit, onCancel, onCommit }) 
   const inputRef = useRef(null);
 
   useEffect(() => { setDraft(value ?? ""); }, [value, isEditing]);
-  useEffect(() => { if (isEditing && inputRef.current) inputRef.current.focus(); }, [isEditing]);
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      if ((col.type === "date" || col.type === "dateOrMonths") && typeof inputRef.current.showPicker === "function") {
+        try {
+          inputRef.current.showPicker();
+        } catch (e) {
+          // ignore if browser blocks auto showPicker
+        }
+      }
+    }
+  }, [isEditing, col.type]);
 
   const commit = (v) => onCommit(col.key, v);
   const handleKeyDown = (e) => {
@@ -102,24 +113,24 @@ function EditableCell({ row, col, isEditing, onStartEdit, onCancel, onCommit }) 
   };
 
   if (!isEditing) {
-    if (col.type === "date" && value) {
+    if (col.type === "date") {
+      if (value) {
+        return (
+          <div onClick={onStartEdit} onDoubleClick={onStartEdit} className="editable-date" title="Click to edit date">
+            <span className="dot dot-green" />
+            <span>{value}</span>
+          </div>
+        );
+      }
       return (
-        <div onDoubleClick={onStartEdit} className="editable-date">
-          <span className={`dot ${col.group === "Date of Fees Payment" ? "dot-green" : "dot-gray"}`} />
-          <span>{value}</span>
-        </div>
-      );
-    }
-    if (col.group === "Date of Fees Payment" && !value) {
-      return (
-        <div onDoubleClick={onStartEdit} className="editable-date">
+        <div onClick={onStartEdit} onDoubleClick={onStartEdit} className="editable-date" title="Click to select date">
           <span className="dot dot-red" />
-          <span className="text-red">Pending</span>
+          <span className="text-red">{col.group === "Date of Fees Payment" ? "Pending" : "Not Finished"}</span>
         </div>
       );
     }
     return (
-      <div onDoubleClick={onStartEdit} className="editable-cell-wrapper" title={value || "Double-click to edit"}>
+      <div onClick={onStartEdit} onDoubleClick={onStartEdit} className="editable-cell-wrapper" title={value || "Click or double-click to edit"}>
         {value || <span style={{ color: "#cbd5e1" }}>—</span>}
       </div>
     );
@@ -204,6 +215,8 @@ export default function ScholarManagement() {
   const [department, setDepartment] = useState("");
   const [paymentFilter, setPaymentFilter] = useState("");
   const [dcFilter, setDcFilter] = useState("");
+  const [synopsisFilter, setSynopsisFilter] = useState("");
+  const [vivaFilter, setVivaFilter] = useState("");
 
   const stickyOffsets = useMemo(() => computeStickyOffsets(COLUMNS), []);
   const departments = useMemo(() => [...new Set(rows.map((r) => r.department).filter(Boolean))], [rows]);
@@ -223,6 +236,16 @@ export default function ScholarManagement() {
         if (dcFilter === "completed" && !anyDone) return false;
         if (dcFilter === "none" && anyDone) return false;
       }
+      if (synopsisFilter) {
+        const isDone = !!row.synopsisSubmittedOn;
+        if (synopsisFilter === "completed" && !isDone) return false;
+        if (synopsisFilter === "pending" && isDone) return false;
+      }
+      if (vivaFilter) {
+        const isDone = !!row.publicVivaOn;
+        if (vivaFilter === "completed" && !isDone) return false;
+        if (vivaFilter === "pending" && isDone) return false;
+      }
       if (search) {
         const q = search.toLowerCase();
         const hay = [row.scholarName, row.regNo, row.guideName, row.remarks].join(" ").toLowerCase();
@@ -230,7 +253,7 @@ export default function ScholarManagement() {
       }
       return true;
     });
-  }, [rows, department, paymentFilter, dcFilter, search]);
+  }, [rows, department, paymentFilter, dcFilter, synopsisFilter, vivaFilter, search]);
 
   const updateRow = (visibleIndex, nextRow) => {
     const targetRow = filteredRows[visibleIndex];
@@ -295,6 +318,16 @@ export default function ScholarManagement() {
           <option value="">DC Meeting: Any</option>
           <option value="completed">At Least One Completed</option>
           <option value="none">None Completed</option>
+        </select>
+        <select value={synopsisFilter} onChange={(e) => setSynopsisFilter(e.target.value)}>
+          <option value="">Synopsis: Any</option>
+          <option value="completed">Submitted / Completed</option>
+          <option value="pending">Not Finished</option>
+        </select>
+        <select value={vivaFilter} onChange={(e) => setVivaFilter(e.target.value)}>
+          <option value="">Public Viva: Any</option>
+          <option value="completed">Completed</option>
+          <option value="pending">Not Finished</option>
         </select>
         <div style={{ flex: 1 }} />
         <button onClick={addRow} className="ledger-btn ledger-btn-primary">+ Add Row</button>
