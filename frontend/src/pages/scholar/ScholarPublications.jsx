@@ -123,7 +123,7 @@ function AddPublicationModal({ onClose, onSave }) {
         <div className="modal" style={{ maxWidth: 620 }}>
           <div className="modal-header">
             <span className="modal-title">Add Publication - Select Type</span>
-            <button className="modal-close" onClick={onClose}></button>
+            <button className="modal-close" onClick={onClose} style={{ fontSize: "20px", lineHeight: "1", display: "flex", alignItems: "center", justifyContent: "center" }}>&times;</button>
           </div>
           <div className="modal-body">
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
@@ -175,7 +175,7 @@ function AddPublicationModal({ onClose, onSave }) {
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{form.pubType}</div>
             </div>
           </div>
-          <button className="modal-close" style={{ color: '#fff' }} onClick={onClose}></button>
+          <button className="modal-close" style={{ color: '#fff' }} onClick={onClose} style={{ fontSize: "20px", lineHeight: "1", display: "flex", alignItems: "center", justifyContent: "center" }}>&times;</button>
         </div>
 
         <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', padding: '24px 28px' }}>
@@ -379,7 +379,7 @@ function EditPublicationModal({ pub, onClose, onUpdate }) {
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{pub.type}</div>
             </div>
           </div>
-          <button className="modal-close" style={{ color: '#fff' }} onClick={onClose}></button>
+          <button className="modal-close" style={{ color: '#fff' }} onClick={onClose} style={{ fontSize: "20px", lineHeight: "1", display: "flex", alignItems: "center", justifyContent: "center" }}>&times;</button>
         </div>
 
         <div className="modal-body" style={{ padding: '24px 28px' }}>

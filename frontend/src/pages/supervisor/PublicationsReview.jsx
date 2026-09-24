@@ -57,7 +57,7 @@ function ViewPublicationModal({ pub, onClose, onAction }) {
       <div className="modal" style={{ maxWidth: 580 }}>
         <div className="modal-header">
           <span className="modal-title">Publication Details</span>
-          <button className="modal-close" onClick={onClose}></button>
+          <button className="modal-close" onClick={onClose} style={{ fontSize: "20px", lineHeight: "1", display: "flex", alignItems: "center", justifyContent: "center" }}>&times;</button>
         </div>
         <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>

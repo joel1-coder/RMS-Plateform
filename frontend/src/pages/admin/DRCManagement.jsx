@@ -48,7 +48,7 @@ function AssignMeetingModal({ onClose, onSave, editData = null }) {
       <div className="modal">
         <div className="modal-header">
           <span className="modal-title">{editData ? 'Edit Meeting Details' : 'Assign New Meeting'}</span>
-          <button className="modal-close" onClick={onClose}></button>
+          <button className="modal-close" onClick={onClose} style={{ fontSize: "20px", lineHeight: "1", display: "flex", alignItems: "center", justifyContent: "center" }}>&times;</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">

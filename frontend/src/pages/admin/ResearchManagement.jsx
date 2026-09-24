@@ -47,7 +47,7 @@ function ResearchModal({ onClose, onSave, editData = null, scholarsList = [] }) 
       <div className="modal" style={{ maxWidth: '600px' }}>
         <div className="modal-header">
           <span className="modal-title">{editData ? 'Edit Research Project' : 'Add New Research Project'}</span>
-          <button className="modal-close" onClick={onClose}></button>
+          <button className="modal-close" onClick={onClose} style={{ fontSize: "20px", lineHeight: "1", display: "flex", alignItems: "center", justifyContent: "center" }}>&times;</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
