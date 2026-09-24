@@ -9,6 +9,7 @@ export default function SynopsisReview() {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
 
   const fetchSubmissions = async () => {
     try {
@@ -97,8 +98,8 @@ export default function SynopsisReview() {
         <div className="modal-backdrop">
           <div className="modal">
             <div className="modal-header">
-              <span className="modal-title">Review Synopsis Submission</span>
-              <button className="modal-close" onClick={() => setSelectedSub(null)} style={{ fontSize: '20px', lineHeight: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
+              <span className="modal-title">{isEditing ? 'Review Synopsis Submission' : 'Submission Review Status'}</span>
+              <button className="modal-close" onClick={() => { setSelectedSub(null); setIsEditing(false); }} style={{ fontSize: '20px', lineHeight: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
             </div>
             <div className="modal-body">
               <div style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
@@ -141,42 +142,59 @@ export default function SynopsisReview() {
                 )}
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Review Remarks / Feedback *</label>
-                <textarea
-                  className="form-control"
-                  rows={4}
-                  placeholder="Enter detailed review feedback or revisions required for the scholar / DRC..."
-                  value={remarks}
-                  onChange={e => setRemarks(e.target.value)}
-                />
+              {isEditing ? (
+                <div className="form-group">
+                  <label className="form-label">Review Remarks / Feedback *</label>
+                  <textarea
+                    className="form-control"
+                    rows={4}
+                    placeholder="Enter detailed review feedback or revisions required for the scholar / DRC..."
+                    value={remarks}
+                    onChange={e => setRemarks(e.target.value)}
+                  />
+                </div>
+              ) : (
+                <div className="form-group">
+                  <label className="form-label">Previous Review Feedback</label>
+                  <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '13.5px', color: 'var(--text-secondary)' }}>
+                    {selectedSub.remarks || 'No remarks provided.'}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {isEditing ? (
+              <div className="modal-footer" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                <button className="btn btn-ghost btn-sm" onClick={() => { setSelectedSub(null); setIsEditing(false); }}>Cancel</button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  disabled={actionLoading}
+                  onClick={() => handleAction(selectedSub.id, 'Rejected', 'Rejected by supervisor.')}
+                >
+                   Reject
+                </button>
+                <button
+                  className="btn btn-warning btn-sm"
+                  disabled={actionLoading}
+                  onClick={() => handleAction(selectedSub.id, 'Changes Requested', 'Changes requested by supervisor.')}
+                >
+                   Request Changes
+                </button>
+                <button
+                  className="btn btn-primary btn-sm"
+                  style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
+                  disabled={actionLoading}
+                  onClick={() => handleAction(selectedSub.id, 'Pending DRC Review', 'Approved by supervisor. Forwarded to DRC committee.')}
+                >
+                  {actionLoading ? 'Processing...' : ' Approve & Forward to DRC'}
+                </button>
               </div>
-            </div>
-            <div className="modal-footer" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => setSelectedSub(null)}>Cancel</button>
-              <button
-                className="btn btn-danger btn-sm"
-                disabled={actionLoading}
-                onClick={() => handleAction(selectedSub.id, 'Rejected', 'Rejected by supervisor.')}
-              >
-                 Reject
-              </button>
-              <button
-                className="btn btn-warning btn-sm"
-                disabled={actionLoading}
-                onClick={() => handleAction(selectedSub.id, 'Changes Requested', 'Changes requested by supervisor.')}
-              >
-                 Request Changes
-              </button>
-              <button
-                className="btn btn-primary btn-sm"
-                style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
-                disabled={actionLoading}
-                onClick={() => handleAction(selectedSub.id, 'Pending DRC Review', 'Approved by supervisor. Forwarded to DRC committee.')}
-              >
-                {actionLoading ? 'Processing...' : ' Approve & Forward to DRC'}
-              </button>
-            </div>
+            ) : (
+              <div className="modal-footer" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                <button className="btn btn-outline btn-sm" onClick={() => setIsEditing(true)}>Alter Decision</button>
+                <button className="btn btn-primary btn-sm" onClick={() => { setSelectedSub(null); setIsEditing(false); }}>Close</button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -262,8 +280,12 @@ export default function SynopsisReview() {
                         </td>
                         <td>
                           <div style={{ display: 'flex', gap: '5px' }}>
-                            <button className="btn btn-secondary btn-sm" onClick={() => setSelectedSub(sub)}>
-                              Review
+                            <button className="btn btn-secondary btn-sm" onClick={() => {
+                              setSelectedSub(sub);
+                              setRemarks(sub.remarks || '');
+                              setIsEditing(sub.status === 'Pending Supervisor Review' || sub.status === 'Pending');
+                            }}>
+                              {sub.status === 'Pending Supervisor Review' || sub.status === 'Pending' ? 'Review' : 'View'}
                             </button>
                             {sub.fileUrl && (
                               <a
