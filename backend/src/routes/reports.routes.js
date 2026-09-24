@@ -11,6 +11,7 @@ router.get('/admin-dashboard', authorize(['admin']), reports.getAdminDashboardSt
 
 router.use(authorize(['admin', 'hod', 'drc']));
 router.get('/hod-dashboard', authorize(['hod']), reports.getHodDashboardStats);
+router.get('/drc-dashboard', authorize(['drc']), reports.getDrcDashboardStats);
 
 // TODO: VERIFY_INFERENCE Routes are present in route-map.json but absent from api-spec.json.
 router.get('/scholar', validate(schemas.scholarReportQuery, 'query'), reports.scholarReport);

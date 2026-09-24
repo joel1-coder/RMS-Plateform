@@ -1,25 +1,39 @@
+import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-
-const drcStats = [
-  { label: 'Active Committees', value: '12', icon: '', color: 'blue', sub: 'Across CS & Biotech' },
-  { label: 'Meetings Scheduled', value: '03', icon: '', color: 'green', sub: 'Next: Oct 25, 10 AM' },
-  { label: 'Approved YTD', value: '48', icon: '', color: 'green', sub: 'On track' },
-]
-
-const activityData = [
-  { name: 'Jan-Mar', Approved: 12, Rejected: 2 },
-  { name: 'Apr-Jun', Approved: 18, Rejected: 4 },
-  { name: 'Jul-Sep', Approved: 15, Rejected: 1 },
-  { name: 'Oct-Dec', Approved: 18, Rejected: 3 },
-]
-
-
-const upcomingMeetings = [
-  { id: 1, title: 'DRC Evaluation Panel (CS)', date: 'Oct 25, 2023', time: '10:00 AM', room: 'Conference Hall A', members: ['Dr. Mohan Reddy', 'Dr. Sarah Chen', 'Prof. Alan Turing'] },
-  { id: 2, title: 'Synopsis Review Board', date: 'Nov 02, 2023', time: '02:30 PM', room: 'Virtual Room 4', members: ['Dr. Mohan Reddy', 'Dr. Linda Gray'] },
-]
+import { apiFetch } from '../../utils/api'
 
 export default function DRCDashboard() {
+  const [drcStats, setDrcStats] = useState([
+    { label: 'Active Committees', value: '0', icon: '', color: 'blue', sub: 'Across CS & Biotech' },
+    { label: 'Meetings Scheduled', value: '0', icon: '', color: 'green', sub: 'Next: Oct 25, 10 AM' },
+    { label: 'Approved YTD', value: '0', icon: '', color: 'green', sub: 'On track' },
+  ])
+  const [activityData, setActivityData] = useState([])
+  const [upcomingMeetings, setUpcomingMeetings] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = sessionStorage.getItem('rms_token')
+        const res = await apiFetch('/api/reports/drc-dashboard', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setDrcStats(data.drcStats || [])
+          setActivityData(data.activityData || [])
+          setUpcomingMeetings(data.upcomingMeetings || [])
+        }
+      } catch (err) {
+        console.error('Failed to fetch DRC dashboard stats', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDashboardData()
+  }, [])
+
   return (
     <div className="animate-fade">
       {/* Topbar */}

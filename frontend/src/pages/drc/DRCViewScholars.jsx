@@ -1,22 +1,30 @@
 import { useState, useEffect } from 'react'
+import { apiFetch } from '../../utils/api'
 
 export default function DRCViewScholars() {
   const [scholars, setScholars] = useState([])
   const [search, setSearch] = useState('')
   const [selectedScholar, setSelectedScholar] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load users from localStorage (rms_all_users)
-    const stored = localStorage.getItem('rms_all_users')
-    if (stored) {
+    const fetchScholars = async () => {
       try {
-        const users = JSON.parse(stored)
-        const scholarList = users.filter(u => u.role?.toLowerCase() === 'scholar')
-        setScholars(scholarList)
+        const token = sessionStorage.getItem('rms_token')
+        const res = await apiFetch('/api/users?role=scholar', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setScholars(data)
+        }
       } catch (e) {
-        console.error('Failed to parse users', e)
+        console.error('Failed to fetch scholars', e)
+      } finally {
+        setLoading(false)
       }
     }
+    fetchScholars()
   }, [])
 
   // Helper to determine if a scholar joined recently (e.g., 2024 or 2026)

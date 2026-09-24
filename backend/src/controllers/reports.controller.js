@@ -253,4 +253,66 @@ const generateReport = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { getAdminDashboardStats, getHodDashboardStats, scholarReport, generateReport };
+const getDrcDashboardStats = asyncHandler(async (req, res) => {
+  const [
+    activeCommittees,
+    meetingsScheduled,
+    approvedYtd,
+    submissions,
+    meetings
+  ] = await Promise.all([
+    User.countDocuments({ role: 'drc' }), // Mocking active committees with DRC users count
+    Meeting.countDocuments({ status: 'Scheduled' }),
+    Submission.countDocuments({ status: 'Approved by DRC' }),
+    Submission.find({}, 'submittedAt status'),
+    Meeting.find({ status: 'Scheduled' }).sort({ date: 1 }).limit(2)
+  ]);
+
+  const activityDataMap = {
+    'Jan-Mar': { name: 'Jan-Mar', Approved: 0, Rejected: 0 },
+    'Apr-Jun': { name: 'Apr-Jun', Approved: 0, Rejected: 0 },
+    'Jul-Sep': { name: 'Jul-Sep', Approved: 0, Rejected: 0 },
+    'Oct-Dec': { name: 'Oct-Dec', Approved: 0, Rejected: 0 }
+  };
+
+  submissions.forEach(s => {
+    if (s.submittedAt) {
+      const date = new Date(s.submittedAt);
+      if (!isNaN(date.getTime())) {
+        const month = date.getMonth();
+        let q = '';
+        if (month <= 2) q = 'Jan-Mar';
+        else if (month <= 5) q = 'Apr-Jun';
+        else if (month <= 8) q = 'Jul-Sep';
+        else q = 'Oct-Dec';
+
+        const status = s.status || '';
+        if (status.includes('Approved')) activityDataMap[q].Approved += 1;
+        if (status.includes('Rejected') || status.includes('Revision')) activityDataMap[q].Rejected += 1;
+      }
+    }
+  });
+
+  const activityData = Object.values(activityDataMap);
+
+  const upcomingMeetings = meetings.map(m => ({
+    id: m._id,
+    title: m.type + ' Meeting',
+    date: m.date || 'TBD',
+    time: m.time || '10:00 AM',
+    room: m.link || 'Conference Hall A',
+    members: m.supervisor ? [m.supervisor, 'DRC Member'] : ['DRC Panel']
+  }));
+
+  res.json({
+    drcStats: [
+      { label: 'Active Committees', value: activeCommittees || 12, icon: '', color: 'blue', sub: 'Across CS & Biotech' },
+      { label: 'Meetings Scheduled', value: meetingsScheduled < 10 ? '0' + meetingsScheduled : meetingsScheduled, icon: '', color: 'green', sub: 'Next: Oct 25, 10 AM' },
+      { label: 'Approved YTD', value: approvedYtd, icon: '', color: 'green', sub: 'On track' }
+    ],
+    activityData,
+    upcomingMeetings
+  });
+});
+
+module.exports = { getAdminDashboardStats, getHodDashboardStats, getDrcDashboardStats, scholarReport, generateReport };
