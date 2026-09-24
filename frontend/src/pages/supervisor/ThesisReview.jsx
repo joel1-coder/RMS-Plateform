@@ -35,7 +35,7 @@ function UploadThesisModal({ onClose, onUpload, scholars }) {
       <div className="modal">
         <div className="modal-header">
           <span className="modal-title">Upload Scholar Thesis Draft</span>
-          <button className="modal-close" onClick={onClose}></button>
+          <button className="modal-close" onClick={onClose} style={{ fontSize: '20px', lineHeight: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -239,7 +239,7 @@ export default function ThesisReview() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Review Thesis Draft</span>
-              <button className="modal-close" onClick={() => setSelectedSub(null)}></button>
+              <button className="modal-close" onClick={() => setSelectedSub(null)} style={{ fontSize: '20px', lineHeight: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
             </div>
             <div className="modal-body">
               <div style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
@@ -277,7 +277,8 @@ export default function ThesisReview() {
                 />
               </div>
             </div>
-            <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="modal-footer" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setSelectedSub(null)}>Cancel</button>
               <button
                 className="btn btn-danger btn-sm"
                 disabled={actionLoading}
@@ -285,24 +286,21 @@ export default function ThesisReview() {
               >
                  Reject Draft
               </button>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  className="btn btn-warning btn-sm"
-                  disabled={actionLoading}
-                  onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Changes Requested')}
-                >
-                   Request Changes
-                </button>
-                <button
-                  className="btn btn-primary btn-sm"
-                  style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
-                  disabled={actionLoading}
-                  onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Approved')}
-                >
-                  {actionLoading ? 'Saving...' : ' Approve Draft'}
-                </button>
-                <button className="btn btn-ghost" onClick={() => setSelectedSub(null)}>Cancel</button>
-              </div>
+              <button
+                className="btn btn-warning btn-sm"
+                disabled={actionLoading}
+                onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Changes Requested')}
+              >
+                 Request Changes
+              </button>
+              <button
+                className="btn btn-primary btn-sm"
+                style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
+                disabled={actionLoading}
+                onClick={() => handleAction(selectedSub.id || selectedSub._id, 'Approved')}
+              >
+                {actionLoading ? 'Saving...' : ' Approve Draft'}
+              </button>
             </div>
           </div>
         </div>

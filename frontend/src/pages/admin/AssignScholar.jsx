@@ -187,7 +187,11 @@ export default function AssignScholar() {
                       <select
                         className="form-control form-select"
                         value={selectedScholar}
-                        onChange={e => setSelectedScholar(e.target.value)}
+                        onChange={e => {
+                          setSelectedScholar(e.target.value)
+                          setSupervisorSearch('')
+                          setSelectedSupervisor('')
+                        }}
                         required
                       >
                         <option value="">-- Choose Scholar --</option>
@@ -205,13 +209,24 @@ export default function AssignScholar() {
                       <input
                         list="supervisors-datalist"
                         className="form-control"
-                        placeholder="Type to search supervisor..."
+                        placeholder={
+                          selectedScholar
+                            ? `Search ${scholars.find(s => (s.id || s._id) === selectedScholar)?.dept || ''} supervisor...`
+                            : "Select a scholar first..."
+                        }
                         value={supervisorSearch}
                         onChange={handleSupervisorSearchChange}
+                        disabled={!selectedScholar}
                         required
                       />
                       <datalist id="supervisors-datalist">
-                        {supervisors.map(s => (
+                        {supervisors
+                          .filter(s => {
+                            if (!selectedScholar) return true
+                            const cur = scholars.find(sch => (sch.id || sch._id) === selectedScholar)
+                            return cur ? s.dept === cur.dept : true
+                          })
+                          .map(s => (
                           <option key={s.id || s._id} value={`${s.name} (${s.dept})`} />
                         ))}
                       </datalist>

@@ -29,7 +29,17 @@ export default function PortalLayout({
         })
         if (res.ok) {
           const data = await res.json()
-          setUnreadNotifs(data.filter(n => !n.read).length)
+          const unreadCount = data.filter(n => !n.read).length
+          setUnreadNotifs(unreadCount)
+
+          // Show popup toast once per session if there are unread notifications
+          if (unreadCount > 0 && !sessionStorage.getItem('notif_toast_shown')) {
+            toast(`You have ${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}`, {
+              icon: '🔔',
+              duration: 5000,
+            })
+            sessionStorage.setItem('notif_toast_shown', 'true')
+          }
         }
       } catch (err) {
         console.error('Failed to fetch notifications', err)

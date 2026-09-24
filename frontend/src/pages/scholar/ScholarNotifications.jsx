@@ -1,26 +1,61 @@
-import { useState } from 'react'
-
-const notifData = [
-  { id: 1, icon: '', title: 'Chapter 3 Approved', msg: 'Your supervisor Dr. Priya Kumar has approved Chapter 3 - Research Methodology.', time: '10 min ago', read: false, type: 'success' },
-  { id: 2, icon: '', title: 'DRC Meeting Scheduled', msg: 'A DRC progress review meeting is scheduled for July 25, 2024 at 11:00 AM, Board Room 1.', time: '1 hr ago', read: false, type: 'info' },
-  { id: 3, icon: '', title: 'Supervisor Feedback', msg: 'Dr. Kumar added comments on Chapter 4 draft. Please review and revise before Aug 5.', time: '3 hrs ago', read: false, type: 'warning' },
-  { id: 4, icon: '', title: 'Viva Tentatively Scheduled', msg: 'Your viva voce has been tentatively scheduled for November 12, 2024. Details will follow.', time: '1 day ago', read: true, type: 'primary' },
-  { id: 5, icon: '', title: 'Paper Status Update', msg: 'Your paper "Federated Learning Approaches" is currently under review at Springer LNCS.', time: '2 days ago', read: true, type: 'info' },
-  { id: 6, icon: '', title: 'Deadline Reminder', msg: 'Progress report for Jan-Jun 2024 was submitted. Awaiting supervisor sign-off.', time: '3 days ago', read: true, type: 'warning' },
-  { id: 7, icon: '', title: 'Registration Renewal', msg: 'Your PhD registration is due for annual renewal. Submit Form R-12 by July 31, 2024.', time: '5 days ago', read: true, type: 'danger' },
-  { id: 8, icon: '', title: 'Library Book Due', msg: 'Library book "Deep Learning Goodfellow" is due for return on July 25, 2024.', time: '1 week ago', read: true, type: 'info' },
-]
+import { useState, useEffect } from 'react'
+import { apiFetch } from '../../utils/api'
+import toast from 'react-hot-toast'
 
 const TYPE_COLORS = { success: '#1E7D45', info: '#174EA6', warning: '#C89B1E', danger: '#B4232A', primary: '#174EA6' }
 
 export default function ScholarNotifications() {
-  const [notifs, setNotifs] = useState(notifData)
+  const [notifs, setNotifs] = useState([])
   const [filter, setFilter] = useState('all')
+  const [loading, setLoading] = useState(true)
+
+  const fetchNotifs = async () => {
+    try {
+      const token = sessionStorage.getItem('rms_token')
+      const res = await apiFetch('/api/notifications', { headers: { 'Authorization': `Bearer ${token}` } })
+      if (res.ok) {
+        const data = await res.json()
+        setNotifs(data)
+      }
+    } catch (err) {
+      toast.error('Failed to load notifications')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchNotifs()
+  }, [])
 
   const unread = notifs.filter(n => !n.read).length
-  const markAll = () => setNotifs(p => p.map(n => ({ ...n, read: true })))
-  const markRead = id => setNotifs(p => p.map(n => n.id === id ? { ...n, read: true } : n))
-  const del = id => setNotifs(p => p.filter(n => n.id !== id))
+
+  const markAllRead = async () => {
+    try {
+      const token = sessionStorage.getItem('rms_token')
+      await apiFetch('/api/notifications/read', { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } })
+      fetchNotifs()
+      toast.success('All marked as read')
+    } catch (err) {
+      toast.error('Failed to update')
+    }
+  }
+
+  const markRead = async (id) => {
+    // Optimistic update
+    setNotifs(p => p.map(n => n._id === id || n.id === id ? { ...n, read: true } : n))
+  }
+
+  const handleClear = async () => {
+    try {
+      const token = sessionStorage.getItem('rms_token')
+      await apiFetch('/api/notifications/clear', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+      fetchNotifs()
+      toast.success('Cleared all notifications')
+    } catch (err) {
+      toast.error('Failed to clear notifications')
+    }
+  }
 
   const filtered = notifs.filter(n => filter === 'all' ? true : filter === 'unread' ? !n.read : n.read)
 
@@ -34,7 +69,8 @@ export default function ScholarNotifications() {
           </span>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-ghost btn-sm" onClick={markAll}> Mark all read</button>
+          <button className="btn btn-ghost btn-sm" onClick={markAllRead}> Mark all read</button>
+          <button className="btn btn-danger btn-sm" onClick={handleClear}> Clear all</button>
         </div>
       </div>
 
@@ -43,12 +79,12 @@ export default function ScholarNotifications() {
           {[
             { label: 'Total', value: notifs.length, icon: '', color: 'blue' },
             { label: 'Unread', value: unread, icon: '', color: 'blue' },
-            { label: 'Alerts', value: notifs.filter(n => n.type === 'danger').length, icon: '', color: 'red' },
+            { label: 'Alerts', value: notifs.filter(n => n.type === 'danger' || n.type === 'allocation').length, icon: '', color: 'red' },
             { label: 'Reminders', value: notifs.filter(n => n.type === 'warning').length, icon: '', color: 'orange' },
           ].map((s, i) => (
             <div className="stat-card" key={i}>
               <div className={`stat-icon ${s.color}`}>{s.icon}</div>
-              <div className="stat-info"><div className="stat-value">{s.value}</div><div className="stat-label">{s.label}</div></div>
+              <div className="stat-info"><div className="stat-value">{loading ? '--' : s.value}</div><div className="stat-label">{s.label}</div></div>
             </div>
           ))}
         </div>
@@ -65,25 +101,28 @@ export default function ScholarNotifications() {
             ))}
           </div>
 
-          {filtered.length === 0 ? (
+          {loading ? (
+             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading alerts...</div>
+          ) : filtered.length === 0 ? (
             <div className="empty-state"><div className="empty-icon"></div><h3>No notifications</h3><p>You're all caught up!</p></div>
           ) : (
-            filtered.map(n => (
-              <div key={n.id} className={`notification-item${n.read ? '' : ' unread'}`} onClick={() => markRead(n.id)}
-                style={{ borderLeft: !n.read ? `3px solid ${TYPE_COLORS[n.type]}` : '3px solid transparent' }}>
+            filtered.map(n => {
+              const id = n._id || n.id;
+              return (
+              <div key={id} className={`notification-item${n.read ? '' : ' unread'}`} onClick={() => markRead(id)}
+                style={{ borderLeft: !n.read ? `3px solid ${TYPE_COLORS[n.type] || '#174EA6'}` : '3px solid transparent' }}>
                 <div style={{
                   width: 42, height: 42, borderRadius: 'var(--radius-md)', flexShrink: 0,
-                  background: `${TYPE_COLORS[n.type]}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px',
+                  background: `${TYPE_COLORS[n.type] || '#174EA6'}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px',
                 }}>{n.icon}</div>
                 <div className="notification-body">
                   <div className="notification-title">{n.title}</div>
-                  <div className="notification-text">{n.msg}</div>
-                  <div className="notification-time">{n.time}</div>
+                  <div className="notification-text">{n.message}</div>
+                  <div className="notification-time">{new Date(n.createdAt).toLocaleString()}</div>
                 </div>
-                {!n.read && <div style={{ width: 8, height: 8, borderRadius: '50%', background: TYPE_COLORS[n.type], flexShrink: 0, marginTop: 6 }} />}
-                <button onClick={e => { e.stopPropagation(); del(n.id) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', borderRadius: '50%' }}></button>
+                {!n.read && <div style={{ width: 8, height: 8, borderRadius: '50%', background: TYPE_COLORS[n.type] || '#174EA6', flexShrink: 0, marginTop: 6 }} />}
               </div>
-            ))
+            )})
           )}
         </div>
       </div>

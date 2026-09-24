@@ -98,7 +98,7 @@ export default function SynopsisReview() {
           <div className="modal">
             <div className="modal-header">
               <span className="modal-title">Review Synopsis Submission</span>
-              <button className="modal-close" onClick={() => setSelectedSub(null)}></button>
+              <button className="modal-close" onClick={() => setSelectedSub(null)} style={{ fontSize: '20px', lineHeight: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
             </div>
             <div className="modal-body">
               <div style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
@@ -152,7 +152,8 @@ export default function SynopsisReview() {
                 />
               </div>
             </div>
-            <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="modal-footer" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setSelectedSub(null)}>Cancel</button>
               <button
                 className="btn btn-danger btn-sm"
                 disabled={actionLoading}
@@ -160,24 +161,21 @@ export default function SynopsisReview() {
               >
                  Reject
               </button>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  className="btn btn-warning btn-sm"
-                  disabled={actionLoading}
-                  onClick={() => handleAction(selectedSub.id, 'Changes Requested', 'Changes requested by supervisor.')}
-                >
-                   Request Changes
-                </button>
-                <button
-                  className="btn btn-primary btn-sm"
-                  style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
-                  disabled={actionLoading}
-                  onClick={() => handleAction(selectedSub.id, 'Pending DRC Review', 'Approved by supervisor. Forwarded to DRC committee.')}
-                >
-                  {actionLoading ? 'Processing...' : ' Approve & Forward to DRC'}
-                </button>
-                <button className="btn btn-ghost" onClick={() => setSelectedSub(null)}>Cancel</button>
-              </div>
+              <button
+                className="btn btn-warning btn-sm"
+                disabled={actionLoading}
+                onClick={() => handleAction(selectedSub.id, 'Changes Requested', 'Changes requested by supervisor.')}
+              >
+                 Request Changes
+              </button>
+              <button
+                className="btn btn-primary btn-sm"
+                style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}
+                disabled={actionLoading}
+                onClick={() => handleAction(selectedSub.id, 'Pending DRC Review', 'Approved by supervisor. Forwarded to DRC committee.')}
+              >
+                {actionLoading ? 'Processing...' : ' Approve & Forward to DRC'}
+              </button>
             </div>
           </div>
         </div>
