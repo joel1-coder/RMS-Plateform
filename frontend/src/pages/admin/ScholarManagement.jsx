@@ -217,6 +217,7 @@ export default function ScholarManagement() {
   const [dcFilter, setDcFilter] = useState("");
   const [synopsisFilter, setSynopsisFilter] = useState("");
   const [vivaFilter, setVivaFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const stickyOffsets = useMemo(() => computeStickyOffsets(COLUMNS), []);
   const departments = useMemo(() => [...new Set(rows.map((r) => r.department).filter(Boolean))], [rows]);
@@ -246,6 +247,7 @@ export default function ScholarManagement() {
         if (vivaFilter === "completed" && !isDone) return false;
         if (vivaFilter === "pending" && isDone) return false;
       }
+      if (statusFilter && row.status !== statusFilter) return false;
       if (search) {
         const q = search.toLowerCase();
         const hay = [row.scholarName, row.regNo, row.guideName, row.remarks].join(" ").toLowerCase();
@@ -253,7 +255,7 @@ export default function ScholarManagement() {
       }
       return true;
     });
-  }, [rows, department, paymentFilter, dcFilter, synopsisFilter, vivaFilter, search]);
+  }, [rows, department, paymentFilter, dcFilter, synopsisFilter, vivaFilter, search, statusFilter]);
 
   const updateRow = (visibleIndex, nextRow) => {
     const targetRow = filteredRows[visibleIndex];
@@ -328,6 +330,12 @@ export default function ScholarManagement() {
           <option value="">Public Viva: Any</option>
           <option value="completed">Completed</option>
           <option value="pending">Not Finished</option>
+        </select>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <option value="">Status: Any</option>
+          <option value="Continue">Continue</option>
+          <option value="Completed">Completed</option>
+          <option value="Discontinue">Discontinue</option>
         </select>
         <div style={{ flex: 1 }} />
         <button onClick={addRow} className="ledger-btn ledger-btn-primary">+ Add Row</button>
