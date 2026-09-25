@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
+import { apiFetch } from '../../utils/api'
 
 const DEFAULT_SETTINGS = {
   uniName: 'University of Excellence',
@@ -31,10 +32,18 @@ export default function SystemSettings() {
   const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('rms_settings') || 'null')
-      if (stored) setSettings({ ...DEFAULT_SETTINGS, ...stored })
-    } catch {}
+    const fetchSettings = async () => {
+      try {
+        const res = await apiFetch('/api/settings')
+        if (res.ok) {
+          const data = await res.json()
+          setSettings({ ...DEFAULT_SETTINGS, ...data })
+        }
+      } catch (err) {
+        console.error('Failed to load settings from DB:', err)
+      }
+    }
+    fetchSettings()
   }, [])
 
   const handleChange = e => {
@@ -43,10 +52,23 @@ export default function SystemSettings() {
     setHasChanges(true)
   }
 
-  const handleSave = () => {
-    localStorage.setItem('rms_settings', JSON.stringify(settings))
-    toast.success(' Settings saved and applied successfully!')
-    setHasChanges(false)
+  const handleSave = async () => {
+    try {
+      const res = await apiFetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings)
+      })
+      if (res.ok) {
+        toast.success(' Settings saved to MongoDB successfully!')
+        setHasChanges(false)
+      } else {
+        toast.error('Failed to save settings')
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error('Error saving settings')
+    }
   }
 
   const handleReset = () => {
@@ -149,7 +171,7 @@ export default function SystemSettings() {
               {[
                 { label: 'Version', value: 'v2.5.1' },
                 { label: 'Build', value: '#20240718' },
-                { label: 'DB', value: 'LocalStorage' },
+                { label: 'DB', value: 'MongoDB' },
                 { label: 'Status', value: ' Online' },
               ].map((row, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', marginBottom: '3px' }}>

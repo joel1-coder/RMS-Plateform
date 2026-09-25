@@ -18,6 +18,7 @@ const publicationRoutes = require('./routes/publication.routes');
 const auditRoutes = require('./routes/audit.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const testAccountRoutes = require('./routes/testAccount.routes');
+const settingsRoutes = require('./routes/settings.routes');
 const { uploadRoot } = require('./services/storageService');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
@@ -66,6 +67,7 @@ app.use('/api/publication', publicationRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/test-accounts', testAccountRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
