@@ -256,3 +256,39 @@
 .row-completed td {
   border-color: #86efac !important;
 }
+
+@media print {
+  .ledger-toolbar,
+  .ledger-footer-text,
+  .no-print,
+  .ledger-th-sticky-right,
+  .ledger-td-sticky-right {
+    display: none !important;
+  }
+  
+  .ledger-table-wrapper {
+    max-height: none !important;
+    overflow: visible !important;
+    border: none !important;
+  }
+  
+  .ledger-container {
+    background-color: white !important;
+    padding: 0 !important;
+  }
+
+  .ledger-table {
+    width: auto !important;
+    page-break-inside: auto;
+  }
+
+  .ledger-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+}

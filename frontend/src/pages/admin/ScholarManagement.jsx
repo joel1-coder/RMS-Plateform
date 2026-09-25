@@ -373,7 +373,7 @@ export default function ScholarManagement() {
                 </tr>
               );
             })}
-            <tr>
+            <tr className="no-print">
               <td colSpan={COLUMNS.length + 1} style={{ padding: 0 }}>
                 <button onClick={addRow} className="add-row-btn">+ Add Row</button>
               </td>
