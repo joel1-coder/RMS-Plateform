@@ -204,9 +204,14 @@ export default function ScholarDocuments() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Category</label>
-                  <select className="form-control form-select" value={uploadCategory} onChange={e => setUploadCategory(e.target.value)}>
-                    {['Synopsis', 'Thesis', 'Publication', 'Report', 'Certificate', 'Other'].map(c => <option key={c}>{c}</option>)}
-                  </select>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter document category..."
+                    value={uploadCategory}
+                    onChange={e => setUploadCategory(e.target.value)}
+                    required
+                  />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Attach File (PDF, DOCX, ZIP)</label>

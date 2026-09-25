@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const events = [
@@ -23,9 +24,57 @@ const TYPE_ICON = { meeting: '', research: '', drc: '', writing: '' }
 
 export default function ScholarSchedule() {
   const [view, setView] = useState('week')
+  const [showModal, setShowModal] = useState(false)
+
+  const handleAddEvent = (e) => {
+    e.preventDefault()
+    toast.success('Event added to schedule!')
+    setShowModal(false)
+  }
 
   return (
     <div className="animate-fade">
+      {showModal && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <div className="modal-header">
+              <span className="modal-title">Add Event</span>
+              <button className="modal-close" onClick={() => setShowModal(false)} style={{ fontSize: '20px', lineHeight: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
+            </div>
+            <form onSubmit={handleAddEvent}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">Event Title *</label>
+                  <input type="text" className="form-control" placeholder="e.g. Supervisor Meeting" required />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div className="form-group">
+                    <label className="form-label">Date *</label>
+                    <input type="date" className="form-control" required />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Time *</label>
+                    <input type="time" className="form-control" required />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Event Type</label>
+                  <select className="form-control form-select">
+                    <option>Meeting</option>
+                    <option>Research / Lab</option>
+                    <option>DRC / Committee</option>
+                    <option>Thesis Writing</option>
+                  </select>
+                </div>
+              </div>
+              <div className="modal-footer" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}>Save Event</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       <div className="topbar">
         <div>
           <div className="topbar-title">My Schedule</div>
@@ -45,7 +94,7 @@ export default function ScholarSchedule() {
               </button>
             ))}
           </div>
-          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }}>+ Add Event</button>
+          <button className="btn btn-primary btn-sm" style={{ background: 'linear-gradient(90deg,#1E7D45,#166A3A)' }} onClick={() => setShowModal(true)}>+ Add Event</button>
         </div>
       </div>
 
