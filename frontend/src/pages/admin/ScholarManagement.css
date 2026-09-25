@@ -258,6 +258,7 @@
 }
 
 @media print {
+  /* ===== Hide non-printable UI elements ===== */
   .ledger-toolbar,
   .ledger-footer-text,
   .no-print,
@@ -265,20 +266,40 @@
   .ledger-td-sticky-right {
     display: none !important;
   }
-  
+
+  /* ===== Hide sidebar and topbar ===== */
+  .sidebar,
+  .topbar,
+  .mobile-header {
+    display: none !important;
+  }
+
+  /* ===== Remove sidebar margin so content takes full width ===== */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .portal-layout {
+    display: block !important;
+  }
+
+  /* ===== Table container: no scroll, full expansion ===== */
   .ledger-table-wrapper {
     max-height: none !important;
     overflow: visible !important;
-    border: none !important;
-  }
-  
-  .ledger-container {
-    background-color: white !important;
-    padding: 0 !important;
+    border: 1px solid #94a3b8 !important;
   }
 
+  .ledger-container {
+    background-color: white !important;
+    padding: 4mm 0 !important;
+  }
+
+  /* ===== Make the table fit the page ===== */
   .ledger-table {
-    width: auto !important;
+    width: 100% !important;
+    table-layout: fixed !important;
     page-break-inside: auto;
   }
 
@@ -287,8 +308,47 @@
     page-break-after: auto;
   }
 
+  /* ===== Shrink font so all columns fit ===== */
+  .ledger-th-top {
+    font-size: 7px !important;
+    padding: 3px 2px !important;
+    position: static !important;
+  }
+
+  .ledger-th-bottom {
+    font-size: 6.5px !important;
+    padding: 2px !important;
+    position: static !important;
+  }
+
+  .ledger-td {
+    font-size: 7.5px !important;
+    height: auto !important;
+    padding: 2px 3px !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+
+  .editable-cell-wrapper {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    padding: 2px 3px !important;
+  }
+
+  /* ===== Remove sticky positioning for print ===== */
+  .ledger-th-sticky-left,
+  .ledger-td-sticky-left {
+    position: static !important;
+  }
+
+  .ledger-table thead {
+    position: static !important;
+  }
+
+  /* ===== A3 landscape for maximum space ===== */
   @page {
-    size: landscape;
-    margin: 10mm;
+    size: A3 landscape;
+    margin: 8mm;
   }
 }
