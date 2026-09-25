@@ -248,3 +248,11 @@
 .row-discontinued td {
   border-color: #fca5a5 !important;
 }
+
+.row-completed {
+  background-color: #dcfce7 !important;
+  box-shadow: inset 0 0 8px rgba(34, 197, 94, 0.6);
+}
+.row-completed td {
+  border-color: #86efac !important;
+}

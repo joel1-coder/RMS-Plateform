@@ -25,7 +25,7 @@ const COLUMNS = [
   { key: "synopsisSubmittedOn", label: "Synopsis Submitted on", group: null, type: "date", width: 125 },
   { key: "publicVivaOn", label: "Public Viva Voce on", group: null, type: "date", width: 125 },
   { key: "remarks", label: "Remarks", group: null, type: "text", width: 170 },
-  { key: "status", label: "Status", group: null, type: "select", width: 120, options: ["Continue", "Discontinue"] },
+  { key: "status", label: "Status", group: null, type: "select", width: 120, options: ["Continue", "Completed", "Discontinue"] },
 ];
 
 function getGroupedHeaderRows(columns) {
@@ -341,9 +341,10 @@ export default function ScholarManagement() {
           <tbody>
             {filteredRows.map((row, idx) => {
               const isDiscontinued = row.status === "Discontinue";
+              const isCompleted = row.status === "Completed";
               const baseClass = idx % 2 === 0 ? "ledger-tr-even" : "ledger-tr-odd";
-              const rowClass = `${baseClass} ${isDiscontinued ? "row-discontinued" : ""}`;
-              const stickyBg = isDiscontinued ? "#fee2e2" : (idx % 2 === 0 ? "#ffffff" : "#f8fafc");
+              const rowClass = `${baseClass} ${isDiscontinued ? "row-discontinued" : isCompleted ? "row-completed" : ""}`;
+              const stickyBg = isDiscontinued ? "#fee2e2" : isCompleted ? "#dcfce7" : (idx % 2 === 0 ? "#ffffff" : "#f8fafc");
               return (
                 <tr key={row.regNo || row._tempId || idx} className={rowClass}>
                   {COLUMNS.map((col) => {
