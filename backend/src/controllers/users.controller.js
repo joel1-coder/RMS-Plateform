@@ -12,7 +12,8 @@ function checkHierarchy(creatorRole, targetRole) {
   const allowed = {
     principal: ['hod', 'drc', 'scholar'],
     hod: ['supervisor', 'scholar'],
-    supervisor: ['scholar']
+    supervisor: ['scholar'],
+    drc: ['scholar', 'supervisor']
   };
   if (!allowed[creatorRole] || !allowed[creatorRole].includes(targetRole)) {
     throw new AppError(`You are not authorized to manage ${targetRole || 'these'} users`, 403);
@@ -34,7 +35,8 @@ const listUsers = asyncHandler(async (req, res) => {
     const allowed = {
       principal: ['hod', 'drc', 'scholar'],
       hod: ['supervisor', 'scholar'],
-      supervisor: ['scholar']
+      supervisor: ['scholar'],
+      drc: ['scholar', 'supervisor']
     };
     const allowedRoles = allowed[req.user?.role] || [];
     
