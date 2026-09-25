@@ -229,7 +229,7 @@ function StatusScreen({ status, rejectionReason, onLogout, formData }) {
           .hdr p { font-size: 9.5pt; margin-top: 2px; }
           .doc-sub { font-size: 9pt; font-weight: bold; text-decoration: underline; margin-top: 6px; }
           .photo-box {
-            position: absolute; top: 12mm; right: 12mm; width: 35mm; height: 42mm;
+            position: absolute; top: 44mm; right: 12mm; width: 35mm; height: 42mm;
             border: 1px solid #333; text-align: center; display: flex;
             align-items: center; justify-content: center; font-size: 8pt; color: #555;
           }
